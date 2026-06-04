@@ -1,4 +1,6 @@
-# Cricket AI Platform — Instrucciones para Claude Code
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Qué es Cricket
 SaaS multi-tenant que implementa agentes IA para gestionar el customer journey completo.
@@ -29,17 +31,18 @@ payment_initiator skill
 ## Arquitectura del proyecto
 ```
 cricket/
-├── CLAUDE.md                    ← estás aquí
 ├── apps/
 │   ├── dashboard/               → Next.js 15 (App Router) — portal del cliente
 │   └── widget/                  → React — chat embebido para web
 ├── packages/
-│   ├── core/                    → tipos TypeScript, Supabase clients, utils compartidas
-│   ├── agents/                  → agentes Claude (consultation, sales, transactions, feedback)
-│   ├── channels/                → adaptadores WhatsApp, Web Chat, Email
-│   └── sectors/                 → extensiones por sector (banking, retail, health...)
-└── services/
-    └── api/                     → Node.js + Fastify — API principal + webhook receiver
+│   ├── core/                    → tipos TypeScript, Supabase clients (único package creado hasta ahora)
+│   ├── agents/                  → agentes Claude (por crear)
+│   ├── channels/                → adaptadores WhatsApp, Web Chat, Email (por crear)
+│   └── sectors/                 → extensiones por sector (por crear)
+├── services/
+│   └── api/                     → Node.js + Fastify — API principal + webhook receiver (por crear)
+└── supabase/
+    └── migrations/              → cricket_001_initial_schema.sql ya aplicado
 ```
 
 ## Stack
@@ -47,17 +50,41 @@ cricket/
 |------|-----------|
 | Frontend | Next.js 15 (App Router), TypeScript strict, Tailwind |
 | Backend | Node.js + Fastify, TypeScript |
-| DB | Supabase (PostgreSQL 15) con Row Level Security |
-| AI | Anthropic Claude (`claude-sonnet-4-20250514`) |
+| DB | Supabase (PostgreSQL 17) con Row Level Security |
+| AI | Anthropic Claude (`claude-sonnet-4-6`) |
 | Auth | Supabase Auth + JWT custom claims (`tenant_id`, `user_role`) |
 | Multi-tenancy | Subdominio por tenant, resuelto en `apps/dashboard/middleware.ts` |
 | Realtime | Supabase Realtime (escaladas, checkpoints, sesiones activas) |
+
+## Setup inicial (una vez al clonar)
+```bash
+./setup.sh                                          # instala deps, crea .env.local
+# Editar .env.local con las credenciales reales
+npx supabase link --project-ref TU_PROJECT_REF      # conectar CLI al proyecto remoto
+pnpm db:push                                        # aplicar schema
+pnpm db:types                                       # generar tipos TypeScript
+```
+Tras el push, registrar el Auth Hook en Supabase Dashboard:
+`Authentication → Hooks → Custom Access Token → public.cricket_custom_access_token_hook`
+
+## Comandos
+```bash
+pnpm dev          # Levanta dashboard + api en paralelo
+pnpm build        # Compila packages primero, luego apps y services
+pnpm type-check   # Verifica tipos en todos los packages (requiere que exista supabase.generated.ts)
+pnpm db:types     # Regenera packages/core/src/types/supabase.generated.ts (correr tras cada migración)
+pnpm db:push      # Aplica migraciones al proyecto Supabase remoto
+pnpm db:reset     # Resetea la DB local y re-aplica todas las migraciones
+pnpm db:studio    # Abre Supabase Studio local
+```
+
+> `pnpm type-check` falla si `supabase.generated.ts` no existe todavía — correr `pnpm db:types` primero.
 
 ## Reglas de código
 
 ### TypeScript
 - `strict: true` en todos los tsconfig. Cero `any`.
-- Tipos del schema: `@cricket/core/types` → generado con `pnpm db:types`
+- Importar tipos del schema desde `@cricket/core/types` (genera `pnpm db:types`)
 - Errores: usar tipos de error explícitos, nunca `catch(e: any)`
 
 ### Supabase — clientes
@@ -66,6 +93,12 @@ packages/core/src/lib/supabase/client.ts   → cliente browser (Client Component
 packages/core/src/lib/supabase/server.ts   → cliente servidor (Server Components, Route Handlers)
 packages/core/src/lib/supabase/admin.ts    → service_role (SOLO en services/api)
 ```
+Imports via los export paths del package:
+```typescript
+import { createClient } from '@cricket/core/supabase/client'
+import { createClient } from '@cricket/core/supabase/server'
+import { supabaseAdmin }  from '@cricket/core/supabase/admin'
+```
 - ❌ NUNCA usar el cliente browser en Server Components
 - ❌ NUNCA exponer `SUPABASE_SERVICE_ROLE_KEY` en el cliente
 - ❌ NUNCA bypassar RLS desde el dashboard
@@ -73,24 +106,26 @@ packages/core/src/lib/supabase/admin.ts    → service_role (SOLO en services/ap
 ### Multi-tenancy
 - Tenant se resuelve en `apps/dashboard/middleware.ts` leyendo el subdominio del host
 - Header `x-tenant-slug` propaga el slug a todos los Server Components
+- En localhost, el slug viene de `DEV_TENANT_SLUG` (`.env.local`)
 - ❌ NUNCA hardcodear `tenant_id` en ningún query
 
-### Agentes (packages/agents/)
-```typescript
-// Todo agente implementa esta interfaz
-interface Agent {
-  run(input: AgentInput, ctx: AgentContext): Promise<AgentOutput>
-}
+### Agentes (`packages/agents/`)
+Todo agente implementa `Agent { run(input: AgentInput, ctx: AgentContext): Promise<AgentOutput> }`.
 
-// AgentOutput siempre incluye:
+`AgentOutput` completo (definido en `packages/core/src/types/index.ts`):
+```typescript
 interface AgentOutput {
   content: string
-  confidence: number      // 0.000 - 1.000
-  reasoning: string       // chain-of-thought (para audit log)
-  action?: AgentAction    // acción a ejecutar (si la hay)
-  requiresIH?: boolean    // true → crear cognitive_checkpoint antes de continuar
+  confidence: number       // 0.000–1.000; bajo umbral del tenant → requiresIH automático
+  reasoning: string        // chain-of-thought; se persiste en ai_decisions.reasoning
+  toolsUsed: string[]
+  requiresIH: boolean      // true → Journey Engine crea cognitive_checkpoint
+  action?: AgentAction     // acción propuesta; nunca ejecutar si requiresIHApproval = true
+  usage: { promptTokens: number; completionTokens: number }
+  latencyMs: number
 }
 ```
+`EscalationRequired` es el error que lanza un agente cuando debe escalar (definido en `@cricket/core/types`).
 
 ### Nomenclatura
 - Archivos: `kebab-case.ts`
@@ -99,20 +134,12 @@ interface AgentOutput {
 - Constantes: `UPPER_SNAKE_CASE`
 - Rutas Next.js: `kebab-case` (carpetas)
 
-## Comandos
-```bash
-pnpm dev          # Levanta dashboard + api en paralelo
-pnpm db:types     # Regenera tipos TypeScript desde Supabase (correr tras cada migración)
-pnpm db:push      # Aplica migraciones a Supabase
-pnpm db:studio    # Abre Supabase Studio local
-pnpm type-check   # Verifica tipos en todos los packages
-```
-
 ## Variables de entorno críticas
 ```bash
 NEXT_PUBLIC_SUPABASE_URL          # URL del proyecto (pública)
 NEXT_PUBLIC_SUPABASE_ANON_KEY     # Anon key (pública, RLS la protege)
 SUPABASE_SERVICE_ROLE_KEY         # ⚠️ SOLO en services/api — NUNCA en cliente
+SUPABASE_PROJECT_REF              # Ref del proyecto para el CLI
 ANTHROPIC_API_KEY                 # Para agentes Claude — SOLO en servicios server-side
 DEV_TENANT_SLUG                   # Slug del tenant en desarrollo local (ej: 'banco-dev')
 ```
@@ -141,7 +168,6 @@ audit_log            → inmutable, append-only (requerido para cumplimiento ban
 - No ejecutar pagos o transacciones sensibles sin checkpoint IH resuelto
 
 ## Próximos archivos a crear (en orden)
-1. `packages/core/src/types/index.ts` → tipos base del schema
-2. `packages/agents/src/consultation/index.ts` → primer agente
-3. `services/api/src/routes/webhook.ts` → recibir mensajes WhatsApp
-4. `apps/dashboard/src/app/(auth)/login/page.tsx` → login con tenant detection
+1. `packages/agents/src/consultation/index.ts` → primer agente
+2. `services/api/src/routes/webhook.ts` → recibir mensajes WhatsApp
+3. `apps/dashboard/src/app/(auth)/login/page.tsx` → login con tenant detection
