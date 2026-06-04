@@ -1,0 +1,18 @@
+{
+  "name": "@cricket/core",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./types": "./src/types/index.ts",
+    "./supabase/client": "./src/lib/supabase/client.ts",
+    "./supabase/server": "./src/lib/supabase/server.ts",
+    "./supabase/admin": "./src/lib/supabase/admin.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.5.0",
+    "@supabase/supabase-js": "^2.45.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
