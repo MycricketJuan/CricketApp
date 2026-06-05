@@ -1,0 +1,16 @@
+{
+  "name": "@cricket/agents",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./registry": "./src/registry.ts",
+    "./consultation": "./src/consultation/index.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0",
+    "@cricket/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
