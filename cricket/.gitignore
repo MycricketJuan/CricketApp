@@ -24,5 +24,4 @@ Thumbs.db
 .vscode/
 .idea/
 
-# TypeScript generated
-packages/core/src/types/supabase.generated.ts
+# TypeScript generated — supabase.generated.ts is committed as placeholder; regenerar con pnpm db:types
