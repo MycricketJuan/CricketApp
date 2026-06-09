@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { supabaseAdmin } from '@cricket/core/supabase/admin'
+import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 import { JourneyEngine } from '@cricket/core/journey-engine'
 import { AgentRegistry } from '@cricket/agents/registry'
 import type { ChannelMessage, IHPolicy } from '@cricket/core/types'
@@ -16,6 +16,7 @@ export async function handleWhatsAppMessage(
 ): Promise<string | null> {
 
   // ── 1. Buscar tenant activo por slug ──────────────────────
+  const supabaseAdmin = getSupabaseAdmin()
   const { data: tenant, error: tenantError } = await supabaseAdmin
     .from('tenants')
     .select('id, slug, ih_policies, claude_config, is_active')

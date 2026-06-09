@@ -1,11 +1,12 @@
 import { headers } from 'next/headers'
-import { supabaseAdmin } from '@cricket/core/supabase/admin'
+import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 import { QueueRealtime } from './queue-realtime'
 import type { EscalationRow, CheckpointRow } from './queue-realtime'
 
 export default async function QueuePage() {
   const headersList = await headers()
   const tenantSlug = headersList.get('x-tenant-slug') ?? ''
+  const supabaseAdmin = getSupabaseAdmin()
 
   const { data: tenant } = await supabaseAdmin
     .from('tenants')
