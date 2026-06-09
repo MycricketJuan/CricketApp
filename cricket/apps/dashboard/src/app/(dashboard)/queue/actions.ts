@@ -1,18 +1,15 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { supabaseAdmin } from '@cricket/core/supabase/admin'
+import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 import { auth0 } from '@/lib/auth0'
 
-// ── takeControl ──────────────────────────────────────────────────
-// Toma el control de una sesión en nombre del operador autenticado.
-// Registra la transferencia en audit_log (requerido para cumplimiento bancario).
-
 export async function takeControl(sessionId: string): Promise<void> {
+  const db = getSupabaseAdmin()
   const session = await auth0.getSession()
   const userId = session?.user.sub ?? 'unknown'
 
-  await supabaseAdmin
+  await db
     .from('sessions')
     .update({
       actor_control: 'HUMAN',
@@ -22,7 +19,7 @@ export async function takeControl(sessionId: string): Promise<void> {
     })
     .eq('id', sessionId)
 
-  await supabaseAdmin.from('audit_log').insert({
+  await db.from('audit_log').insert({
     session_id: sessionId,
     actor_type: 'HUMAN',
     actor_id: userId,
@@ -33,19 +30,16 @@ export async function takeControl(sessionId: string): Promise<void> {
   revalidatePath('/queue')
 }
 
-// ── resolveCheckpoint ────────────────────────────────────────────
-// Resuelve un cognitive_checkpoint como aprobado o con override.
-// Si no quedan checkpoints pendientes en la sesión, devuelve el control a la IA.
-
 export async function resolveCheckpoint(formData: FormData): Promise<void> {
-  const checkpointId  = formData.get('checkpointId') as string
-  const sessionId     = formData.get('session_id') as string
-  const ihDecision    = formData.get('ih_decision') as string
-  const rawOverride   = formData.get('ih_override_reason') as string | null
+  const db = getSupabaseAdmin()
+  const checkpointId   = formData.get('checkpointId') as string
+  const sessionId      = formData.get('session_id') as string
+  const ihDecision     = formData.get('ih_decision') as string
+  const rawOverride    = formData.get('ih_override_reason') as string | null
   const overrideReason = rawOverride?.trim() || null
-  const hasOverride   = Boolean(overrideReason)
+  const hasOverride    = Boolean(overrideReason)
 
-  await supabaseAdmin
+  await db
     .from('cognitive_checkpoints')
     .update({
       status: hasOverride ? 'overridden' : 'approved',
@@ -55,15 +49,14 @@ export async function resolveCheckpoint(formData: FormData): Promise<void> {
     })
     .eq('id', checkpointId)
 
-  // Si no quedan checkpoints pendientes, devolver control a IA
-  const { count } = await supabaseAdmin
+  const { count } = await db
     .from('cognitive_checkpoints')
     .select('id', { count: 'exact', head: true })
     .eq('session_id', sessionId)
     .eq('status', 'pending')
 
   if (count === 0) {
-    await supabaseAdmin
+    await db
       .from('sessions')
       .update({ actor_control: 'AI' })
       .eq('id', sessionId)
@@ -72,15 +65,14 @@ export async function resolveCheckpoint(formData: FormData): Promise<void> {
   revalidatePath('/queue')
 }
 
-// ── returnToAI ───────────────────────────────────────────────────
-// Devuelve el control de la sesión a la IA y cierra la escalación.
-
 export async function returnToAI(
   sessionId: string,
   escalationId: string,
 ): Promise<void> {
+  const db = getSupabaseAdmin()
+
   await Promise.all([
-    supabaseAdmin
+    db
       .from('sessions')
       .update({
         actor_control: 'AI',
@@ -89,7 +81,7 @@ export async function returnToAI(
       })
       .eq('id', sessionId),
 
-    supabaseAdmin
+    db
       .from('escalations')
       .update({
         outcome: 'returned_to_ai',
