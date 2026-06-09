@@ -4,66 +4,46 @@
  * Responsabilidades:
  * 1. Resolver el tenant a partir del subdominio
  * 2. Propagar el slug via header x-tenant-slug a Server Components
- * 3. Refrescar la sesión de Supabase Auth en cada request
+ * 3. Gestionar sesión Auth0 en cada request (rolling sessions)
  * 4. Proteger rutas autenticadas
  */
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
+import { auth0 } from './src/lib/auth0'
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({ request })
-
-  // ── 1. Resolver tenant desde subdominio ──────────────────
-  const host = request.headers.get('host') ?? ''
-  const tenantSlug = extractTenantSlug(host)
-  response.headers.set('x-tenant-slug', tenantSlug)
-
-  // ── 2. Crear cliente Supabase y refrescar sesión ─────────
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return request.cookies.getAll() },
-        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
-          response = NextResponse.next({ request })
-          response.headers.set('x-tenant-slug', tenantSlug)
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2])
-          )
-        },
-      },
-    }
-  )
-
-  // getUser() verifica el JWT contra Supabase Auth (no solo decodifica)
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // ── 3. Proteger rutas autenticadas ───────────────────────
   const { pathname } = request.nextUrl
 
-  const isAuthRoute = pathname.startsWith('/login') ||
-                      pathname.startsWith('/invite')
-  const isPublicRoute = pathname.startsWith('/api/webhook') ||
-                        pathname === '/health'
+  // ── 1. Resolver tenant desde subdominio ──────────────────
+  const tenantSlug = extractTenantSlug(request.headers.get('host') ?? '')
 
-  if (!user && !isAuthRoute && !isPublicRoute) {
-    const loginUrl = request.nextUrl.clone()
-    loginUrl.pathname = '/login'
-    return NextResponse.redirect(loginUrl)
+  // ── 2. Auth0 gestiona las rutas /auth/* + refresca sesión
+  // Siempre correr para que las rolling sessions funcionen en todas las rutas
+  const authResponse = await auth0.middleware(request)
+  authResponse.headers.set('x-tenant-slug', tenantSlug)
+
+  // Las rutas /auth/* son manejadas exclusivamente por Auth0
+  if (pathname.startsWith('/auth/')) {
+    return authResponse
   }
 
-  // Usuario ya autenticado intentando ir a /login → redirigir al dashboard
-  if (user && isAuthRoute && !pathname.startsWith('/invite')) {
-    const dashUrl = request.nextUrl.clone()
-    dashUrl.pathname = '/'
-    return NextResponse.redirect(dashUrl)
+  // ── 3. Proteger rutas autenticadas ───────────────────────
+  const isPublicRoute = pathname.startsWith('/api/webhook') || pathname === '/health'
+  const isLoginRoute = pathname === '/login'
+
+  if (!isPublicRoute) {
+    const session = await auth0.getSession(request)
+
+    if (!session && !isLoginRoute) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
+    }
+
+    if (session && isLoginRoute) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
 
-  return response
+  return authResponse
 }
 
 /**
