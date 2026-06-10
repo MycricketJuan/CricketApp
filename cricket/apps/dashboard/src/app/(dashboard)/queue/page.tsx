@@ -8,7 +8,7 @@ export default async function QueuePage() {
   const tenantSlug = headersList.get('x-tenant-slug') ?? ''
   const supabaseAdmin = getSupabaseAdmin()
 
-  const { data: tenant } = await supabaseAdmin
+  const { data: tenant, error: tenantError } = await supabaseAdmin
     .from('tenants')
     .select('id')
     .eq('slug', tenantSlug)
@@ -16,8 +16,11 @@ export default async function QueuePage() {
 
   if (!tenant) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-gray-500">Tenant no encontrado: {tenantSlug}</p>
+      <div className="flex min-h-[60vh] items-center justify-center flex-col gap-2">
+        <p className="text-sm text-gray-500">Tenant no encontrado: <code>{tenantSlug}</code></p>
+        {tenantError && (
+          <p className="text-xs text-red-500 font-mono">{tenantError.code}: {tenantError.message}</p>
+        )}
       </div>
     )
   }
