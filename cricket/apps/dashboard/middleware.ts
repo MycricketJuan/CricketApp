@@ -1,12 +1,3 @@
-/**
- * Cricket Dashboard — Middleware
- *
- * Responsabilidades:
- * 1. Resolver el tenant a partir del subdominio
- * 2. Propagar el slug via header x-tenant-slug a Server Components
- * 3. Gestionar sesión Auth0 en cada request (rolling sessions)
- * 4. Proteger rutas autenticadas
- */
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { auth0 } from './src/lib/auth0'
@@ -14,20 +5,31 @@ import { auth0 } from './src/lib/auth0'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // ── 1. Resolver tenant desde subdominio ──────────────────
-  const tenantSlug = extractTenantSlug(request.headers.get('host') ?? '')
+  // ── 1. Auth0 gestiona las rutas /auth/* + refresca rolling sessions ──
+  // Debe correr en TODAS las rutas para que las rolling sessions funcionen.
+  let authResponse: NextResponse
+  try {
+    authResponse = await auth0.middleware(request)
+  } catch (err) {
+    // Auth0 env vars no configuradas — devolver error explícito en vez de 404 silencioso
+    const message = err instanceof Error ? err.message : 'Auth0 misconfigured'
+    return new NextResponse(`Auth0 configuration error: ${message}`, { status: 500 })
+  }
 
-  // ── 2. Auth0 gestiona las rutas /auth/* + refresca sesión
-  // Siempre correr para que las rolling sessions funcionen en todas las rutas
-  const authResponse = await auth0.middleware(request)
-  authResponse.headers.set('x-tenant-slug', tenantSlug)
-
-  // Las rutas /auth/* son manejadas exclusivamente por Auth0
+  // Las rutas /auth/* (login, callback, logout) son manejadas exclusivamente por Auth0
   if (pathname.startsWith('/auth/')) {
     return authResponse
   }
 
-  // ── 3. Proteger rutas autenticadas ───────────────────────
+  // ── 2. Resolver tenant y propagar como REQUEST header ────────────────
+  // IMPORTANTE: usar NextResponse.next({ request: { headers } }) para que
+  // Server Components puedan leerlo con headers() de next/headers.
+  // authResponse.headers.set() solo fija headers de respuesta HTTP (no llegan al Server Component).
+  const tenantSlug = extractTenantSlug(request.headers.get('host') ?? '')
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-tenant-slug', tenantSlug)
+
+  // ── 3. Proteger rutas autenticadas ───────────────────────────────────
   const isPublicRoute = pathname.startsWith('/api/webhook') || pathname === '/health'
   const isLoginRoute = pathname === '/login'
 
@@ -43,27 +45,41 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return authResponse
+  // ── 4. Construir respuesta con header de tenant en el request ────────
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  })
+
+  // Propagar las cookies de sesión que Auth0 pudo haber actualizado (rolling sessions)
+  authResponse.cookies.getAll().forEach((cookie) => {
+    response.cookies.set(cookie)
+  })
+
+  return response
 }
 
 /**
  * Extrae el slug del tenant desde el host header.
  *
- * banco.mycricket.ai  → 'banco'
- * app.mycricket.ai    → 'app'   (platform admin)
- * localhost:3000      → process.env.DEV_TENANT_SLUG ?? 'dev'
+ * banco.mycricket.ai   → 'banco'
+ * localhost:3000       → process.env.DEV_TENANT_SLUG ?? 'dev'
+ * *.vercel.app         → process.env.DEV_TENANT_SLUG ?? 'dev'
  */
 function extractTenantSlug(host: string): string {
-  if (host.includes('localhost') || host.match(/^\d+\.\d+\.\d+\.\d+/)) {
+  // Entornos locales y previews de Vercel usan la variable de entorno
+  if (
+    host.includes('localhost') ||
+    host.match(/^\d+\.\d+\.\d+\.\d+/) ||
+    host.endsWith('.vercel.app')
+  ) {
     return process.env.DEV_TENANT_SLUG ?? 'dev'
   }
   const subdomain = host.split('.')[0]
-  return subdomain ?? 'app'
+  return subdomain ?? 'dev'
 }
 
 export const config = {
   matcher: [
-    // Excluir archivos estáticos y rutas internas de Next.js
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
