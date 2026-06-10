@@ -2,7 +2,7 @@ import { headers } from 'next/headers'
 
 export default async function LoginPage() {
   const headersList = await headers()
-  const tenantSlug = headersList.get('x-tenant-slug') ?? 'app'
+  const tenantSlug = headersList.get('x-tenant-slug') ?? 'dev'
 
   return (
     <div className="w-full max-w-sm space-y-6">
