@@ -10,6 +10,7 @@ import {
   type IHPolicy,
   type StageConfig,
 } from '../types'
+import { getSectorIntentMapping } from '@cricket/sectors/registry'
 
 // ── Interfaz pública — inyectada en el constructor ────────────
 // Implementada por AgentRegistry en packages/agents.
@@ -35,6 +36,7 @@ export interface Tenant {
   id: string
   ih_policies: IHPolicy
   claude_config: { model: string; max_tokens: number }
+  sector?: string
 }
 
 interface IntentResult {
@@ -87,9 +89,10 @@ export class JourneyEngine {
     }
 
     const ihPolicies = tenant.ih_policies
+    const effectiveIntentMap = this.getEffectiveIntentMapping(tenant.sector)
 
     // ── 2. Clasificar intención (modelo ligero y rápido) ──────
-    const intent = await this.classifyIntent(message.content, session)
+    const intent = await this.classifyIntent(message.content, session, effectiveIntentMap)
 
     // ── 3. Escalada preventiva por sentimiento negativo ───────
     // Se evalúa ANTES de invocar al agente de negocio.
@@ -151,6 +154,12 @@ export class JourneyEngine {
     return { type: 'ai_response', content: output.content, stage: targetStage }
   }
 
+  private getEffectiveIntentMapping(sector?: string): Record<string, ModuleType> {
+    if (!sector) return INTENT_TO_STAGE
+    const sectorMap = getSectorIntentMapping(sector)
+    return { ...INTENT_TO_STAGE, ...sectorMap } as Record<string, ModuleType>
+  }
+
   // ── Intent Classifier ─────────────────────────────────────
   // Usa claude-haiku (rápido y barato) solo para clasificar.
   // El agente de negocio usa el modelo configurado en el tenant.
@@ -158,6 +167,7 @@ export class JourneyEngine {
   private async classifyIntent(
     message: string,
     session: Session,
+    intentMap: Record<string, ModuleType>,
   ): Promise<IntentResult> {
     const response = await this.anthropicClient.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -176,7 +186,7 @@ Mensaje: "${message}"`,
 
     const raw = (response.content[0] as { text: string }).text
     const parsed = JSON.parse(raw) as { intent: string; sentiment: string; confidence: number }
-    const targetStage: ModuleType = INTENT_TO_STAGE[parsed.intent] ?? session.current_stage ?? 'consultation'
+    const targetStage: ModuleType = intentMap[parsed.intent] ?? session.current_stage ?? 'consultation'
 
     return { ...parsed, targetStage }
   }
@@ -289,6 +299,7 @@ Mensaje: "${message}"`,
       currentStage: session.current_stage ?? 'consultation',
       channel: 'whatsapp',
       ihPolicies: tenant.ih_policies,
+      sectorExtension: tenant.sector,
       conversationHistory: (interactions ?? []).reverse().map(i => ({
         role: i.actor_type === 'AI' ? 'assistant' : 'user',
         content: i.content,

@@ -11,6 +11,7 @@ interface NavItem {
 const NAV_BY_ROLE: Record<string, NavItem[]> = {
   superadmin: [
     { label: 'Visión general',  href: '/platform' },
+    { label: 'Nuevo tenant',    href: '/onboarding' },
     { label: 'Tenants',         href: '/platform/tenants' },
     { label: 'Módulos',         href: '/platform/modules' },
     { label: 'Monitoreo',       href: '/platform/monitoring' },
@@ -27,7 +28,7 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
   supervisor: [
     { label: 'Panel',           href: '/dashboard' },
     { label: 'Cola',            href: '/queue' },
-    { label: 'Análisis',        href: '/dashboard/analytics' },
+    { label: 'Análisis',        href: '/analytics' },
   ],
   operator: [
     { label: 'Cola de atención', href: '/queue' },
@@ -71,6 +72,7 @@ export function NavSidebar({ role, userName }: { role: string; userName: string 
 
       {/* Footer */}
       <div className="border-t border-gray-100 p-3 space-y-1">
+        <NavItem href="/help" label="Ayuda" />
         <p className="truncate px-3 text-xs text-gray-500">{userName}</p>
         <a
           href="/auth/logout"

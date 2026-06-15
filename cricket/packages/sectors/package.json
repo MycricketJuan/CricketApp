@@ -1,0 +1,13 @@
+{
+  "name": "@cricket/sectors",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./types": "./types.ts",
+    "./registry": "./registry.ts",
+    "./retail": "./retail/index.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

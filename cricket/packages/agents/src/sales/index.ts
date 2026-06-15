@@ -47,13 +47,14 @@ export class SalesAgent {
     private tenantId: string,
     private supabaseUrl: string,
     private supabaseKey: string,
+    private sectorPromptSuffix: string | null = null,
   ) {}
 
   async run(input: AgentInput): Promise<AgentOutput> {
     const { message, context } = input
     const start = Date.now()
 
-    const systemPrompt = `Eres el agente de ventas de Cricket. Tu objetivo es entender qué busca el cliente,
+    const basePrompt = `Eres el agente de ventas de Cricket. Tu objetivo es entender qué busca el cliente,
 calificar si es un lead real y proponer 2-3 productos que se ajusten a su perfil.
 Nunca presiones ni uses lenguaje agresivo. Si el cliente no está listo, no insistas.
 
@@ -72,6 +73,10 @@ FORMATO DE RESPUESTA — incluir al final de cada mensaje (en línea separada):
 
 leadQualified: true cuando el cliente expresó intención clara de contratar un producto.
 productName: nombre exacto del producto si leadQualified es true, null si no.`
+
+    const systemPrompt = this.sectorPromptSuffix
+      ? `${basePrompt}\n\n${this.sectorPromptSuffix}`
+      : basePrompt
 
     const messages: Anthropic.MessageParam[] = [
       ...context.conversationHistory.map(m => ({

@@ -103,6 +103,8 @@ export interface AgentContext {
   channel: ChannelType
   ihPolicies: IHPolicy
   conversationHistory: MessageTurn[]
+  /** Slug del sector ('retail', 'banking', etc.) o undefined si el tenant no tiene extensión sectorial */
+  sectorExtension?: string
 }
 
 export interface MessageTurn {

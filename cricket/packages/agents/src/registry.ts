@@ -1,6 +1,7 @@
 import type Anthropic from '@anthropic-ai/sdk'
 import type { AgentInput, AgentOutput, AgentContext, ModuleType } from '@cricket/core/types'
 import type { ClaudeConfig } from './consultation/index'
+import { getSectorPrompts, getSectorTransactionsConfig } from '@cricket/sectors/registry'
 
 export class AgentRegistry {
   constructor(
@@ -12,11 +13,18 @@ export class AgentRegistry {
 
   async run(stage: ModuleType, message: string, context: AgentContext): Promise<AgentOutput> {
     const input: AgentInput = { message, context }
+    const sector = context.sectorExtension ?? null
+    const sectorPrompts = sector ? getSectorPrompts(sector) : null
+    const sectorTransactionsConfig = sector ? getSectorTransactionsConfig(sector) : null
 
     switch (stage) {
       case 'consultation': {
         const { ConsultationAgent } = await import('./consultation/index')
-        return new ConsultationAgent(this.client, this.config).run(input, context)
+        return new ConsultationAgent(
+          this.client,
+          this.config,
+          sectorPrompts?.consultation ?? null,
+        ).run(input, context)
       }
       case 'sales': {
         const { SalesAgent } = await import('./sales/index')
@@ -25,11 +33,32 @@ export class AgentRegistry {
           context.tenantId,
           this.supabaseUrl,
           this.supabaseKey,
+          sectorPrompts?.sales ?? null,
         ).run(input)
       }
-      case 'transactions':
-      case 'feedback':
-        throw new Error(`Agent not yet implemented for stage: ${stage}`)
+      case 'transactions': {
+        const { TransactionsAgent } = await import('./transactions/index')
+        return new TransactionsAgent(
+          this.client,
+          context.tenantId,
+          this.supabaseUrl,
+          this.supabaseKey,
+          sectorPrompts?.transactions ?? null,
+          sectorTransactionsConfig,
+        ).run(input)
+      }
+      case 'feedback': {
+        const { FeedbackAgent } = await import('./feedback/index')
+        return new FeedbackAgent(
+          this.client,
+          context.tenantId,
+          context.sessionId,
+          context.currentStage,
+          this.supabaseUrl,
+          this.supabaseKey,
+          sectorPrompts?.feedback ?? null,
+        ).run(input)
+      }
     }
   }
 }

@@ -16,19 +16,26 @@ export class ConsultationAgent {
   constructor(
     private client: Anthropic,
     private config: ClaudeConfig,
+    private sectorPromptSuffix: string | null = null,
   ) {}
 
   async run(input: AgentInput, context: AgentContext): Promise<AgentOutput> {
     const start = Date.now()
 
-    const response = await this.client.messages.create({
-      model: this.config.model,
-      max_tokens: this.config.max_tokens,
-      system: `Eres el agente de consulta de un tenant en la plataforma Cricket.
+    const basePrompt = `Eres el agente de consulta de un tenant en la plataforma Cricket.
 Tu rol es responder las preguntas del cliente con precisión y brevedad.
 Canal activo: ${context.channel}. Etapa del journey: ${context.currentStage}.
 Cuando no tengas suficiente información para responder con seguridad, indícalo claramente.
-Responde siempre en el mismo idioma que usa el cliente.`,
+Responde siempre en el mismo idioma que usa el cliente.`
+
+    const systemPrompt = this.sectorPromptSuffix
+      ? `${basePrompt}\n\n${this.sectorPromptSuffix}`
+      : basePrompt
+
+    const response = await this.client.messages.create({
+      model: this.config.model,
+      max_tokens: this.config.max_tokens,
+      system: systemPrompt,
       messages: [
         ...context.conversationHistory.map(m => ({
           role: m.role as 'user' | 'assistant',
