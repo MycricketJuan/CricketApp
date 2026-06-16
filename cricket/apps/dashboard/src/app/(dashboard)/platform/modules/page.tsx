@@ -28,8 +28,8 @@ export default async function ModulesPage() {
   const db = getSupabaseAdmin()
 
   const [{ data: modules }, { data: tenants }] = await Promise.all([
-    db.from('tenant_modules').select('*').order('module_type') as Promise<{ data: ModuleRow[] | null }>,
-    db.from('tenants').select('id, name, slug, sector').order('name') as Promise<{ data: TenantRow[] | null }>,
+    db.from('tenant_modules').select('*').order('module_type') as unknown as Promise<{ data: ModuleRow[] | null }>,
+    db.from('tenants').select('id, name, slug, sector').order('name') as unknown as Promise<{ data: TenantRow[] | null }>,
   ])
 
   const tenantMap = (tenants ?? []).reduce<Record<string, TenantRow>>(

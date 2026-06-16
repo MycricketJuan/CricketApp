@@ -50,19 +50,19 @@ export default async function MonitoringPage() {
       .select('*')
       .in('status', ['active', 'escalated', 'human_takeover'])
       .order('started_at', { ascending: false })
-      .limit(50) as Promise<{ data: SessionRow[] | null }>,
+      .limit(50) as unknown as Promise<{ data: SessionRow[] | null }>,
     db.from('cognitive_checkpoints')
       .select('*')
       .eq('status', 'pending')
       .order('created_at', { ascending: true })
-      .limit(20) as Promise<{ data: CheckpointRow[] | null }>,
+      .limit(20) as unknown as Promise<{ data: CheckpointRow[] | null }>,
     db.from('escalations')
       .select('*')
       .is('outcome', null)
       .order('created_at', { ascending: false })
-      .limit(20) as Promise<{ data: EscalationRow[] | null }>,
+      .limit(20) as unknown as Promise<{ data: EscalationRow[] | null }>,
     db.from('tenants')
-      .select('id, name, slug') as Promise<{ data: Pick<TenantRow, 'id' | 'name' | 'slug'>[] | null }>,
+      .select('id, name, slug') as unknown as Promise<{ data: Pick<TenantRow, 'id' | 'name' | 'slug'>[] | null }>,
     db.from('sessions')
       .select('*', { count: 'exact', head: true })
       .gte('started_at', ago1h),

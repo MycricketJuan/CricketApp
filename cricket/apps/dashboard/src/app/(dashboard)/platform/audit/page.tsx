@@ -28,9 +28,9 @@ export default async function AuditPage() {
     db.from('audit_log')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(200) as Promise<{ data: AuditRow[] | null }>,
+      .limit(200) as unknown as Promise<{ data: AuditRow[] | null }>,
     db.from('tenants')
-      .select('id, name') as Promise<{ data: Pick<TenantRow, 'id' | 'name'>[] | null }>,
+      .select('id, name') as unknown as Promise<{ data: Pick<TenantRow, 'id' | 'name'>[] | null }>,
   ])
 
   const tenantMap = (tenants ?? []).reduce<Record<string, string>>(

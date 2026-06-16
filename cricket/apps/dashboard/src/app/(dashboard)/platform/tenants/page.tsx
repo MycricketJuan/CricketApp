@@ -29,7 +29,7 @@ export default async function TenantsPage() {
   ] = await Promise.all([
     db.from('tenants')
       .select('*')
-      .order('created_at', { ascending: false }) as Promise<{ data: TenantRow[] | null }>,
+      .order('created_at', { ascending: false }) as unknown as Promise<{ data: TenantRow[] | null }>,
     db.from('tenant_modules')
       .select('tenant_id, is_active'),
     db.from('sessions')
