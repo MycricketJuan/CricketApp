@@ -2,7 +2,7 @@ import { createClient } from '@cricket/core/supabase/server'
 import type { Database } from '@cricket/core/types'
 import { SessionsChart } from './sessions-chart'
 import type { DailySession } from './sessions-chart'
-import { NpsGauge } from './nps-gauge' 
+import { NpsGauge } from './nps-gauge'  
 
 type SessionRow    = Database['public']['Tables']['sessions']['Row']
 type EscalationRow = Database['public']['Tables']['escalations']['Row']
