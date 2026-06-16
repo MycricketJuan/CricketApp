@@ -73,7 +73,7 @@ export async function whatsappRoutes(fastify: FastifyInstance) {
         // ── Extraer campos del payload ─────────────────────
         const from = request.body.From ?? ''
         const messageText = request.body.Body ?? ''
-        const tenantSlug = (request.headers['x-tenant-slug'] as string) ?? ''
+        const tenantSlug = (request.headers['x-tenant-slug'] as string) || (process.env.DEV_TENANT_SLUG ?? 'moda-xyz')
 
         // Limpiar prefijo "whatsapp:" del número remitente
         const senderId = from.replace(/^whatsapp:/i, '')

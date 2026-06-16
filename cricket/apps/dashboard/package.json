@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.22.0",
+    "@anthropic-ai/sdk": "^0.30.0",
+    "@cricket/agents": "workspace:*",
     "@cricket/core": "workspace:*",
     "@supabase/ssr": "^0.5.0",
     "@supabase/supabase-js": "^2.45.0",
