@@ -14,7 +14,7 @@ interface FeedbackParsed {
   declined: boolean
 }
 
-const JSON_BLOCK_RE = /\{[^{}]*"confidence"\s*:[^{}]*\}/s
+const JSON_BLOCK_RE = /\{[^{}]*"confidence"\s*:[^{}]*\}/
 
 function parseResponse(raw: string): FeedbackParsed {
   const match = JSON_BLOCK_RE.exec(raw)
