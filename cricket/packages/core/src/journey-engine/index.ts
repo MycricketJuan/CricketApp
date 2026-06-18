@@ -185,7 +185,8 @@ Mensaje: "${message}"`,
     })
 
     const raw = (response.content[0] as { text: string }).text
-    const parsed = JSON.parse(raw) as { intent: string; sentiment: string; confidence: number }
+    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
+    const parsed = JSON.parse(cleaned) as { intent: string; sentiment: string; confidence: number }
     const targetStage: ModuleType = intentMap[parsed.intent] ?? session.current_stage ?? 'consultation'
 
     return { ...parsed, targetStage }
