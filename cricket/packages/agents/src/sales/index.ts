@@ -13,7 +13,7 @@ interface ParsedResponse {
   productName?: string
 }
 
-const JSON_BLOCK_RE = /\{[^{}]*"confidence"\s*:[^{}]*\}/s
+const JSON_BLOCK_RE = /\{[^{}]*"confidence"\s*:[^{}]*\}/
 
 function parseResponse(raw: string): ParsedResponse {
   const match = JSON_BLOCK_RE.exec(raw)
