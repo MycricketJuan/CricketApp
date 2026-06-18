@@ -185,8 +185,10 @@ Mensaje: "${message}"`,
     })
 
     const raw = (response.content[0] as { text: string }).text
-    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
-    const parsed = JSON.parse(cleaned) as { intent: string; sentiment: string; confidence: number }
+    const start = raw.indexOf('{')
+    const end = raw.lastIndexOf('}')
+    if (start === -1 || end === -1) throw new Error(`Intent classifier returned no JSON: ${raw}`)
+    const parsed = JSON.parse(raw.slice(start, end + 1)) as { intent: string; sentiment: string; confidence: number }
     const targetStage: ModuleType = intentMap[parsed.intent] ?? session.current_stage ?? 'consultation'
 
     return { ...parsed, targetStage }
