@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from 'react'
 
 type DocStatus = 'processing' | 'ready' | 'error'
 
-interface KBDocument {
+export interface KBDocument {
   id: string
   title: string
   source_type: string

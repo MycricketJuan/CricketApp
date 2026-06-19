@@ -59,7 +59,7 @@ export default async function KnowledgePage() {
       </div>
       <KnowledgePageClient
         tenantId={tenant.id}
-        initialDocuments={documents ?? []}
+        initialDocuments={(documents ?? []) as import('./knowledge-page-client').KBDocument[]}
       />
     </div>
   )
