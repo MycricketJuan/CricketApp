@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
+import { getKBAdmin } from './db'
 
 const CHUNK_SIZE  = 500  // tokens aproximados (~2000 chars)
 const CHUNK_CHARS = 2000
@@ -31,7 +31,7 @@ export async function ingestChunks(
   tenantId: string,
   chunks: string[],
 ): Promise<void> {
-  const db = getSupabaseAdmin()
+  const db = getKBAdmin()
 
   for (let i = 0; i < chunks.length; i++) {
     const embedding = await generateEmbedding(chunks[i])
@@ -51,7 +51,7 @@ export async function ingestChunks(
 }
 
 export async function markDocumentError(documentId: string, msg: string): Promise<void> {
-  const db = getSupabaseAdmin()
+  const db = getKBAdmin()
   await db
     .from('knowledge_base_documents')
     .update({ status: 'error', error_msg: msg })

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { load } from 'cheerio'
-import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
+import { getKBAdmin } from '@/lib/knowledge/db'
 import { chunkText, ingestChunks, markDocumentError } from '@/lib/knowledge/pipeline'
 
 export async function POST(req: NextRequest) {
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Crear documento
-    const db = getSupabaseAdmin()
+    const db = getKBAdmin()
     const { data: doc, error: docErr } = await db
       .from('knowledge_base_documents')
       .insert({

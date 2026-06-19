@@ -1,5 +1,6 @@
 import { headers } from 'next/headers'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
+import { getKBAdmin } from '@/lib/knowledge/db'
 import { KnowledgePageClient } from './knowledge-page-client'
 
 export default async function KnowledgePage() {
@@ -21,28 +22,8 @@ export default async function KnowledgePage() {
     )
   }
 
-  // Usamos cast porque la tabla es de la migración 002 y puede no estar
-  // en los tipos generados todavía
-  type DocRow = {
-    id: string
-    title: string
-    source_type: string
-    source_url: string | null
-    file_name: string | null
-    status: string
-    chunk_count: number
-    created_at: string
-  }
-
-  const { data: documents } = await (db as unknown as {
-    from: (t: string) => {
-      select: (c: string) => {
-        eq: (col: string, val: string) => {
-          order: (col: string, opts: object) => Promise<{ data: DocRow[] | null }>
-        }
-      }
-    }
-  })
+  const kb = getKBAdmin()
+  const { data: documents } = await kb
     .from('knowledge_base_documents')
     .select('id, title, source_type, source_url, file_name, status, chunk_count, created_at')
     .eq('tenant_id', tenant.id)

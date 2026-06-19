@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
+import { getKBAdmin } from '@/lib/knowledge/db'
 
 export async function GET(req: NextRequest) {
   try {
@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'tenant_id requerido' }, { status: 400 })
     }
 
-    const db = getSupabaseAdmin()
+    const db = getKBAdmin()
     const { data, error } = await db
       .from('knowledge_base_documents')
       .select('id, title, source_type, source_url, file_name, status, chunk_count, created_at')
@@ -31,7 +31,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'id y tenant_id requeridos' }, { status: 400 })
     }
 
-    const db = getSupabaseAdmin()
+    const db = getKBAdmin()
     const { error } = await db
       .from('knowledge_base_documents')
       .delete()
