@@ -13,6 +13,7 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
     { label: 'Visión general',  href: '/platform' },
     { label: 'Nuevo tenant',    href: '/onboarding' },
     { label: 'Tenants',         href: '/platform/tenants' },
+    { label: 'Usuarios',        href: '/platform/users' },
     { label: 'Módulos',         href: '/platform/modules' },
     { label: 'Monitoreo',       href: '/platform/monitoring' },
     { label: 'Agentes IA',      href: '/platform/agents' },
