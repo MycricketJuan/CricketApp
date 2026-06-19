@@ -462,6 +462,94 @@ export type Database = {
           },
         ]
       }
+      knowledge_base_chunks: {
+        Row: {
+          chunk_index: number
+          content: string
+          created_at: string
+          document_id: string
+          embedding: string | null
+          id: string
+          tenant_id: string
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          created_at?: string
+          document_id: string
+          embedding?: string | null
+          id?: string
+          tenant_id: string
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          created_at?: string
+          document_id?: string
+          embedding?: string | null
+          id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_base_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_base_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_base_documents: {
+        Row: {
+          chunk_count: number
+          created_at: string
+          error_msg: string | null
+          file_name: string | null
+          id: string
+          source_type: string
+          source_url: string | null
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          chunk_count?: number
+          created_at?: string
+          error_msg?: string | null
+          file_name?: string | null
+          id?: string
+          source_type: string
+          source_url?: string | null
+          status?: string
+          tenant_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          chunk_count?: number
+          created_at?: string
+          error_msg?: string | null
+          file_name?: string | null
+          id?: string
+          source_type?: string
+          source_url?: string | null
+          status?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_base_documents_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nps_responses: {
         Row: {
           channel: string | null
@@ -872,6 +960,15 @@ export type Database = {
       }
       is_superadmin: { Args: never; Returns: boolean }
       is_tenant_admin: { Args: never; Returns: boolean }
+      search_knowledge_base: {
+        Args: { p_embedding: string; p_limit?: number; p_tenant_id: string }
+        Returns: {
+          chunk_id: string
+          content: string
+          document_id: string
+          similarity: number
+        }[]
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
@@ -1059,5 +1156,3 @@ export const Constants = {
     },
   },
 } as const
-A new version of Supabase CLI is available: v2.107.0 (currently installed v2.105.0)
-We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli
