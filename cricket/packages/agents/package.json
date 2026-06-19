@@ -10,7 +10,8 @@
     "@anthropic-ai/sdk": "^0.30.0",
     "@cricket/core": "workspace:*",
     "@cricket/sectors": "workspace:*",
-    "@supabase/supabase-js": "^2.45.0"
+    "@supabase/supabase-js": "^2.45.0",
+    "openai": "^4.77.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0"

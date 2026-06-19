@@ -24,6 +24,8 @@ export class AgentRegistry {
           this.client,
           this.config,
           sectorPrompts?.consultation ?? null,
+          this.supabaseUrl,
+          this.supabaseKey,
         ).run(input, context)
       }
       case 'sales': {
