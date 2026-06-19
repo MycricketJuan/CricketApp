@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ProfileSwitcher, type UserProfile } from './profile-switcher'
 
 interface NavItem {
   label: string
@@ -55,7 +56,14 @@ function NavItem({ href, label }: NavItem) {
   )
 }
 
-export function NavSidebar({ role, userName }: { role: string; userName: string }) {
+interface NavSidebarProps {
+  role:       string
+  userName:   string
+  profiles:   UserProfile[]
+  activeSlug: string
+}
+
+export function NavSidebar({ role, userName, profiles, activeSlug }: NavSidebarProps) {
   const items = NAV_BY_ROLE[role] ?? NAV_BY_ROLE.operator
 
   return (
@@ -75,13 +83,21 @@ export function NavSidebar({ role, userName }: { role: string; userName: string 
       {/* Footer */}
       <div className="border-t border-gray-100 p-3 space-y-1">
         <NavItem href="/help" label="Ayuda" />
-        <p className="truncate px-3 text-xs text-gray-500">{userName}</p>
         <a
           href="/auth/logout"
           className="block rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-900"
         >
           Cerrar sesión
         </a>
+
+        {/* Profile switcher */}
+        <div className="border-t border-gray-100 pt-2 mt-1">
+          <ProfileSwitcher
+            profiles={profiles}
+            activeSlug={activeSlug}
+            userName={userName}
+          />
+        </div>
       </div>
     </aside>
   )

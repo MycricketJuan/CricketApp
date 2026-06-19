@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
   // IMPORTANTE: usar NextResponse.next({ request: { headers } }) para que
   // Server Components puedan leerlo con headers() de next/headers.
   // authResponse.headers.set() solo fija headers de respuesta HTTP (no llegan al Server Component).
-  const tenantSlug = extractTenantSlug(request.headers.get('host') ?? '')
+  const tenantSlug = extractTenantSlug(request.headers.get('host') ?? '', request)
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set('x-tenant-slug', tenantSlug)
 
@@ -65,14 +65,15 @@ export async function middleware(request: NextRequest) {
  * localhost:3000       → process.env.DEV_TENANT_SLUG ?? 'dev'
  * *.vercel.app         → process.env.DEV_TENANT_SLUG ?? 'dev'
  */
-function extractTenantSlug(host: string): string {
-  // Entornos locales y previews de Vercel usan la variable de entorno
+function extractTenantSlug(host: string, request: NextRequest): string {
+  // Entornos locales y previews de Vercel usan cookie o variable de entorno
   if (
     host.includes('localhost') ||
     host.match(/^\d+\.\d+\.\d+\.\d+/) ||
     host.endsWith('.vercel.app')
   ) {
-    return process.env.DEV_TENANT_SLUG ?? 'dev'
+    const cookieSlug = request.cookies.get('cricket_active_tenant')?.value
+    return cookieSlug ?? process.env.DEV_TENANT_SLUG ?? 'dev'
   }
   const subdomain = host.split('.')[0]
   return subdomain ?? 'dev'
