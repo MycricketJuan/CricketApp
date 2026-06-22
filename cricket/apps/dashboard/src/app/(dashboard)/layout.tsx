@@ -17,17 +17,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
   let profiles: UserProfile[] = []
   if (userId) {
     const db = getSupabaseAdmin()
-    const { data } = await db
+    const { data } = (await db
       .from('tenant_users')
       .select('role, tenant_id, tenants(id, name, slug)')
       .eq('id', userId)
-      .eq('is_active', true) as unknown as Promise<{
+      .eq('is_active', true)) as unknown as {
         data: Array<{
           role: string
           tenant_id: string
           tenants: { id: string; name: string; slug: string } | null
         }> | null
-      }>
+      }
 
     profiles = (data ?? [])
       .filter(r => r.tenants !== null)
