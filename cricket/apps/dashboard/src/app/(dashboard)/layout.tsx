@@ -7,7 +7,7 @@ import type { UserProfile } from './profile-switcher'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session      = await auth0.getSession()
-  const role         = resolveRole((session?.user ?? {}) as Record<string, unknown>)
+  const jwtRole      = resolveRole((session?.user ?? {}) as Record<string, unknown>)
   const name         = session?.user.name ?? session?.user.email ?? 'Usuario'
   const userId       = session?.user.sub as string | undefined
   const headersList  = await headers()
@@ -25,10 +25,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       tenants: { id: string; name: string; slug: string } | null
     }
 
-    // OR: filas con auth0_sub (post-migración) O con email (pre-migración / rows manuales)
     const orFilter = [
-      userId    ? `auth0_sub.eq.${userId}`    : null,
-      userEmail ? `email.eq.${userEmail}`     : null,
+      userId    ? `auth0_sub.eq.${userId}` : null,
+      userEmail ? `email.eq.${userEmail}`  : null,
     ].filter(Boolean).join(',')
 
     const { data } = (await dbAny
@@ -37,7 +36,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
       .or(orFilter)
       .eq('is_active', true)) as { data: ProfileRow[] | null }
 
-    // Deduplicar por tenant_id (por si hay coincidencia en ambas columnas)
     const seen = new Set<string>()
     profiles = (data ?? [])
       .filter(r => r.tenants !== null && !seen.has(r.tenant_id) && seen.add(r.tenant_id))
@@ -48,6 +46,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
         role:       r.role,
       }))
   }
+
+  // El rol para el sidebar viene del JWT (superadmin) o del perfil activo en tenant_users.
+  // Sin claim JWT y sin perfil → operator.
+  const activeProfile = profiles.find(p => p.tenantSlug === activeSlug) ?? profiles[0]
+  const role = jwtRole !== 'operator' ? jwtRole : (activeProfile?.role ?? 'operator')
 
   return (
     <div className="flex min-h-screen bg-gray-50">
