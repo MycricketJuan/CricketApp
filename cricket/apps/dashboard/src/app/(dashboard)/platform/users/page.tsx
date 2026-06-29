@@ -65,7 +65,9 @@ interface Superadmin {
 }
 
 export default async function UsersPage() {
-  const db = getSupabaseAdmin()
+  const db    = getSupabaseAdmin()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dbAny = db as any
 
   const [
     { data: tenantUsers },
@@ -80,12 +82,12 @@ export default async function UsersPage() {
     db.from('superadmins')
       .select('id, email, full_name, created_at')
       .order('created_at', { ascending: false }) as unknown as Promise<{ data: Superadmin[] | null }>,
-    db.from('user_grants')
+    dbAny.from('user_grants')
       .select('id, email, tenant_id, role, full_name, provisioned, created_at')
-      .order('created_at', { ascending: false }) as unknown as Promise<{ data: Grant[] | null }>,
-    db.from('superadmin_grants')
+      .order('created_at', { ascending: false }) as Promise<{ data: Grant[] | null }>,
+    dbAny.from('superadmin_grants')
       .select('id, email, full_name, provisioned, created_at')
-      .order('created_at', { ascending: false }) as unknown as Promise<{ data: SuperadminGrant[] | null }>,
+      .order('created_at', { ascending: false }) as Promise<{ data: SuperadminGrant[] | null }>,
     db.from('tenants')
       .select('id, name, slug')
       .eq('is_active', true)

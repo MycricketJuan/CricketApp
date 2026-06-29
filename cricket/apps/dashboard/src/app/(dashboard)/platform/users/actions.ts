@@ -16,7 +16,6 @@ async function assertSuperadmin(): Promise<string> {
 }
 
 // ─── Asignar usuario a tenant por email ─────────────────────────────────────
-// No envía invitación. En el primer login del usuario se crea tenant_users.
 export async function assignUserToTenant(formData: FormData): Promise<void> {
   const actorId  = await assertSuperadmin()
   const email    = (formData.get('email') as string ?? '').trim().toLowerCase()
@@ -26,7 +25,8 @@ export async function assignUserToTenant(formData: FormData): Promise<void> {
 
   if (!email || !tenantId) return
 
-  const db = getSupabaseAdmin()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = getSupabaseAdmin() as any
 
   await db
     .from('user_grants')
@@ -47,7 +47,6 @@ export async function assignUserToTenant(formData: FormData): Promise<void> {
 }
 
 // ─── Crear superadmin ────────────────────────────────────────────────────────
-// Registra el email en superadmin_grants; se activa en el primer login.
 export async function assignSuperadmin(formData: FormData): Promise<void> {
   const actorId  = await assertSuperadmin()
   const email    = (formData.get('email') as string ?? '').trim().toLowerCase()
@@ -55,7 +54,8 @@ export async function assignSuperadmin(formData: FormData): Promise<void> {
 
   if (!email) return
 
-  const db = getSupabaseAdmin()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = getSupabaseAdmin() as any
 
   await db
     .from('superadmin_grants')
@@ -65,7 +65,7 @@ export async function assignSuperadmin(formData: FormData): Promise<void> {
     )
 
   await db.from('audit_log').insert({
-    tenant_id:  null as unknown as string,
+    tenant_id:  null,
     actor_type: 'HUMAN',
     actor_id:   actorId,
     event_type: 'superadmin.grant_created',
@@ -78,13 +78,14 @@ export async function assignSuperadmin(formData: FormData): Promise<void> {
 // ─── Eliminar grant de usuario ───────────────────────────────────────────────
 export async function removeUserGrant(grantId: string, _formData: FormData): Promise<void> {
   const actorId = await assertSuperadmin()
-  const db      = getSupabaseAdmin()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = getSupabaseAdmin() as any
 
-  const { data: grant } = await db
+  const { data: grant } = (await db
     .from('user_grants')
     .select('tenant_id, email')
     .eq('id', grantId)
-    .single() as unknown as { data: { tenant_id: string; email: string } | null }
+    .single()) as { data: { tenant_id: string; email: string } | null }
 
   if (!grant) return
 
@@ -159,7 +160,7 @@ export async function deleteUser(userId: string, _formData: FormData): Promise<v
 
   const { data: user } = await db
     .from('tenant_users')
-    .select('tenant_id, email')
+    .select('tenant_id')
     .eq('id', userId)
     .single()
 
