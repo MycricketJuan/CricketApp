@@ -38,6 +38,15 @@ export default async function AfterLoginPage() {
     await dbAny.from('superadmin_grants').update({ provisioned: true }).eq('id', superGrant.id)
   }
 
+  // ── Actualizar filas existentes sin auth0_sub (creadas antes de la migración) ──
+  if (email) {
+    await dbAny
+      .from('tenant_users')
+      .update({ auth0_sub: sub, email })
+      .is('auth0_sub', null)
+      .eq('email', email)
+  }
+
   // ── Provisionar user_grants pendientes ────────────────────────────────────
   const { data: grants } = (await dbAny
     .from('user_grants')

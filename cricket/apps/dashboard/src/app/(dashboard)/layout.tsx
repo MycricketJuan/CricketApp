@@ -15,20 +15,27 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   // Cargar todos los perfiles del usuario (tenant_users activos)
   let profiles: UserProfile[] = []
+  const userEmail = (session?.user.email as string | undefined ?? '').toLowerCase()
   if (userId) {
-    const db = getSupabaseAdmin()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = (await (db as any)
+    const dbAny = getSupabaseAdmin() as any
+    type ProfileRow = { role: string; tenant_id: string; tenants: { id: string; name: string; slug: string } | null }
+
+    // Intentar por auth0_sub (usuarios que ya hicieron login después de la migración)
+    let { data } = (await dbAny
       .from('tenant_users')
       .select('role, tenant_id, tenants(id, name, slug)')
       .eq('auth0_sub', userId)
-      .eq('is_active', true)) as {
-        data: Array<{
-          role: string
-          tenant_id: string
-          tenants: { id: string; name: string; slug: string } | null
-        }> | null
-      }
+      .eq('is_active', true)) as { data: ProfileRow[] | null }
+
+    // Fallback por email (usuarios con filas creadas antes de la migración)
+    if ((!data || data.length === 0) && userEmail) {
+      ;({ data } = (await dbAny
+        .from('tenant_users')
+        .select('role, tenant_id, tenants(id, name, slug)')
+        .eq('email', userEmail)
+        .eq('is_active', true)) as { data: ProfileRow[] | null })
+    }
 
     profiles = (data ?? [])
       .filter(r => r.tenants !== null)
