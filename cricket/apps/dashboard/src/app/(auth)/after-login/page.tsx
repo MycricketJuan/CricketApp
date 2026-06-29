@@ -49,16 +49,29 @@ export default async function AfterLoginPage() {
 
   if (grants && grants.length > 0) {
     for (const g of grants) {
-      // Verificar si ya existe una fila para este usuario en este tenant
-      const { data: existing } = (await db
+      // Buscar fila existente por auth0_sub o email (dos queries para evitar | en filtros OR)
+      let existing: { id: string } | null = null
+
+      const { data: bySub } = (await db
         .from('tenant_users')
         .select('id')
         .eq('tenant_id', g.tenant_id)
-        .or(`auth0_sub.eq.${sub},email.eq.${email}`)
+        .eq('auth0_sub', sub)
         .maybeSingle()) as { data: { id: string } | null }
 
+      if (bySub) {
+        existing = bySub
+      } else if (email) {
+        const { data: byEmail } = (await db
+          .from('tenant_users')
+          .select('id')
+          .eq('tenant_id', g.tenant_id)
+          .eq('email', email)
+          .maybeSingle()) as { data: { id: string } | null }
+        existing = byEmail
+      }
+
       if (existing) {
-        // Actualizar la fila existente con el sub y rol correcto
         const { error } = await db
           .from('tenant_users')
           .update({ auth0_sub: sub, email, role: g.role, is_active: true })
@@ -67,7 +80,6 @@ export default async function AfterLoginPage() {
           await db.from('user_grants').update({ provisioned: true }).eq('id', g.id)
         }
       } else {
-        // Insertar nueva fila
         const { error } = await db
           .from('tenant_users')
           .insert({
@@ -85,27 +97,37 @@ export default async function AfterLoginPage() {
     }
   }
 
-  // ── Parchear filas existentes sin auth0_sub ni email ─────────────────────
-  // Cubre usuarios creados manualmente en Supabase antes de la migración
-  await db
-    .from('tenant_users')
-    .update({ auth0_sub: sub, email })
-    .or(`auth0_sub.is.null,email.is.null`)
-    .or(`auth0_sub.eq.${sub},email.eq.${email}`)
-
   // ── Determinar rol y redirigir ────────────────────────────────────────────
   const jwtRole = resolveRole(session.user as Record<string, unknown>)
 
   let effectiveRole = jwtRole
   if (effectiveRole === 'operator') {
-    const { data: userRow } = (await db
-      .from('tenant_users')
-      .select('role')
-      .or(`auth0_sub.eq.${sub},email.eq.${email}`)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()) as { data: { role: string } | null }
+    // Buscar el rol más alto del usuario en tenant_users
+    let userRow: { role: string } | null = null
+
+    if (sub) {
+      const { data } = (await db
+        .from('tenant_users')
+        .select('role')
+        .eq('auth0_sub', sub)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()) as { data: { role: string } | null }
+      userRow = data
+    }
+
+    if (!userRow && email) {
+      const { data } = (await db
+        .from('tenant_users')
+        .select('role')
+        .eq('email', email)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()) as { data: { role: string } | null }
+      userRow = data
+    }
 
     if (userRow) effectiveRole = userRow.role
   }

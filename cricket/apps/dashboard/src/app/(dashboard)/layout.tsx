@@ -25,19 +25,30 @@ export default async function DashboardLayout({ children }: { children: React.Re
       tenants: { id: string; name: string; slug: string } | null
     }
 
-    const orFilter = [
-      userId    ? `auth0_sub.eq.${userId}` : null,
-      userEmail ? `email.eq.${userEmail}`  : null,
-    ].filter(Boolean).join(',')
+    // Dos queries separadas para evitar el carácter | del Auth0 sub en filtros OR de PostgREST
+    const results: ProfileRow[] = []
 
-    const { data } = (await dbAny
-      .from('tenant_users')
-      .select('role, tenant_id, tenants(id, name, slug)')
-      .or(orFilter)
-      .eq('is_active', true)) as { data: ProfileRow[] | null }
+    if (userId) {
+      const { data } = (await dbAny
+        .from('tenant_users')
+        .select('role, tenant_id, tenants(id, name, slug)')
+        .eq('auth0_sub', userId)
+        .eq('is_active', true)) as { data: ProfileRow[] | null }
+      results.push(...(data ?? []))
+    }
 
+    if (userEmail) {
+      const { data } = (await dbAny
+        .from('tenant_users')
+        .select('role, tenant_id, tenants(id, name, slug)')
+        .eq('email', userEmail)
+        .eq('is_active', true)) as { data: ProfileRow[] | null }
+      results.push(...(data ?? []))
+    }
+
+    // Deduplicar por tenant_id
     const seen = new Set<string>()
-    profiles = (data ?? [])
+    profiles = results
       .filter(r => r.tenants !== null && !seen.has(r.tenant_id) && seen.add(r.tenant_id))
       .map(r => ({
         tenantId:   r.tenants!.id,
