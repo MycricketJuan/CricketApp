@@ -13,7 +13,8 @@ export async function switchProfile(tenantSlug: string): Promise<void> {
   const db     = getSupabaseAdmin()
 
   // Verificar que el usuario realmente tiene acceso a este tenant
-  const { data: profile } = await db
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: profile } = await (db as any)
     .from('tenant_users')
     .select('id, tenants!inner(slug)')
     .eq('auth0_sub', userId)

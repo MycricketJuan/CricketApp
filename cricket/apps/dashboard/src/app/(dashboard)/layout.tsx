@@ -17,11 +17,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   let profiles: UserProfile[] = []
   if (userId) {
     const db = getSupabaseAdmin()
-    const { data } = (await db
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = (await (db as any)
       .from('tenant_users')
       .select('role, tenant_id, tenants(id, name, slug)')
       .eq('auth0_sub', userId)
-      .eq('is_active', true)) as unknown as {
+      .eq('is_active', true)) as {
         data: Array<{
           role: string
           tenant_id: string
