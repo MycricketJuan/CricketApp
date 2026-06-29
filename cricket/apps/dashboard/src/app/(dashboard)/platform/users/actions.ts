@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { auth0 } from '@/lib/auth0'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
@@ -14,7 +15,92 @@ async function assertSuperadmin(): Promise<string> {
   return session.user.sub as string
 }
 
-// Cambiar rol — se usa con .bind(null, userId) como action del form
+// ─── Asignar usuario a tenant por email ─────────────────────────────────────
+// No envía invitación. En el primer login del usuario se crea tenant_users.
+export async function assignUserToTenant(formData: FormData): Promise<void> {
+  const actorId  = await assertSuperadmin()
+  const email    = (formData.get('email') as string ?? '').trim().toLowerCase()
+  const tenantId = formData.get('tenant_id') as string
+  const role     = (formData.get('role') as UserRole) ?? 'operator'
+  const fullName = (formData.get('full_name') as string ?? '').trim() || null
+
+  if (!email || !tenantId) return
+
+  const db = getSupabaseAdmin()
+
+  await db
+    .from('user_grants')
+    .upsert(
+      { email, tenant_id: tenantId, role, full_name: fullName, granted_by: actorId, provisioned: false },
+      { onConflict: 'email,tenant_id', ignoreDuplicates: false }
+    )
+
+  await db.from('audit_log').insert({
+    tenant_id:  tenantId,
+    actor_type: 'HUMAN',
+    actor_id:   actorId,
+    event_type: 'user.grant_created',
+    payload:    { email, role },
+  })
+
+  revalidatePath('/platform/users')
+}
+
+// ─── Crear superadmin ────────────────────────────────────────────────────────
+// Registra el email en superadmin_grants; se activa en el primer login.
+export async function assignSuperadmin(formData: FormData): Promise<void> {
+  const actorId  = await assertSuperadmin()
+  const email    = (formData.get('email') as string ?? '').trim().toLowerCase()
+  const fullName = (formData.get('full_name') as string ?? '').trim() || null
+
+  if (!email) return
+
+  const db = getSupabaseAdmin()
+
+  await db
+    .from('superadmin_grants')
+    .upsert(
+      { email, full_name: fullName, granted_by: actorId },
+      { onConflict: 'email', ignoreDuplicates: true }
+    )
+
+  await db.from('audit_log').insert({
+    tenant_id:  null as unknown as string,
+    actor_type: 'HUMAN',
+    actor_id:   actorId,
+    event_type: 'superadmin.grant_created',
+    payload:    { email },
+  })
+
+  revalidatePath('/platform/users')
+}
+
+// ─── Eliminar grant de usuario ───────────────────────────────────────────────
+export async function removeUserGrant(grantId: string, _formData: FormData): Promise<void> {
+  const actorId = await assertSuperadmin()
+  const db      = getSupabaseAdmin()
+
+  const { data: grant } = await db
+    .from('user_grants')
+    .select('tenant_id, email')
+    .eq('id', grantId)
+    .single() as unknown as { data: { tenant_id: string; email: string } | null }
+
+  if (!grant) return
+
+  await db.from('user_grants').delete().eq('id', grantId)
+  await db.from('audit_log').insert({
+    tenant_id:  grant.tenant_id,
+    actor_type: 'HUMAN',
+    actor_id:   actorId,
+    event_type: 'user.grant_removed',
+    payload:    { email: grant.email },
+  })
+
+  revalidatePath('/platform/users')
+}
+
+// ─── Cambiar rol de usuario activo ───────────────────────────────────────────
 export async function setUserRole(userId: string, formData: FormData): Promise<void> {
   const actorId = await assertSuperadmin()
   const role    = formData.get('role') as UserRole
@@ -36,10 +122,11 @@ export async function setUserRole(userId: string, formData: FormData): Promise<v
     event_type: 'user.role_changed',
     payload:    { user_id: userId, from_role: user.role, to_role: role },
   })
+
+  revalidatePath('/platform/users')
 }
 
-// Activar / desactivar — se usa con .bind(null, userId) como action del form
-// El form pasa is_active como hidden input ('true'/'false')
+// ─── Activar / desactivar usuario activo ─────────────────────────────────────
 export async function toggleUserActive(userId: string, formData: FormData): Promise<void> {
   const actorId  = await assertSuperadmin()
   const isActive = formData.get('is_active') === 'true'
@@ -61,16 +148,18 @@ export async function toggleUserActive(userId: string, formData: FormData): Prom
     event_type: isActive ? 'user.activated' : 'user.deactivated',
     payload:    { user_id: userId },
   })
+
+  revalidatePath('/platform/users')
 }
 
-// Eliminar usuario de un tenant — se usa con .bind(null, userId)
+// ─── Eliminar usuario activo ─────────────────────────────────────────────────
 export async function deleteUser(userId: string, _formData: FormData): Promise<void> {
   const actorId = await assertSuperadmin()
   const db      = getSupabaseAdmin()
 
   const { data: user } = await db
     .from('tenant_users')
-    .select('tenant_id, full_name')
+    .select('tenant_id, email')
     .eq('id', userId)
     .single()
 
@@ -84,66 +173,6 @@ export async function deleteUser(userId: string, _formData: FormData): Promise<v
     event_type: 'user.deleted',
     payload:    { user_id: userId },
   })
-}
 
-// Revocar invitación — se usa con .bind(null, invitationId)
-export async function revokeInvitation(invitationId: string, _formData: FormData): Promise<void> {
-  const actorId = await assertSuperadmin()
-  const db      = getSupabaseAdmin()
-
-  const { data: inv } = await db
-    .from('tenant_invitations')
-    .select('tenant_id, email')
-    .eq('id', invitationId)
-    .single()
-
-  if (!inv) return
-
-  await db
-    .from('tenant_invitations')
-    .update({ status: 'revoked' })
-    .eq('id', invitationId)
-
-  await db.from('audit_log').insert({
-    tenant_id:  inv.tenant_id,
-    actor_type: 'HUMAN',
-    actor_id:   actorId,
-    event_type: 'invitation.revoked',
-    payload:    { invitation_id: invitationId, email: inv.email },
-  })
-}
-
-// Invitar usuario a un tenant — form directo
-export async function inviteUser(formData: FormData): Promise<void> {
-  const actorId  = await assertSuperadmin()
-  const email    = (formData.get('email') as string ?? '').trim().toLowerCase()
-  const tenantId = formData.get('tenant_id') as string
-  const role     = (formData.get('role') as UserRole) ?? 'operator'
-
-  if (!email || !tenantId) return
-
-  const db = getSupabaseAdmin()
-
-  // Upsert: si ya existe una invitación revocada/expirada, la renueva
-  await db
-    .from('tenant_invitations')
-    .upsert(
-      {
-        tenant_id:  tenantId,
-        email,
-        role,
-        status:     'pending',
-        invited_by: null,
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-      { onConflict: 'tenant_id,email', ignoreDuplicates: false }
-    )
-
-  await db.from('audit_log').insert({
-    tenant_id:  tenantId,
-    actor_type: 'HUMAN',
-    actor_id:   actorId,
-    event_type: 'invitation.created',
-    payload:    { email, role },
-  })
+  revalidatePath('/platform/users')
 }
