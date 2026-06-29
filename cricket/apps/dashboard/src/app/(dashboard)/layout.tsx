@@ -16,29 +16,31 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // Cargar todos los perfiles del usuario (tenant_users activos)
   let profiles: UserProfile[] = []
   const userEmail = (session?.user.email as string | undefined ?? '').toLowerCase()
-  if (userId) {
+  if (userId || userEmail) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dbAny = getSupabaseAdmin() as any
-    type ProfileRow = { role: string; tenant_id: string; tenants: { id: string; name: string; slug: string } | null }
-
-    // Intentar por auth0_sub (usuarios que ya hicieron login después de la migración)
-    let { data } = (await dbAny
-      .from('tenant_users')
-      .select('role, tenant_id, tenants(id, name, slug)')
-      .eq('auth0_sub', userId)
-      .eq('is_active', true)) as { data: ProfileRow[] | null }
-
-    // Fallback por email (usuarios con filas creadas antes de la migración)
-    if ((!data || data.length === 0) && userEmail) {
-      ;({ data } = (await dbAny
-        .from('tenant_users')
-        .select('role, tenant_id, tenants(id, name, slug)')
-        .eq('email', userEmail)
-        .eq('is_active', true)) as { data: ProfileRow[] | null })
+    type ProfileRow = {
+      role: string
+      tenant_id: string
+      tenants: { id: string; name: string; slug: string } | null
     }
 
+    // OR: filas con auth0_sub (post-migración) O con email (pre-migración / rows manuales)
+    const orFilter = [
+      userId    ? `auth0_sub.eq.${userId}`    : null,
+      userEmail ? `email.eq.${userEmail}`     : null,
+    ].filter(Boolean).join(',')
+
+    const { data } = (await dbAny
+      .from('tenant_users')
+      .select('role, tenant_id, tenants(id, name, slug)')
+      .or(orFilter)
+      .eq('is_active', true)) as { data: ProfileRow[] | null }
+
+    // Deduplicar por tenant_id (por si hay coincidencia en ambas columnas)
+    const seen = new Set<string>()
     profiles = (data ?? [])
-      .filter(r => r.tenants !== null)
+      .filter(r => r.tenants !== null && !seen.has(r.tenant_id) && seen.add(r.tenant_id))
       .map(r => ({
         tenantId:   r.tenants!.id,
         tenantName: r.tenants!.name,
