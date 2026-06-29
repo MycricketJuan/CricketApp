@@ -13,7 +13,6 @@ const SUPERADMIN_SUBS = new Set([
 ])
 
 const SUPERADMIN_EMAILS = new Set([
-  'juandavid.franco@agilizar.co',
   'juandavid.franco@mycricket.ai',
 ])
 
