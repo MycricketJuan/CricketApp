@@ -3,14 +3,13 @@
 import { redirect } from 'next/navigation'
 import { auth0 } from '@/lib/auth0'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
+import { resolveRole } from '@/lib/auth-helpers'
 import type { UserRole } from '@cricket/core/types'
-
-const USER_ROLE_CLAIM = 'https://mycricket.ai/user_role'
 
 async function assertSuperadmin(): Promise<string> {
   const session = await auth0.getSession()
   if (!session) redirect('/auth/login')
-  const role = (session.user[USER_ROLE_CLAIM] ?? '') as string
+  const role = resolveRole(session.user as Record<string, unknown>)
   if (role !== 'superadmin') redirect('/')
   return session.user.sub as string
 }
