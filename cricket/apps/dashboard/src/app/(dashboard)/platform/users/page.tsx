@@ -70,29 +70,36 @@ export default async function UsersPage() {
   const dbAny = db as any
 
   const [
-    { data: tenantUsers },
-    { data: superadmins },
-    { data: userGrants },
-    { data: superadminGrants },
-    { data: tenants },
+    { data: tenantUsers, error: e1 },
+    { data: superadmins, error: e2 },
+    { data: userGrants,  error: e3 },
+    { data: superadminGrants, error: e4 },
+    { data: tenants,     error: e5 },
   ] = await Promise.all([
     db.from('tenant_users')
       .select('id, full_name, email, role, is_active, last_seen_at, created_at, tenant_id')
-      .order('created_at', { ascending: false }) as unknown as Promise<{ data: TenantUserRow[] | null }>,
+      .order('created_at', { ascending: false }) as unknown as Promise<{ data: TenantUserRow[] | null; error: { message: string } | null }>,
     db.from('superadmins')
       .select('id, email, full_name, created_at')
-      .order('created_at', { ascending: false }) as unknown as Promise<{ data: Superadmin[] | null }>,
+      .order('created_at', { ascending: false }) as unknown as Promise<{ data: Superadmin[] | null; error: { message: string } | null }>,
     dbAny.from('user_grants')
       .select('id, email, tenant_id, role, full_name, provisioned, created_at')
-      .order('created_at', { ascending: false }) as Promise<{ data: Grant[] | null }>,
+      .order('created_at', { ascending: false }) as Promise<{ data: Grant[] | null; error: { message: string } | null }>,
     dbAny.from('superadmin_grants')
       .select('id, email, full_name, provisioned, created_at')
-      .order('created_at', { ascending: false }) as Promise<{ data: SuperadminGrant[] | null }>,
+      .order('created_at', { ascending: false }) as Promise<{ data: SuperadminGrant[] | null; error: { message: string } | null }>,
     db.from('tenants')
       .select('id, name, slug')
       .eq('is_active', true)
-      .order('name') as unknown as Promise<{ data: Pick<TenantRow, 'id' | 'name' | 'slug'>[] | null }>,
+      .order('name') as unknown as Promise<{ data: Pick<TenantRow, 'id' | 'name' | 'slug'>[] | null; error: { message: string } | null }>,
   ])
+
+  // Log query errors so they appear in Vercel runtime logs
+  if (e1) console.error('[users/page] tenant_users:', e1.message)
+  if (e2) console.error('[users/page] superadmins:', e2.message)
+  if (e3) console.error('[users/page] user_grants:', e3.message)
+  if (e4) console.error('[users/page] superadmin_grants:', e4.message)
+  if (e5) console.error('[users/page] tenants:', e5.message)
 
   const tenantMap  = Object.fromEntries((tenants ?? []).map(t => [t.id, t]))
   const users      = tenantUsers ?? []
