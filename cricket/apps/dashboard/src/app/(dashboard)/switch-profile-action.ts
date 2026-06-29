@@ -16,7 +16,7 @@ export async function switchProfile(tenantSlug: string): Promise<void> {
   const { data: profile } = await db
     .from('tenant_users')
     .select('id, tenants!inner(slug)')
-    .eq('id', userId)
+    .eq('auth0_sub', userId)
     .eq('is_active', true)
     .eq('tenants.slug', tenantSlug)
     .maybeSingle()

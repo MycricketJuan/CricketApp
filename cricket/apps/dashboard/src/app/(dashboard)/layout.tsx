@@ -20,7 +20,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     const { data } = (await db
       .from('tenant_users')
       .select('role, tenant_id, tenants(id, name, slug)')
-      .eq('id', userId)
+      .eq('auth0_sub', userId)
       .eq('is_active', true)) as unknown as {
         data: Array<{
           role: string
