@@ -65,6 +65,33 @@ interface Superadmin {
 }
 
 export default async function UsersPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let debugError: any = null
+
+  try {
+    return await renderPage()
+  } catch (err) {
+    debugError = err
+  }
+
+  return (
+    <div className="p-6">
+      <div className="rounded-xl border border-red-200 bg-red-50 p-6">
+        <h2 className="text-sm font-semibold text-red-800 mb-2">Error cargando usuarios</h2>
+        <pre className="text-xs text-red-700 whitespace-pre-wrap break-all">
+          {String(debugError)}
+        </pre>
+        {debugError instanceof Error && debugError.stack && (
+          <pre className="mt-2 text-xs text-red-400 whitespace-pre-wrap break-all">
+            {debugError.stack}
+          </pre>
+        )}
+      </div>
+    </div>
+  )
+}
+
+async function renderPage() {
   const db    = getSupabaseAdmin()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dbAny = db as any
