@@ -8,6 +8,7 @@ import {
   toggleUserActive,
   deleteUser,
 } from './actions'
+import { ConfirmButton } from './confirm-button'
 
 type TenantUserRow = Database['public']['Tables']['tenant_users']['Row'] & {
   auth0_sub?: string | null
@@ -381,13 +382,12 @@ async function renderPage() {
                           </button>
                         </form>
                         <form action={deleteAction}>
-                          <button
-                            type="submit"
+                          <ConfirmButton
+                            message="¿Eliminar acceso de este usuario?"
                             className="rounded px-2 py-1 text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-                            onClick={(e) => { if (!confirm('¿Eliminar acceso de este usuario?')) e.preventDefault() }}
                           >
                             Eliminar
-                          </button>
+                          </ConfirmButton>
                         </form>
                       </div>
                     </td>
