@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 type DocStatus = 'processing' | 'ready' | 'error'
 
@@ -12,7 +12,9 @@ export interface KBDocument {
   file_name: string | null
   status: DocStatus
   chunk_count: number
+  error_msg: string | null
   created_at: string
+  updated_at: string
 }
 
 interface Props {
@@ -24,7 +26,7 @@ type Tab = 'files' | 'urls' | 'faq'
 
 // ── Status badge ─────────────────────────────────────────────
 
-function StatusBadge({ status }: { status: DocStatus }) {
+function StatusBadge({ status, animated }: { status: DocStatus; animated?: boolean }) {
   const styles: Record<DocStatus, string> = {
     processing: 'bg-yellow-100 text-yellow-800',
     ready:      'bg-green-100  text-green-800',
@@ -36,9 +38,172 @@ function StatusBadge({ status }: { status: DocStatus }) {
     error:      'Error',
   }
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
+      {status === 'processing' && animated && (
+        <span className="inline-block h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+      )}
       {labels[status]}
     </span>
+  )
+}
+
+// ── Elapsed timer ─────────────────────────────────────────────
+
+function ElapsedTimer({ since }: { since: string }) {
+  const [elapsed, setElapsed] = useState(0)
+
+  useEffect(() => {
+    const start = new Date(since).getTime()
+    const tick = () => setElapsed(Math.floor((Date.now() - start) / 1000))
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [since])
+
+  const m = Math.floor(elapsed / 60)
+  const s = elapsed % 60
+  return <span className="tabular-nums">{m > 0 ? `${m}m ` : ''}{s}s</span>
+}
+
+// ── Doc detail panel ──────────────────────────────────────────
+
+function DocDetailPanel({
+  doc,
+  tenantId,
+  onClose,
+  onUpdate,
+}: {
+  doc: KBDocument
+  tenantId: string
+  onClose: () => void
+  onUpdate: (updater: (prev: KBDocument[]) => KBDocument[]) => void
+}) {
+  const [current, setCurrent] = useState<KBDocument>(doc)
+
+  // Keep in sync when parent passes a new version (e.g. after list refresh)
+  useEffect(() => { setCurrent(doc) }, [doc])
+
+  // Auto-poll while processing
+  useEffect(() => {
+    if (current.status !== 'processing') return
+    const id = setInterval(async () => {
+      const res = await fetch(`/api/knowledge/documents?tenant_id=${tenantId}`)
+      if (!res.ok) return
+      const list = await res.json() as KBDocument[]
+      const updated = list.find(d => d.id === current.id)
+      if (!updated) return
+      setCurrent(updated)
+      onUpdate(prev => prev.map(d => d.id === updated.id ? updated : d))
+    }, 3000)
+    return () => clearInterval(id)
+  }, [current.status, current.id, tenantId, onUpdate])
+
+  const SOURCE_LABELS: Record<string, string> = { file: 'Archivo', url: 'URL', faq: 'FAQ' }
+
+  function Row({ label, children }: { label: string; children: React.ReactNode }) {
+    return (
+      <div className="flex items-start justify-between gap-4 py-2.5 border-b border-gray-100 last:border-0">
+        <span className="text-sm text-gray-500 shrink-0 w-36">{label}</span>
+        <span className="text-sm text-gray-900 text-right break-all">{children}</span>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/20 z-40"
+        onClick={onClose}
+      />
+
+      {/* Slide-over */}
+      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+          <h2 className="text-sm font-semibold text-gray-900">Detalle del documento</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-700 transition-colors text-lg leading-none"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          {/* Metadata */}
+          <div>
+            <Row label="Título">{current.title}</Row>
+            <Row label="Tipo">{SOURCE_LABELS[current.source_type] ?? current.source_type}</Row>
+            {current.source_url && (
+              <Row label="URL">
+                <a
+                  href={current.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  {current.source_url}
+                </a>
+              </Row>
+            )}
+            {current.file_name && <Row label="Archivo">{current.file_name}</Row>}
+            <Row label="Estado">
+              <StatusBadge status={current.status} animated />
+            </Row>
+            <Row label="Fragmentos">
+              {current.chunk_count > 0 ? current.chunk_count.toLocaleString('es') : '—'}
+            </Row>
+            <Row label="Creado">
+              {new Date(current.created_at).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
+            </Row>
+            <Row label="Actualizado">
+              {new Date(current.updated_at).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
+            </Row>
+          </div>
+
+          {/* Processing state */}
+          {current.status === 'processing' && (
+            <div className="rounded-xl bg-yellow-50 border border-yellow-200 px-4 py-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-3 w-3 rounded-full bg-yellow-400 animate-ping" />
+                <p className="text-sm font-medium text-yellow-800">Procesando</p>
+              </div>
+              <p className="text-xs text-yellow-700">
+                Analizando contenido y generando embeddings para búsqueda semántica…
+              </p>
+              <p className="text-xs text-yellow-600">
+                Tiempo transcurrido: <ElapsedTimer since={current.created_at} />
+              </p>
+              <p className="text-xs text-yellow-500 mt-1">Esta vista se actualiza automáticamente.</p>
+            </div>
+          )}
+
+          {/* Ready state */}
+          {current.status === 'ready' && (
+            <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-4">
+              <p className="text-sm font-medium text-green-800">Documento listo</p>
+              <p className="text-xs text-green-700 mt-1">
+                {current.chunk_count} fragmento{current.chunk_count !== 1 ? 's' : ''} indexado{current.chunk_count !== 1 ? 's' : ''} y disponibles para búsqueda semántica.
+              </p>
+            </div>
+          )}
+
+          {/* Error state */}
+          {current.status === 'error' && (
+            <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-4">
+              <p className="text-sm font-medium text-red-800">Error al procesar</p>
+              {current.error_msg && (
+                <p className="text-xs text-red-700 mt-1 font-mono whitespace-pre-wrap break-all">
+                  {current.error_msg}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   )
 }
 
@@ -47,9 +212,11 @@ function StatusBadge({ status }: { status: DocStatus }) {
 function DocumentList({
   docs,
   onDelete,
+  onSelect,
 }: {
   docs: KBDocument[]
   onDelete: (id: string) => void
+  onSelect: (doc: KBDocument) => void
 }) {
   if (docs.length === 0) {
     return (
@@ -68,7 +235,11 @@ function DocumentList({
   return (
     <ul className="mt-4 divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white">
       {docs.map(doc => (
-        <li key={doc.id} className="flex items-center justify-between px-4 py-3 gap-3">
+        <li
+          key={doc.id}
+          className="flex items-center justify-between px-4 py-3 gap-3 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => onSelect(doc)}
+        >
           <div className="flex items-start gap-3 min-w-0">
             <span className="mt-0.5 text-lg">{sourceIcon[doc.source_type] ?? '📄'}</span>
             <div className="min-w-0">
@@ -81,9 +252,9 @@ function DocumentList({
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            <StatusBadge status={doc.status} />
+            <StatusBadge status={doc.status} animated={doc.status === 'processing'} />
             <button
-              onClick={() => onDelete(doc.id)}
+              onClick={(e) => { e.stopPropagation(); onDelete(doc.id) }}
               className="text-gray-300 hover:text-red-500 transition-colors"
               title="Eliminar"
             >
@@ -99,14 +270,15 @@ function DocumentList({
 // ── Main component ────────────────────────────────────────────
 
 export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
-  const [tab, setTab]           = useState<Tab>('files')
-  const [docs, setDocs]         = useState<KBDocument[]>(initialDocuments)
+  const [tab, setTab]             = useState<Tab>('files')
+  const [docs, setDocs]           = useState<KBDocument[]>(initialDocuments)
   const [uploading, setUploading] = useState(false)
   const [urlInput, setUrlInput]   = useState('')
   const [faqQ, setFaqQ]           = useState('')
   const [faqA, setFaqA]           = useState('')
   const [error, setError]         = useState<string | null>(null)
   const [success, setSuccess]     = useState<string | null>(null)
+  const [selectedDoc, setSelectedDoc] = useState<KBDocument | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const notify = (msg: string, type: 'ok' | 'err') => {
@@ -122,6 +294,7 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
   }, [tenantId])
 
   const handleDelete = async (id: string) => {
+    if (selectedDoc?.id === id) setSelectedDoc(null)
     const res = await fetch('/api/knowledge/documents', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -205,6 +378,15 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
     { id: 'faq',   label: '❓ FAQ' },
   ]
 
+  // Keep selectedDoc in sync with latest list data
+  useEffect(() => {
+    if (!selectedDoc) return
+    const fresh = docs.find(d => d.id === selectedDoc.id)
+    if (fresh && fresh.updated_at !== selectedDoc.updated_at) {
+      setSelectedDoc(fresh)
+    }
+  }, [docs, selectedDoc])
+
   return (
     <div>
       {/* Notificaciones */}
@@ -264,6 +446,7 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
             <DocumentList
               docs={docs.filter(d => d.source_type === 'file')}
               onDelete={handleDelete}
+              onSelect={setSelectedDoc}
             />
           </div>
         )}
@@ -292,6 +475,7 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
             <DocumentList
               docs={docs.filter(d => d.source_type === 'url')}
               onDelete={handleDelete}
+              onSelect={setSelectedDoc}
             />
           </div>
         )}
@@ -333,10 +517,21 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
             <DocumentList
               docs={docs.filter(d => d.source_type === 'faq')}
               onDelete={handleDelete}
+              onSelect={setSelectedDoc}
             />
           </div>
         )}
       </div>
+
+      {/* Detail panel */}
+      {selectedDoc && (
+        <DocDetailPanel
+          doc={selectedDoc}
+          tenantId={tenantId}
+          onClose={() => setSelectedDoc(null)}
+          onUpdate={setDocs}
+        />
+      )}
     </div>
   )
 }

@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     const db = getKBAdmin()
     const { data, error } = await db
       .from('knowledge_base_documents')
-      .select('id, title, source_type, source_url, file_name, status, chunk_count, created_at')
+      .select('id, title, source_type, source_url, file_name, status, chunk_count, error_msg, created_at, updated_at')
       .eq('tenant_id', tenantId)
       .order('created_at', { ascending: false })
 
