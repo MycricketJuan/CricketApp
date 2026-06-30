@@ -65,6 +65,15 @@ function ElapsedTimer({ since }: { since: string }) {
   return <span className="tabular-nums">{m > 0 ? `${m}m ` : ''}{s}s</span>
 }
 
+// ── Progress data ─────────────────────────────────────────────
+
+interface ProgressData {
+  status: string
+  processed: number
+  total: number
+  started_at: string
+}
+
 // ── Doc detail panel ──────────────────────────────────────────
 
 function DocDetailPanel({
@@ -78,23 +87,49 @@ function DocDetailPanel({
   onClose: () => void
   onUpdate: (updater: (prev: KBDocument[]) => KBDocument[]) => void
 }) {
-  const [current, setCurrent] = useState<KBDocument>(doc)
+  const [current, setCurrent]   = useState<KBDocument>(doc)
+  const [progress, setProgress] = useState<ProgressData | null>(null)
+  const [elapsed, setElapsed]   = useState(0)
 
-  // Keep in sync when parent passes a new version (e.g. after list refresh)
+  // Keep in sync when parent passes a new version
   useEffect(() => { setCurrent(doc) }, [doc])
 
-  // Auto-poll while processing
+  // Elapsed timer (seconds since created_at)
   useEffect(() => {
     if (current.status !== 'processing') return
-    const id = setInterval(async () => {
-      const res = await fetch(`/api/knowledge/documents?tenant_id=${tenantId}`)
+    const start = new Date(current.created_at).getTime()
+    const tick = () => setElapsed(Math.floor((Date.now() - start) / 1000))
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [current.status, current.created_at])
+
+  // Poll /api/knowledge/progress every 3s while processing
+  useEffect(() => {
+    if (current.status !== 'processing') return
+
+    const poll = async () => {
+      const res = await fetch(
+        `/api/knowledge/progress?document_id=${current.id}&tenant_id=${tenantId}`
+      )
       if (!res.ok) return
-      const list = await res.json() as KBDocument[]
-      const updated = list.find(d => d.id === current.id)
-      if (!updated) return
-      setCurrent(updated)
-      onUpdate(prev => prev.map(d => d.id === updated.id ? updated : d))
-    }, 3000)
+      const data = await res.json() as ProgressData
+      setProgress(data)
+
+      if (data.status !== 'processing') {
+        // Refresh the full document list so status badge updates everywhere
+        const listRes = await fetch(`/api/knowledge/documents?tenant_id=${tenantId}`)
+        if (listRes.ok) {
+          const list = await listRes.json() as KBDocument[]
+          onUpdate(() => list)
+          const updated = list.find(d => d.id === current.id)
+          if (updated) setCurrent(updated)
+        }
+      }
+    }
+
+    poll()
+    const id = setInterval(poll, 3000)
     return () => clearInterval(id)
   }, [current.status, current.id, tenantId, onUpdate])
 
@@ -109,13 +144,22 @@ function DocDetailPanel({
     )
   }
 
+  // Derived progress values
+  const pct          = progress && progress.total > 0 ? Math.min(100, Math.round((progress.processed / progress.total) * 100)) : null
+  const elapsedMins  = elapsed / 60
+  const rate         = elapsed > 30 && progress && progress.processed > 0 ? progress.processed / elapsedMins : null
+  const etaMins      = rate && progress && progress.total > progress.processed ? Math.ceil((progress.total - progress.processed) / rate) : null
+
+  const fmtElapsed = () => {
+    const m = Math.floor(elapsed / 60)
+    const s = elapsed % 60
+    return m > 0 ? `${m}m ${s}s` : `${s}s`
+  }
+
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/20 z-40"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
       {/* Slide-over */}
       <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col">
@@ -152,9 +196,6 @@ function DocDetailPanel({
             <Row label="Estado">
               <StatusBadge status={current.status} animated />
             </Row>
-            <Row label="Fragmentos">
-              {current.chunk_count > 0 ? current.chunk_count.toLocaleString('es') : '—'}
-            </Row>
             <Row label="Creado">
               {new Date(current.created_at).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
             </Row>
@@ -165,18 +206,58 @@ function DocDetailPanel({
 
           {/* Processing state */}
           {current.status === 'processing' && (
-            <div className="rounded-xl bg-yellow-50 border border-yellow-200 px-4 py-4 space-y-2">
+            <div className="rounded-xl bg-yellow-50 border border-yellow-200 px-4 py-4 space-y-3">
               <div className="flex items-center gap-2">
                 <span className="inline-block h-3 w-3 rounded-full bg-yellow-400 animate-ping" />
                 <p className="text-sm font-medium text-yellow-800">Procesando</p>
               </div>
-              <p className="text-xs text-yellow-700">
+
+              {/* Progress bar */}
+              {progress && progress.total > 0 && (
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs text-yellow-700">
+                    <span>
+                      {progress.processed} de {progress.total} fragmentos procesados
+                    </span>
+                    <span>{pct}%</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-yellow-200 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-yellow-500 transition-all duration-500"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Stats grid */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <div className="rounded-lg bg-yellow-100 px-3 py-2">
+                  <p className="text-xs text-yellow-600">Tiempo transcurrido</p>
+                  <p className="text-sm font-medium text-yellow-800 tabular-nums">{fmtElapsed()}</p>
+                </div>
+                {rate !== null && (
+                  <div className="rounded-lg bg-yellow-100 px-3 py-2">
+                    <p className="text-xs text-yellow-600">Velocidad</p>
+                    <p className="text-sm font-medium text-yellow-800 tabular-nums">
+                      ~{rate.toFixed(1)} frg/min
+                    </p>
+                  </div>
+                )}
+                {etaMins !== null && (
+                  <div className="rounded-lg bg-yellow-100 px-3 py-2 col-span-2">
+                    <p className="text-xs text-yellow-600">Tiempo estimado restante</p>
+                    <p className="text-sm font-medium text-yellow-800">
+                      ~{etaMins < 1 ? 'menos de 1 min' : `${etaMins} min`}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <p className="text-xs text-yellow-600">
                 Analizando contenido y generando embeddings para búsqueda semántica…
               </p>
-              <p className="text-xs text-yellow-600">
-                Tiempo transcurrido: <ElapsedTimer since={current.created_at} />
-              </p>
-              <p className="text-xs text-yellow-500 mt-1">Esta vista se actualiza automáticamente.</p>
+              <p className="text-xs text-yellow-400">Esta vista se actualiza automáticamente.</p>
             </div>
           )}
 

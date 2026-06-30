@@ -33,6 +33,12 @@ export async function ingestChunks(
 ): Promise<void> {
   const db = getKBAdmin()
 
+  // Write total upfront so the progress endpoint can show X of N during processing
+  await db
+    .from('knowledge_base_documents')
+    .update({ chunk_count: chunks.length })
+    .eq('id', documentId)
+
   for (let i = 0; i < chunks.length; i++) {
     const embedding = await generateEmbedding(chunks[i])
     await db.from('knowledge_base_chunks').insert({
