@@ -17,6 +17,8 @@ export function chunkText(text: string): string[] {
   return chunks.filter(c => c.length > 50)
 }
 
+const OPENAI_BATCH_SIZE = 100 // OpenAI acepta hasta 2048; 100 es seguro y rápido
+
 export async function generateEmbedding(text: string): Promise<number[]> {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
   const res = await openai.embeddings.create({
@@ -24,6 +26,15 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     input: text,
   })
   return res.data[0].embedding
+}
+
+async function generateEmbeddingsBatch(texts: string[]): Promise<number[][]> {
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
+  const res = await openai.embeddings.create({
+    model: 'text-embedding-3-small',
+    input: texts,
+  })
+  return res.data.map(d => d.embedding)
 }
 
 export async function ingestChunks(
@@ -39,15 +50,20 @@ export async function ingestChunks(
     .update({ chunk_count: chunks.length })
     .eq('id', documentId)
 
-  for (let i = 0; i < chunks.length; i++) {
-    const embedding = await generateEmbedding(chunks[i])
-    await db.from('knowledge_base_chunks').insert({
+  // Process in batches: one OpenAI call per batch instead of one per chunk
+  for (let batchStart = 0; batchStart < chunks.length; batchStart += OPENAI_BATCH_SIZE) {
+    const batchChunks = chunks.slice(batchStart, batchStart + OPENAI_BATCH_SIZE)
+    const embeddings  = await generateEmbeddingsBatch(batchChunks)
+
+    const rows = batchChunks.map((content, i) => ({
       document_id: documentId,
       tenant_id:   tenantId,
-      content:     chunks[i],
-      embedding:   JSON.stringify(embedding),
-      chunk_index: i,
-    })
+      content,
+      embedding:   JSON.stringify(embeddings[i]),
+      chunk_index: batchStart + i,
+    }))
+
+    await db.from('knowledge_base_chunks').insert(rows)
   }
 
   await db
