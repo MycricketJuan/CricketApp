@@ -199,9 +199,11 @@ function DocDetailPanel({
             <Row label="Creado">
               {new Date(current.created_at).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
             </Row>
-            <Row label="Actualizado">
-              {new Date(current.updated_at).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
-            </Row>
+            {current.updated_at && current.updated_at !== current.created_at && (
+              <Row label="Actualizado">
+                {new Date(current.updated_at).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
+              </Row>
+            )}
           </div>
 
           {/* Processing state */}
@@ -213,7 +215,7 @@ function DocDetailPanel({
               </div>
 
               {/* Progress bar */}
-              {progress && progress.total > 0 && (
+              {progress && progress.total > 0 ? (
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs text-yellow-700">
                     <span>
@@ -228,7 +230,11 @@ function DocDetailPanel({
                     />
                   </div>
                 </div>
-              )}
+              ) : progress && progress.processed > 0 ? (
+                <p className="text-xs text-yellow-700">
+                  {progress.processed} fragmentos procesados hasta ahora…
+                </p>
+              ) : null}
 
               {/* Stats grid */}
               <div className="grid grid-cols-2 gap-2 pt-1">
