@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { redirect } from 'next/navigation'
 import { auth0 } from '@/lib/auth0'
 import { resolveRole } from '@/lib/auth-helpers'

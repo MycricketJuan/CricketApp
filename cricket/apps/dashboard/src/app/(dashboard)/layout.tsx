@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { headers } from 'next/headers'
 import { auth0 } from '@/lib/auth0'
 import { resolveRole } from '@/lib/auth-helpers'
