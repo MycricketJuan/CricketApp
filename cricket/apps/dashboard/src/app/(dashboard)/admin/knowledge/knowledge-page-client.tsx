@@ -104,7 +104,7 @@ function DocDetailPanel({
     return () => clearInterval(id)
   }, [current.status, current.created_at])
 
-  // Poll /api/knowledge/progress every 3s while processing
+  // Poll /api/knowledge/progress (1.5s while total=0, 3s otherwise)
   useEffect(() => {
     if (current.status !== 'processing') return
 
@@ -117,7 +117,6 @@ function DocDetailPanel({
       setProgress(data)
 
       if (data.status !== 'processing') {
-        // Refresh the full document list so status badge updates everywhere
         const listRes = await fetch(`/api/knowledge/documents?tenant_id=${tenantId}`)
         if (listRes.ok) {
           const list = await listRes.json() as KBDocument[]
@@ -129,9 +128,10 @@ function DocDetailPanel({
     }
 
     poll()
-    const id = setInterval(poll, 3000)
+    const interval = !progress || progress.total === 0 ? 1500 : 3000
+    const id = setInterval(poll, interval)
     return () => clearInterval(id)
-  }, [current.status, current.id, tenantId, onUpdate])
+  }, [current.status, current.id, tenantId, onUpdate, progress?.total])
 
   const SOURCE_LABELS: Record<string, string> = { file: 'Archivo', url: 'URL', faq: 'FAQ' }
 
@@ -206,66 +206,94 @@ function DocDetailPanel({
             )}
           </div>
 
-          {/* Processing state */}
-          {current.status === 'processing' && (
-            <div className="rounded-xl bg-yellow-50 border border-yellow-200 px-4 py-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="inline-block h-3 w-3 rounded-full bg-yellow-400 animate-ping" />
-                <p className="text-sm font-medium text-yellow-800">Procesando</p>
-              </div>
+          {/* Processing state — 3 phases */}
+          {current.status === 'processing' && (() => {
+            const phase = !progress || progress.total === 0
+              ? 1
+              : progress.processed === 0
+                ? 2
+                : 3
 
-              {/* Progress bar */}
-              {progress && progress.total > 0 ? (
-                <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs text-yellow-700">
-                    <span>
-                      {progress.processed} de {progress.total} fragmentos procesados
-                    </span>
-                    <span>{pct}%</span>
-                  </div>
+            const PHASE_LABELS = ['Analizando URL', 'Generando embeddings', 'Guardando en base de datos']
+            const PHASE_DESC = [
+              'Descargando el contenido de la página y dividiendo en fragmentos para indexar…',
+              `Enviando ${progress?.total ?? '…'} fragmentos a OpenAI para generar vectores semánticos…`,
+              '',
+            ]
+
+            return (
+              <div className="rounded-xl bg-yellow-50 border border-yellow-200 px-4 py-4 space-y-3">
+                <style>{`
+                  @keyframes indeterminate {
+                    0%   { transform: translateX(-100%); }
+                    100% { transform: translateX(400%); }
+                  }
+                `}</style>
+
+                {/* Phase header */}
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-3 w-3 rounded-full bg-yellow-400 animate-ping shrink-0" />
+                  <p className="text-sm font-semibold text-yellow-900">
+                    Fase {phase} de 3 · {PHASE_LABELS[phase - 1]}
+                  </p>
+                </div>
+
+                {/* Progress bar */}
+                {phase < 3 ? (
+                  /* Indeterminate */
                   <div className="h-2 w-full rounded-full bg-yellow-200 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-yellow-500 transition-all duration-500"
-                      style={{ width: `${pct}%` }}
+                      className="h-full w-1/3 rounded-full bg-yellow-500"
+                      style={{ animation: 'indeterminate 1.5s ease-in-out infinite' }}
                     />
                   </div>
-                </div>
-              ) : progress && progress.processed > 0 ? (
-                <p className="text-xs text-yellow-700">
-                  {progress.processed} fragmentos procesados hasta ahora…
-                </p>
-              ) : null}
+                ) : (
+                  /* Determinate */
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs text-yellow-700">
+                      <span>{progress!.processed} de {progress!.total} fragmentos</span>
+                      <span>{pct}%</span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-yellow-200 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-yellow-500 transition-all duration-500"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
 
-              {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-2 pt-1">
-                <div className="rounded-lg bg-yellow-100 px-3 py-2">
-                  <p className="text-xs text-yellow-600">Tiempo transcurrido</p>
-                  <p className="text-sm font-medium text-yellow-800 tabular-nums">{fmtElapsed()}</p>
-                </div>
-                {rate !== null && (
+                {/* Description */}
+                {phase < 3 && (
+                  <p className="text-xs text-yellow-700">{PHASE_DESC[phase - 1]}</p>
+                )}
+
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-2">
                   <div className="rounded-lg bg-yellow-100 px-3 py-2">
-                    <p className="text-xs text-yellow-600">Velocidad</p>
-                    <p className="text-sm font-medium text-yellow-800 tabular-nums">
-                      ~{rate.toFixed(1)} frg/min
-                    </p>
+                    <p className="text-xs text-yellow-600">Tiempo transcurrido</p>
+                    <p className="text-sm font-medium text-yellow-800 tabular-nums">{fmtElapsed()}</p>
                   </div>
-                )}
-                {etaMins !== null && (
-                  <div className="rounded-lg bg-yellow-100 px-3 py-2 col-span-2">
-                    <p className="text-xs text-yellow-600">Tiempo estimado restante</p>
-                    <p className="text-sm font-medium text-yellow-800">
-                      ~{etaMins < 1 ? 'menos de 1 min' : `${etaMins} min`}
-                    </p>
-                  </div>
-                )}
-              </div>
+                  {rate !== null && (
+                    <div className="rounded-lg bg-yellow-100 px-3 py-2">
+                      <p className="text-xs text-yellow-600">Velocidad</p>
+                      <p className="text-sm font-medium text-yellow-800 tabular-nums">~{rate.toFixed(1)} frg/min</p>
+                    </div>
+                  )}
+                  {etaMins !== null && (
+                    <div className="rounded-lg bg-yellow-100 px-3 py-2 col-span-2">
+                      <p className="text-xs text-yellow-600">Tiempo estimado restante</p>
+                      <p className="text-sm font-medium text-yellow-800">
+                        ~{etaMins < 1 ? 'menos de 1 min' : `${etaMins} min`}
+                      </p>
+                    </div>
+                  )}
+                </div>
 
-              <p className="text-xs text-yellow-600">
-                Analizando contenido y generando embeddings para búsqueda semántica…
-              </p>
-              <p className="text-xs text-yellow-400">Esta vista se actualiza automáticamente.</p>
-            </div>
-          )}
+                <p className="text-xs text-yellow-400">Esta vista se actualiza automáticamente.</p>
+              </div>
+            )
+          })()}
 
           {/* Ready state */}
           {current.status === 'ready' && (
