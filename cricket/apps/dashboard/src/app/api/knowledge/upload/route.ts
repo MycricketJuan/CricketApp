@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { getKBAdmin } from '@/lib/knowledge/db'
 import { chunkText, ingestChunks, markDocumentError } from '@/lib/knowledge/pipeline'
 
@@ -59,10 +59,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'El archivo no contiene texto extraíble' }, { status: 422 })
     }
 
-    // Procesar en background (fire-and-forget) para responder rápido
+    // Procesar en background — `after` mantiene la función viva en Vercel
     const chunks = chunkText(text)
-    ingestChunks(doc.id, tenantId, chunks).catch(err =>
-      markDocumentError(doc.id, String(err))
+    after(
+      ingestChunks(doc.id, tenantId, chunks).catch(err =>
+        markDocumentError(doc.id, String(err))
+      )
     )
 
     return NextResponse.json({ id: doc.id, chunk_count: chunks.length }, { status: 202 })

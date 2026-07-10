@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { load } from 'cheerio'
 import { getKBAdmin } from '@/lib/knowledge/db'
 import { chunkText, ingestChunks, markDocumentError } from '@/lib/knowledge/pipeline'
@@ -41,12 +41,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Error al crear documento' }, { status: 500 })
     }
 
-    // Fetch y extracción en background
-    ;(async () => {
+    // Fetch y extracción en background — `after` mantiene la función viva en Vercel
+    after(async () => {
       try {
         const response = await fetch(url, {
           headers: { 'User-Agent': 'Cricket-Bot/1.0' },
-          signal: AbortSignal.timeout(15000),
+          signal: AbortSignal.timeout(30000),
         })
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         await markDocumentError(doc.id, String(err))
       }
-    })()
+    })
 
     return NextResponse.json({ id: doc.id }, { status: 202 })
 
