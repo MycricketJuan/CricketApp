@@ -328,10 +328,12 @@ function DocumentList({
   docs,
   onDelete,
   onSelect,
+  onEdit,
 }: {
   docs: KBDocument[]
   onDelete: (id: string) => void
   onSelect: (doc: KBDocument) => void
+  onEdit?: (doc: KBDocument) => void
 }) {
   if (docs.length === 0) {
     return (
@@ -368,6 +370,15 @@ function DocumentList({
           </div>
           <div className="flex items-center gap-3 shrink-0">
             <StatusBadge status={doc.status} animated={doc.status === 'processing'} />
+            {onEdit && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onEdit(doc) }}
+                className="text-gray-300 hover:text-blue-500 transition-colors"
+                title="Editar"
+              >
+                ✎
+              </button>
+            )}
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(doc.id) }}
               className="text-gray-300 hover:text-red-500 transition-colors"
@@ -391,6 +402,8 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
   const [urlInput, setUrlInput]   = useState('')
   const [faqQ, setFaqQ]           = useState('')
   const [faqA, setFaqA]           = useState('')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [generating, setGenerating] = useState(false)
   const [error, setError]         = useState<string | null>(null)
   const [success, setSuccess]     = useState<string | null>(null)
   const [selectedDoc, setSelectedDoc] = useState<KBDocument | null>(null)
@@ -466,24 +479,70 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
     }
   }
 
-  // ── Add FAQ ─────────────────────────────────────────────────
-  const handleFaqAdd = async () => {
+  // ── Add / edit FAQ ────────────────────────────────────────────
+  const handleFaqSave = async () => {
     if (!faqQ.trim() || !faqA.trim()) return
     setUploading(true)
-    const res = await fetch('/api/knowledge/faq', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: faqQ, answer: faqA, tenant_id: tenantId }),
-    })
+
+    const res = editingId
+      ? await fetch('/api/knowledge/faq', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editingId, question: faqQ, answer: faqA, tenant_id: tenantId }),
+        })
+      : await fetch('/api/knowledge/faq', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: faqQ, answer: faqA, tenant_id: tenantId }),
+        })
+
     setUploading(false)
     if (res.ok) {
       setFaqQ('')
       setFaqA('')
-      notify('FAQ guardada correctamente.', 'ok')
+      setEditingId(null)
+      notify(editingId ? 'FAQ actualizada correctamente.' : 'FAQ guardada correctamente.', 'ok')
       await refreshDocs()
     } else {
       const body = await res.json() as { error: string }
       notify(body.error ?? 'Error al guardar la FAQ', 'err')
+    }
+  }
+
+  const handleFaqEditStart = async (doc: KBDocument) => {
+    const res = await fetch(`/api/knowledge/faq?id=${doc.id}&tenant_id=${tenantId}`)
+    if (!res.ok) {
+      notify('Error al cargar la FAQ', 'err')
+      return
+    }
+    const body = await res.json() as { question: string; answer: string }
+    setFaqQ(body.question)
+    setFaqA(body.answer)
+    setEditingId(doc.id)
+  }
+
+  const handleFaqCancelEdit = () => {
+    setEditingId(null)
+    setFaqQ('')
+    setFaqA('')
+  }
+
+  // ── Generate FAQs from indexed URLs ──────────────────────────
+  const handleGenerateFaqs = async () => {
+    setGenerating(true)
+    const res = await fetch('/api/knowledge/faq/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tenant_id: tenantId }),
+    })
+    setGenerating(false)
+    if (res.ok) {
+      const body = await res.json() as { inserted: number }
+      notify(`Se generaron ${body.inserted} FAQs a partir de las URLs indexadas.`, 'ok')
+      await refreshDocs()
+    } else {
+      const body = await res.json() as { error: string }
+      notify(body.error ?? 'Error al generar FAQs', 'err')
     }
   }
 
@@ -598,6 +657,14 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
         {/* Tab: FAQ */}
         {tab === 'faq' && (
           <div>
+            <button
+              onClick={handleGenerateFaqs}
+              disabled={generating || uploading}
+              className="mb-4 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
+            >
+              {generating ? 'Generando…' : '✨ Generar FAQs desde URLs'}
+            </button>
+
             <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Pregunta</label>
@@ -621,18 +688,30 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
                   disabled={uploading}
                 />
               </div>
-              <button
-                onClick={handleFaqAdd}
-                disabled={uploading || !faqQ.trim() || !faqA.trim()}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
-              >
-                {uploading ? 'Guardando…' : 'Guardar FAQ'}
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleFaqSave}
+                  disabled={uploading || !faqQ.trim() || !faqA.trim()}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  {uploading ? 'Guardando…' : editingId ? 'Guardar cambios' : 'Guardar FAQ'}
+                </button>
+                {editingId && (
+                  <button
+                    onClick={handleFaqCancelEdit}
+                    disabled={uploading}
+                    className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                )}
+              </div>
             </div>
             <DocumentList
               docs={docs.filter(d => d.source_type === 'faq')}
               onDelete={handleDelete}
               onSelect={setSelectedDoc}
+              onEdit={handleFaqEditStart}
             />
           </div>
         )}

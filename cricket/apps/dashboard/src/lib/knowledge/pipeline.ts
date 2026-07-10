@@ -28,7 +28,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   return res.data[0].embedding
 }
 
-async function generateEmbeddingsBatch(texts: string[]): Promise<number[][]> {
+export async function generateEmbeddingsBatch(texts: string[]): Promise<number[][]> {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
   const res = await openai.embeddings.create({
     model: 'text-embedding-3-small',
