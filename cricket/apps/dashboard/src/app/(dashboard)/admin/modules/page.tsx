@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { headers } from 'next/headers'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 
