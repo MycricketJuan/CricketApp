@@ -2,11 +2,11 @@
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { auth0 } from '@/lib/auth0'
+import { getAuth0 } from '@/lib/auth0'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 
 export async function switchProfile(tenantSlug: string): Promise<void> {
-  const session = await auth0.getSession()
+  const session = await getAuth0().getSession()
   if (!session) redirect('/auth/login')
 
   const userId = session.user.sub as string

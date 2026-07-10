@@ -1,14 +1,14 @@
 export const dynamic = 'force-dynamic'
 
 import { headers } from 'next/headers'
-import { auth0 } from '@/lib/auth0'
+import { getAuth0 } from '@/lib/auth0'
 import { resolveRole } from '@/lib/auth-helpers'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 import { NavSidebar } from './nav-sidebar'
 import type { UserProfile } from './profile-switcher'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const session      = await auth0.getSession()
+  const session      = await getAuth0().getSession()
   const jwtRole      = resolveRole((session?.user ?? {}) as Record<string, unknown>)
   const name         = session?.user.name ?? session?.user.email ?? 'Usuario'
   const userId       = session?.user.sub as string | undefined

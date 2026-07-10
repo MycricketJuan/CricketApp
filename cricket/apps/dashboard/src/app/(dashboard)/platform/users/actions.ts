@@ -2,13 +2,13 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { auth0 } from '@/lib/auth0'
+import { getAuth0 } from '@/lib/auth0'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 import { resolveRole } from '@/lib/auth-helpers'
 import type { UserRole } from '@cricket/core/types'
 
 async function assertSuperadmin(): Promise<string> {
-  const session = await auth0.getSession()
+  const session = await getAuth0().getSession()
   if (!session) redirect('/auth/login')
   const role = resolveRole(session.user as Record<string, unknown>)
   if (role !== 'superadmin') redirect('/')

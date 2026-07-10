@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
-import { auth0 } from './lib/auth0'
+import { getAuth0 } from './lib/auth0'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   // Debe correr en TODAS las rutas para que las rolling sessions funcionen.
   let authResponse: NextResponse
   try {
-    authResponse = await auth0.middleware(request)
+    authResponse = await getAuth0().middleware(request)
   } catch (err) {
     // Auth0 env vars no configuradas — devolver error explícito en vez de 404 silencioso
     const message = err instanceof Error ? err.message : 'Auth0 misconfigured'
@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
   const isLoginRoute = pathname === '/login'
 
   if (!isPublicRoute) {
-    const session = await auth0.getSession(request)
+    const session = await getAuth0().getSession(request)
 
     if (!session && !isLoginRoute) {
       return NextResponse.redirect(new URL('/auth/login', request.url))

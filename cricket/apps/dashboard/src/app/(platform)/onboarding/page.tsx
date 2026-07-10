@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { auth0 } from '@/lib/auth0'
+import { getAuth0 } from '@/lib/auth0'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 import { Stepper } from './stepper'
 import { StepTenant } from './step-tenant'
@@ -21,7 +21,7 @@ export default async function OnboardingPage({
   searchParams: Promise<SearchParams>
 }) {
   // ── Auth guard ────────────────────────────────────────────────────────────
-  const session = await auth0.getSession()
+  const session = await getAuth0().getSession()
   if (!session) redirect('/auth/login')
   const role = (session.user[USER_ROLE_CLAIM] ?? '') as string
   if (role !== 'superadmin') redirect('/')

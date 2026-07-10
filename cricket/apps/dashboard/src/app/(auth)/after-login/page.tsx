@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
-import { auth0 } from '@/lib/auth0'
+import { getAuth0 } from '@/lib/auth0'
 import { resolveRole } from '@/lib/auth-helpers'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 
@@ -13,7 +13,7 @@ const ROLE_REDIRECT: Record<string, string> = {
 }
 
 export default async function AfterLoginPage() {
-  const session = await auth0.getSession()
+  const session = await getAuth0().getSession()
   if (!session) redirect('/login')
 
   const sub   = session.user.sub as string

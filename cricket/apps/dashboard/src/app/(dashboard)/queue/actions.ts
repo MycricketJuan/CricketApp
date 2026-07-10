@@ -2,11 +2,11 @@
 
 import { revalidatePath } from 'next/cache'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
-import { auth0 } from '@/lib/auth0'
+import { getAuth0 } from '@/lib/auth0'
 
 export async function takeControl(sessionId: string): Promise<void> {
   const db = getSupabaseAdmin()
-  const session = await auth0.getSession()
+  const session = await getAuth0().getSession()
   const userId = session?.user.sub ?? 'unknown'
 
   await db
