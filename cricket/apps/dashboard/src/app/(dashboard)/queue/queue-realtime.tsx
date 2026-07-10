@@ -34,8 +34,6 @@ export interface CheckpointRow {
   sessions: { id: string; current_stage: string | null }
 }
 
-// ── Cliente Supabase para Realtime (instancia única) ──────────────
-const supabase = createClient()
 
 // ── Helpers ───────────────────────────────────────────────────────
 
@@ -104,6 +102,7 @@ export function QueueRealtime({
 
   // Realtime: re-fetch vía router.refresh() en cualquier cambio
   useEffect(() => {
+    const supabase = createClient()
     const channel = supabase
       .channel('queue-updates')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'escalations' },
