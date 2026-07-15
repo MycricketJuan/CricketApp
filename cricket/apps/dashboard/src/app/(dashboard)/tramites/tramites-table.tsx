@@ -4,6 +4,7 @@ import { createClient } from '@cricket/core/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { TRAMITE_TEMPLATES } from '@cricket/agents/tramites/templates'
+import { STATUS_LABEL, STATUS_BADGE } from './status'
 
 // ── Tipos exportados para uso en page.tsx ─────────────────────────
 
@@ -25,29 +26,7 @@ export interface TramiteRow {
   tenant_users: { full_name: string | null } | null
 }
 
-// ── Labels y badges ───────────────────────────────────────────────
-
-export const STATUS_LABEL: Record<string, string> = {
-  draft: 'Borrador',
-  submitted: 'Radicado',
-  in_review: 'En revisión',
-  pending_docs: 'Docs pendientes',
-  approved: 'Aprobado',
-  rejected: 'Rechazado',
-  completed: 'Completado',
-  cancelled: 'Cancelado',
-}
-
-const STATUS_BADGE: Record<string, string> = {
-  draft: 'bg-gray-100 text-gray-600',
-  submitted: 'bg-amber-100 text-amber-700',
-  in_review: 'bg-blue-100 text-blue-700',
-  pending_docs: 'bg-amber-100 text-amber-700',
-  approved: 'bg-green-100 text-green-700',
-  rejected: 'bg-red-100 text-red-700',
-  completed: 'bg-green-100 text-green-700',
-  cancelled: 'bg-gray-100 text-gray-600',
-}
+// ── Opciones de filtro por tipo ───────────────────────────────────
 
 const TYPE_OPTIONS = Object.entries(TRAMITE_TEMPLATES).map(([type, tpl]) => ({
   type,

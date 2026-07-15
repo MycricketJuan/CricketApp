@@ -2,8 +2,10 @@ export const dynamic = 'force-dynamic'
 
 import { headers } from 'next/headers'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
-import { TramitesTable, STATUS_LABEL } from './tramites-table'
+import { getTramitesAdmin } from '@/lib/tramites/db'
+import { TramitesTable } from './tramites-table'
 import type { TramiteRow } from './tramites-table'
+import { STATUS_LABEL } from './status'
 
 const PENDING_STATUSES = ['submitted', 'in_review', 'pending_docs'] as const
 
@@ -26,7 +28,7 @@ export default async function TramitesPage() {
     )
   }
 
-  const { data: tramites } = await supabaseAdmin
+  const { data: tramites } = await getTramitesAdmin()
     .from('tramites')
     .select(`
       id, tramite_type, label, status, created_at, submitted_at,

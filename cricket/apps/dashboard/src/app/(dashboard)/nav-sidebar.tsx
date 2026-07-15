@@ -25,16 +25,19 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
     { label: 'Configuración',   href: '/admin/config' },
     { label: 'Usuarios',        href: '/admin/users' },
     { label: 'Módulos',          href: '/admin/modules' },
+    { label: 'Trámites',        href: '/tramites' },
     { label: 'Base de conocimiento', href: '/admin/knowledge' },
     { label: 'Auditoría',       href: '/admin/audit' },
   ],
   supervisor: [
     { label: 'Panel',           href: '/dashboard' },
     { label: 'Cola',            href: '/queue' },
+    { label: 'Trámites',        href: '/tramites' },
     { label: 'Análisis',        href: '/analytics' },
   ],
   operator: [
     { label: 'Cola de atención', href: '/queue' },
+    { label: 'Trámites',        href: '/tramites' },
   ],
 }
 

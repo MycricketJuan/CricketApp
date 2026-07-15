@@ -81,6 +81,11 @@ const INTENT_TO_STAGE: Record<string, ModuleType> = {
   paz_y_salvo:         'tramites',
 }
 
+// El enum module_type de la DB en supabase.generated.ts no incluye
+// 'tramites' hasta regenerar tipos (pnpm db:types) con la migración
+// 20240103000000_tramites.sql aplicada. El cast es inocuo después.
+type DbModuleType = Database['public']['Enums']['module_type']
+
 // ── Journey Engine ────────────────────────────────────────────
 
 export class JourneyEngine {
@@ -158,7 +163,7 @@ export class JourneyEngine {
       await this.supabase
         .from('sessions')
         .update({
-          current_stage: targetStage,
+          current_stage: targetStage as DbModuleType,
           last_activity_at: new Date().toISOString(),
         })
         .eq('id', session.id)
@@ -304,7 +309,7 @@ Mensaje: "${message}"`,
         tenant_id: tenantId,
         actor_type: 'AI',
         content: output.content,
-        stage,
+        stage: stage as DbModuleType,
         channel: message.channelType,
       })
       .select('id')
@@ -357,7 +362,7 @@ Mensaje: "${message}"`,
       .from('tenant_modules')
       .select('is_active, fallback_type, fallback_config, config')
       .eq('tenant_id', tenantId)
-      .eq('module_type', stage)
+      .eq('module_type', stage as DbModuleType)
       .single()
 
     return {
