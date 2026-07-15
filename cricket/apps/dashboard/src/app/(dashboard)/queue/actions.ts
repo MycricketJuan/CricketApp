@@ -6,25 +6,67 @@ import { getAuth0 } from '@/lib/auth0'
 
 export async function takeControl(sessionId: string): Promise<void> {
   const db = getSupabaseAdmin()
-  const session = await getAuth0().getSession()
-  const userId = session?.user.sub ?? 'unknown'
+  const authSession = await getAuth0().getSession()
+  const actorSub = authSession?.user.sub ?? null
+  const actorEmail = (authSession?.user.email as string | undefined)?.toLowerCase() ?? null
+
+  // sessions.assigned_operator y audit_log.actor_id son UUID (FK a
+  // tenant_users) — el sub de Auth0 no es un UUID y rompería el UPDATE
+  // completo. Se resuelve el tenant_user del operador; si no existe,
+  // el control pasa a HUMAN igual pero sin asignación.
+  const { data: chatSession } = await db
+    .from('sessions')
+    .select('tenant_id')
+    .eq('id', sessionId)
+    .single()
+
+  // auth0_sub/email no están en los tipos generados de tenant_users
+  // hasta regenerar con pnpm db:types (mismo cast que usa el layout)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dbAny = db as any
+
+  let operatorId: string | null = null
+  if (chatSession && actorSub) {
+    const { data: bySub } = (await dbAny
+      .from('tenant_users')
+      .select('id')
+      .eq('tenant_id', chatSession.tenant_id)
+      .eq('auth0_sub', actorSub)
+      .maybeSingle()) as { data: { id: string } | null }
+    operatorId = bySub?.id ?? null
+  }
+  if (chatSession && !operatorId && actorEmail) {
+    const { data: byEmail } = (await dbAny
+      .from('tenant_users')
+      .select('id')
+      .eq('tenant_id', chatSession.tenant_id)
+      .eq('email', actorEmail)
+      .maybeSingle()) as { data: { id: string } | null }
+    operatorId = byEmail?.id ?? null
+  }
 
   await db
     .from('sessions')
     .update({
       actor_control: 'HUMAN',
-      assigned_operator: userId,
+      assigned_operator: operatorId,
       status: 'human_takeover',
       last_activity_at: new Date().toISOString(),
     })
     .eq('id', sessionId)
 
   await db.from('audit_log').insert({
+    tenant_id: chatSession?.tenant_id ?? null,
     session_id: sessionId,
     actor_type: 'HUMAN',
-    actor_id: userId,
+    actor_id: operatorId,
     event_type: 'session.control_transferred',
-    payload: { from: 'AI', to: 'HUMAN', triggered_by: 'operator_queue' },
+    payload: {
+      from: 'AI',
+      to: 'HUMAN',
+      triggered_by: 'operator_queue',
+      actor_sub: actorSub ?? 'unknown',
+    },
   })
 
   revalidatePath('/queue')

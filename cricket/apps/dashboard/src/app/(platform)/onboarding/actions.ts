@@ -201,12 +201,13 @@ export async function createTenant(formData: FormData) {
     is_default: true,
   })
 
+  // audit_log.actor_id es UUID y el sub de Auth0 no lo es —
+  // la atribución va en payload.actor_sub
   await db.from('audit_log').insert({
     tenant_id: tenant.id,
     actor_type: 'HUMAN',
-    actor_id: userId,
     event_type: 'tenant.created',
-    payload: { name, slug, sector },
+    payload: { name, slug, sector, actor_sub: userId },
   })
 
   redirect(`/onboarding?step=2&tenantId=${tenant.id}`)
@@ -314,9 +315,8 @@ export async function sendInvitation(formData: FormData) {
   await db.from('audit_log').insert({
     tenant_id: tenantId,
     actor_type: 'HUMAN',
-    actor_id: userId,
     event_type: 'invitation.sent',
-    payload: { email, role: 'tenant_admin', tenant_id: tenantId },
+    payload: { email, role: 'tenant_admin', tenant_id: tenantId, actor_sub: userId },
   })
 
   redirect(`/onboarding?step=done&tenantId=${tenantId}`)

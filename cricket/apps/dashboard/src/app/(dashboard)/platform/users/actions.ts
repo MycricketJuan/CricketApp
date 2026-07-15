@@ -15,6 +15,9 @@ async function assertSuperadmin(): Promise<string> {
   return session.user.sub as string
 }
 
+// audit_log.actor_id es UUID y el sub de Auth0 no lo es (el insert
+// completo fallaría) — la atribución va en payload.actor_sub.
+
 // ─── Asignar usuario a tenant por email ─────────────────────────────────────
 export async function assignUserToTenant(formData: FormData): Promise<void> {
   const actorId  = await assertSuperadmin()
@@ -38,9 +41,8 @@ export async function assignUserToTenant(formData: FormData): Promise<void> {
   await db.from('audit_log').insert({
     tenant_id:  tenantId,
     actor_type: 'HUMAN',
-    actor_id:   actorId,
     event_type: 'user.grant_created',
-    payload:    { email, role },
+    payload:    { email, role, actor_sub: actorId },
   })
 
   revalidatePath('/platform/users')
@@ -67,9 +69,8 @@ export async function assignSuperadmin(formData: FormData): Promise<void> {
   await db.from('audit_log').insert({
     tenant_id:  null,
     actor_type: 'HUMAN',
-    actor_id:   actorId,
     event_type: 'superadmin.grant_created',
-    payload:    { email },
+    payload:    { email, actor_sub: actorId },
   })
 
   revalidatePath('/platform/users')
@@ -93,9 +94,8 @@ export async function removeUserGrant(grantId: string, _formData: FormData): Pro
   await db.from('audit_log').insert({
     tenant_id:  grant.tenant_id,
     actor_type: 'HUMAN',
-    actor_id:   actorId,
     event_type: 'user.grant_removed',
-    payload:    { email: grant.email },
+    payload:    { email: grant.email, actor_sub: actorId },
   })
 
   revalidatePath('/platform/users')
@@ -119,9 +119,8 @@ export async function setUserRole(userId: string, formData: FormData): Promise<v
   await db.from('audit_log').insert({
     tenant_id:  user.tenant_id,
     actor_type: 'HUMAN',
-    actor_id:   actorId,
     event_type: 'user.role_changed',
-    payload:    { user_id: userId, from_role: user.role, to_role: role },
+    payload:    { user_id: userId, from_role: user.role, to_role: role, actor_sub: actorId },
   })
 
   revalidatePath('/platform/users')
@@ -145,9 +144,8 @@ export async function toggleUserActive(userId: string, formData: FormData): Prom
   await db.from('audit_log').insert({
     tenant_id:  user.tenant_id,
     actor_type: 'HUMAN',
-    actor_id:   actorId,
     event_type: isActive ? 'user.activated' : 'user.deactivated',
-    payload:    { user_id: userId },
+    payload:    { user_id: userId, actor_sub: actorId },
   })
 
   revalidatePath('/platform/users')
@@ -170,9 +168,8 @@ export async function deleteUser(userId: string, _formData: FormData): Promise<v
   await db.from('audit_log').insert({
     tenant_id:  user.tenant_id,
     actor_type: 'HUMAN',
-    actor_id:   actorId,
     event_type: 'user.deleted',
-    payload:    { user_id: userId },
+    payload:    { user_id: userId, actor_sub: actorId },
   })
 
   revalidatePath('/platform/users')
