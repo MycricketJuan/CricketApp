@@ -26,7 +26,7 @@ export default async function QueuePage() {
     supabaseAdmin
       .from('escalations')
       .select(`
-        id, trigger_reason, customer_sentiment, context_summary, created_at,
+        id, trigger_reason, customer_sentiment, context_summary, metadata, created_at,
         sessions!inner(id, current_stage, actor_control, channel,
           end_users!inner(channel_ids))
       `)

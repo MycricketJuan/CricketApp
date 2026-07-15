@@ -22,6 +22,32 @@ export type ModuleType =
   | 'sales'
   | 'transactions'
   | 'feedback'
+  | 'tramites'
+
+// ── Trámites bancarios ────────────────────────────────────────
+// Unión literal espejo de TRAMITE_TEMPLATES (packages/agents) —
+// se declara aquí para no invertir la dependencia core→agents.
+
+export type TramiteType =
+  | 'apertura_cuenta'
+  | 'solicitud_credito'
+  | 'tarjeta_credito'
+  | 'actualizacion_datos'
+  | 'cdt'
+  | 'reclamacion'
+  | 'paz_y_salvo'
+
+export type TramiteStatus =
+  | 'draft'
+  | 'submitted'
+  | 'in_review'
+  | 'pending_docs'
+  | 'approved'
+  | 'rejected'
+  | 'cancelled'
+  | 'completed'
+
+export type TramiteResolution = 'approved' | 'rejected' | 'more_info_needed'
 
 export type ChannelType = 'whatsapp' | 'web_chat' | 'email'
 

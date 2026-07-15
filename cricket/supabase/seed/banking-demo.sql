@@ -184,6 +184,37 @@ ON CONFLICT (tenant_id, module_type) DO UPDATE SET
   config          = EXCLUDED.config;
 
 
+-- Módulo 5: tramites
+-- Requiere que la migración 20240103000000_tramites.sql esté aplicada
+-- (el valor 'tramites' del enum module_type se agrega allí; no puede
+-- insertarse en la misma transacción que lo crea).
+INSERT INTO tenant_modules (tenant_id, module_type, is_active, fallback_type, fallback_config, config)
+VALUES (
+  'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  'tramites',
+  true,
+  'ih_handoff',
+  '{"message": "Un asesor te ayudará con tu trámite en breve."}',
+  '{
+    "confidence_threshold": 0.80,
+    "sla_defaults": {
+      "apertura_cuenta": 24,
+      "solicitud_credito": 72,
+      "tarjeta_credito": 120,
+      "actualizacion_datos": 24,
+      "cdt": 8,
+      "reclamacion": 360,
+      "paz_y_salvo": 72
+    }
+  }'
+)
+ON CONFLICT (tenant_id, module_type) DO UPDATE SET
+  is_active       = EXCLUDED.is_active,
+  fallback_type   = EXCLUDED.fallback_type,
+  fallback_config = EXCLUDED.fallback_config,
+  config          = EXCLUDED.config;
+
+
 -- ============================================================
 -- SECCIÓN 4 — Journey template bancario
 -- ============================================================

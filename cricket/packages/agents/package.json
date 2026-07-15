@@ -4,7 +4,9 @@
   "private": true,
   "exports": {
     "./registry": "./src/registry.ts",
-    "./consultation": "./src/consultation/index.ts"
+    "./consultation": "./src/consultation/index.ts",
+    "./handoff": "./src/handoff/index.ts",
+    "./tramites/templates": "./src/tramites/templates.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",

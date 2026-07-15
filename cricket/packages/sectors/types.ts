@@ -1,6 +1,6 @@
 export interface StageConfig {
   order: number
-  stage_type: 'consultation' | 'sales' | 'transactions' | 'feedback'
+  stage_type: 'consultation' | 'sales' | 'transactions' | 'feedback' | 'tramites'
   is_active: boolean
   agent: string | null
   fallback: string | null
@@ -38,6 +38,8 @@ export interface SectorExtension {
     sales: string
     transactions: string
     feedback: string
+    /** Opcional — solo sectores con módulo de trámites (banking por ahora) */
+    tramites?: string
   }
 
   /** Se mergea con INTENT_TO_STAGE del Journey Engine */

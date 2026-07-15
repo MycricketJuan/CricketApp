@@ -61,6 +61,18 @@ export class AgentRegistry {
           sectorPrompts?.feedback ?? null,
         ).run(input)
       }
+      case 'tramites': {
+        const { TramiteAgent } = await import('./tramites/index')
+        return new TramiteAgent(
+          this.client,
+          context.tenantId,
+          context.sessionId,
+          context.endUserId,
+          this.supabaseUrl,
+          this.supabaseKey,
+          sectorPrompts?.tramites ?? null,
+        ).run(input)
+      }
     }
   }
 }

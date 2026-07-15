@@ -50,6 +50,11 @@ export interface EngineResult {
   type: 'ai_response' | 'human_controlled' | 'checkpoint_created' | 'escalated' | 'fallback'
   content?: string
   stage?: ModuleType
+  escalationId?: string
+  checkpointId?: string
+  triggerReason?: string
+  confidence?: number
+  customerSentiment?: string
 }
 
 // ── Intent → Stage mapping ────────────────────────────────────
@@ -66,6 +71,14 @@ const INTENT_TO_STAGE: Record<string, ModuleType> = {
   status_check:        'transactions',
   positive_feedback:   'feedback',
   negative_feedback:   'feedback',
+  tramite_request:     'tramites',
+  apertura_cuenta:     'tramites',
+  solicitud_credito:   'tramites',
+  solicitar_tarjeta:   'tramites',
+  actualizar_datos:    'tramites',
+  abrir_cdt:           'tramites',
+  radicar_queja:       'tramites',
+  paz_y_salvo:         'tramites',
 }
 
 // ── Journey Engine ────────────────────────────────────────────
@@ -98,7 +111,7 @@ export class JourneyEngine {
     // Se evalúa ANTES de invocar al agente de negocio.
     // Principio IA+IH: si el cliente está frustrado, el humano interviene.
     if (intent.sentiment === 'frustrated' || intent.sentiment === 'angry') {
-      return this.escalate(session, 'customer_sentiment', intent.confidence)
+      return this.escalate(session, 'customer_sentiment', intent.confidence, intent.sentiment)
     }
 
     // ── 4. Resolver la etapa destino ──────────────────────────
@@ -174,7 +187,13 @@ export class JourneyEngine {
       max_tokens: 150,
       system: `Clasifica la intención del mensaje. Responde SOLO en JSON, sin explicaciones.
 Intents: product_question, general_info, complaint, buy_intent, upgrade_request,
-         transaction_request, status_check, positive_feedback, negative_feedback, other.
+         transaction_request, status_check, positive_feedback, negative_feedback,
+         tramite_request, apertura_cuenta, solicitud_credito, solicitar_tarjeta,
+         actualizar_datos, abrir_cdt, radicar_queja, paz_y_salvo, other.
+Nota trámites: usa los intents de trámite cuando el cliente quiere INICIAR una
+solicitud formal (abrir cuenta/CDT, pedir crédito o tarjeta, actualizar datos,
+radicar una queja formal, pedir paz y salvo). complaint es para quejas
+conversacionales; radicar_queja para reclamaciones formales.
 Sentiment: positive, neutral, negative, frustrated, angry.
 Formato exacto: {"intent":"...","sentiment":"...","confidence":0.00}`,
       messages: [{
@@ -204,18 +223,30 @@ Mensaje: "${message}"`,
     session: Session,
     reason: string,
     confidence: number,
+    sentiment?: string,
   ): Promise<EngineResult> {
-    await this.supabase.from('escalations').insert({
-      session_id: session.id,
-      tenant_id: session.tenant_id,
-      trigger_reason: reason,
-      confidence_at_trigger: confidence,
-    })
+    const { data: escalation } = await this.supabase
+      .from('escalations')
+      .insert({
+        session_id: session.id,
+        tenant_id: session.tenant_id,
+        trigger_reason: reason,
+        confidence_at_trigger: confidence,
+        customer_sentiment: sentiment ?? null,
+      })
+      .select('id')
+      .single()
     await this.supabase
       .from('sessions')
       .update({ actor_control: 'HUMAN', status: 'escalated' })
       .eq('id', session.id)
-    return { type: 'escalated' }
+    return {
+      type: 'escalated',
+      escalationId: escalation?.id,
+      triggerReason: reason,
+      confidence,
+      customerSentiment: sentiment,
+    }
   }
 
   private async createCheckpoint(
@@ -223,19 +254,28 @@ Mensaje: "${message}"`,
     trigger: 'low_confidence' | 'policy' | 'compliance' | 'customer_request',
     output: AgentOutput,
   ): Promise<EngineResult> {
-    await this.supabase.from('cognitive_checkpoints').insert({
-      session_id: session.id,
-      tenant_id: session.tenant_id,
-      trigger_reason: trigger,
-      ai_recommendation: output.content,
-      confidence_at_trigger: output.confidence,
-      status: 'pending',
-    })
+    const { data: checkpoint } = await this.supabase
+      .from('cognitive_checkpoints')
+      .insert({
+        session_id: session.id,
+        tenant_id: session.tenant_id,
+        trigger_reason: trigger,
+        ai_recommendation: output.content,
+        confidence_at_trigger: output.confidence,
+        status: 'pending',
+      })
+      .select('id')
+      .single()
     await this.supabase
       .from('sessions')
       .update({ actor_control: 'MIXED' })
       .eq('id', session.id)
-    return { type: 'checkpoint_created' }
+    return {
+      type: 'checkpoint_created',
+      checkpointId: checkpoint?.id,
+      triggerReason: trigger,
+      confidence: output.confidence,
+    }
   }
 
   private async applyFallback(

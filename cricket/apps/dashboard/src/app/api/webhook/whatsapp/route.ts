@@ -1,9 +1,10 @@
 import { createHmac, timingSafeEqual } from 'crypto'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 import { JourneyEngine } from '@cricket/core/journey-engine'
 import { AgentRegistry } from '@cricket/agents/registry'
+import { generateHandoffSummary } from '@cricket/agents/handoff'
 import type { ChannelMessage, IHPolicy } from '@cricket/core/types'
 
 // ── Twilio signature validation ───────────────────────────────
@@ -187,6 +188,25 @@ export async function POST(req: NextRequest) {
     })
 
     log(`engine result type=${result.type} content="${result.content?.slice(0, 80)}"`)
+
+    // ── 5. Handoff async post-escalada ────────────────────────
+    // after() mantiene viva la función en Vercel tras responder el
+    // TwiML — un fire-and-forget moriría al enviar la respuesta.
+    if (result.type === 'escalated' || result.type === 'checkpoint_created') {
+      after(async () => {
+        await generateHandoffSummary({
+          escalationId: result.escalationId,
+          checkpointId: result.checkpointId,
+          sessionId: session.id,
+          tenantId: tenant.id,
+          triggerReason: result.triggerReason ?? 'unknown',
+          confidenceAtTrigger: result.confidence,
+          customerSentiment: result.customerSentiment,
+          supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        }, process.env.ANTHROPIC_API_KEY!)
+      })
+    }
 
     const responseText = result.type === 'ai_response' ? (result.content ?? null) : null
     if (!responseText) log(`WARN: sin respuesta para el usuario (type=${result.type})`)

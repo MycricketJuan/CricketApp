@@ -13,6 +13,7 @@ export interface EscalationRow {
   trigger_reason: string
   customer_sentiment: string | null
   context_summary: string | null
+  metadata: { briefing?: { urgency?: string } } | null
   created_at: string
   sessions: {
     id: string
@@ -78,6 +79,26 @@ const TRIGGER_BADGE: Record<string, string> = {
   policy: 'bg-amber-100 text-amber-700',
   low_confidence: 'bg-orange-100 text-orange-700',
   compliance: 'bg-red-100 text-red-700',
+}
+
+// Briefing del HandoffAgent: 4 líneas 👤🎯⚠️✅ → una por párrafo.
+// null → el handoff aún corre en background; texto plano → fallback.
+function ContextSummary({ summary }: { summary: string | null }) {
+  if (!summary) {
+    return <span className="text-xs text-gray-400">Generando resumen…</span>
+  }
+  if (summary.includes('👤')) {
+    return (
+      <div>
+        {summary.split('\n').map((line, i) => (
+          <div key={i} className="text-xs text-gray-600 mb-0.5">
+            {line}
+          </div>
+        ))}
+      </div>
+    )
+  }
+  return <div className="text-xs text-gray-600">{summary}</div>
 }
 
 function Badge({ label, className }: { label: string; className?: string }) {
@@ -203,18 +224,15 @@ function EscalationCard({ escalation: esc }: { escalation: EscalationRow }) {
               className={SENTIMENT_BADGE[esc.customer_sentiment]}
             />
           )}
+          {esc.metadata?.briefing?.urgency === 'high' && (
+            <Badge label="Urgente" className="bg-red-100 text-red-700" />
+          )}
           <span className="text-xs text-gray-400">{esc.trigger_reason}</span>
         </div>
         <span className="shrink-0 text-xs text-gray-400">{timeAgo}</span>
       </div>
 
-      {esc.context_summary && (
-        <p className="text-sm text-gray-600 line-clamp-2">
-          {esc.context_summary.length > 120
-            ? esc.context_summary.slice(0, 120) + '…'
-            : esc.context_summary}
-        </p>
-      )}
+      <ContextSummary summary={esc.context_summary} />
 
       <div className="flex gap-2">
         <button

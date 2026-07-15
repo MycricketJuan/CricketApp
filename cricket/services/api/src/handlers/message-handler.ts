@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
 import { JourneyEngine } from '@cricket/core/journey-engine'
 import { AgentRegistry } from '@cricket/agents/registry'
+import { generateHandoffSummary } from '@cricket/agents/handoff'
 import type { ChannelMessage, IHPolicy } from '@cricket/core/types'
 
 interface ClaudeConfig {
@@ -99,6 +100,25 @@ export async function handleWhatsAppMessage(
     ih_policies: ihPolicies,
     claude_config: claudeConfig,
   })
+
+  // ── 5. Handoff async post-escalada — no bloquea la respuesta ──
+  // El briefing para el operador se genera en background; si falla,
+  // el operador igual tiene la conversación completa en el dashboard.
+  if (result.type === 'escalated' || result.type === 'checkpoint_created') {
+    generateHandoffSummary({
+      escalationId: result.escalationId,
+      checkpointId: result.checkpointId,
+      sessionId: session.id,
+      tenantId: tenant.id,
+      triggerReason: result.triggerReason ?? 'unknown',
+      confidenceAtTrigger: result.confidence,
+      customerSentiment: result.customerSentiment,
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      supabaseKey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    }, process.env.ANTHROPIC_API_KEY!).catch((err: unknown) => {
+      console.error('[HandoffAgent] Error generando summary:', err)
+    })
+  }
 
   // null → sesión escalada o en checkpoint (el humano responde desde el dashboard)
   return result.type === 'ai_response' ? (result.content ?? null) : null
