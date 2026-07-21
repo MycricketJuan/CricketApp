@@ -1,0 +1,720 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "phase_1_target_sectors",
+        "label": "Phase 1 Target Sectors",
+        "nodes": [
+          "docs_spec_cricket_spec_phase1_banking_sector",
+          "docs_spec_cricket_spec_phase1_retail_sector",
+          "docs_spec_cricket_spec_phase1_health_sector"
+        ],
+        "relation": "form",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "cricket-spec-phase1.md"
+      },
+      {
+        "id": "self_service_platform_foundation",
+        "label": "Self-service Platform Foundation",
+        "nodes": [
+          "docs_spec_cricket_spec_phase1_self_service_registration",
+          "docs_spec_cricket_spec_phase1_setup_wizard",
+          "docs_spec_cricket_spec_phase1_knowledge_base_builder",
+          "docs_spec_cricket_spec_phase1_multitenant_whatsapp_webhook"
+        ],
+        "relation": "implement",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "cricket-spec-phase1.md"
+      },
+      {
+        "id": "health_scheduling_flow",
+        "label": "Health Scheduling Flow",
+        "nodes": [
+          "docs_spec_cricket_spec_phase1_citas_agent",
+          "docs_spec_cricket_spec_phase1_schedule_lookup",
+          "docs_spec_cricket_spec_phase1_schedule_appointment",
+          "docs_spec_cricket_spec_phase1_appointments_slots",
+          "docs_spec_cricket_spec_phase1_appointments"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "cricket-spec-phase1.md"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "Cricket Phase 1 Specification",
+      "file_type": "document",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "document",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_cricket_phase_1_specification",
+      "community": 2,
+      "norm_label": "cricket phase 1 specification"
+    },
+    {
+      "label": "Cricket",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "1. Resumen ejecutivo",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_cricket",
+      "community": 2,
+      "norm_label": "cricket"
+    },
+    {
+      "label": "IA + IH",
+      "file_type": "rationale",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "1. Resumen ejecutivo",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_ai_plus_human_intelligence",
+      "community": 2,
+      "norm_label": "ia + ih"
+    },
+    {
+      "label": "Multi-tenancy",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "1. Resumen ejecutivo",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_multitenancy",
+      "community": 2,
+      "norm_label": "multi-tenancy"
+    },
+    {
+      "label": "Self-service Onboarding",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "5. Onboarding self-service",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_self_service_onboarding",
+      "community": 1,
+      "norm_label": "self-service onboarding"
+    },
+    {
+      "label": "Banking Sector",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "3.1 Banca",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_banking_sector",
+      "community": 4,
+      "norm_label": "banking sector"
+    },
+    {
+      "label": "Retail Sector",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "3.2 Retail",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_retail_sector",
+      "community": 5,
+      "norm_label": "retail sector"
+    },
+    {
+      "label": "Health Sector",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "3.3 Salud",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_health_sector",
+      "community": 0,
+      "norm_label": "health sector"
+    },
+    {
+      "label": "Hybrid Conversation-based Pricing",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "4. Modelo de precios",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_hybrid_pricing",
+      "community": 3,
+      "norm_label": "hybrid conversation-based pricing"
+    },
+    {
+      "label": "Citas Agent",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_citas_agent",
+      "community": 0,
+      "norm_label": "citas agent"
+    },
+    {
+      "label": "schedule_lookup",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_schedule_lookup",
+      "community": 0,
+      "norm_label": "schedule_lookup"
+    },
+    {
+      "label": "schedule_appointment",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_schedule_appointment",
+      "community": 0,
+      "norm_label": "schedule_appointment"
+    },
+    {
+      "label": "appointments_slots",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_appointments_slots",
+      "community": 0,
+      "norm_label": "appointments_slots"
+    },
+    {
+      "label": "appointments",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_appointments",
+      "community": 0,
+      "norm_label": "appointments"
+    },
+    {
+      "label": "Health Sector Extension",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.3 Health sector extension",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_health_extension",
+      "community": 0,
+      "norm_label": "health sector extension"
+    },
+    {
+      "label": "Self-service Registration",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.1 Self-service Registration",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_self_service_registration",
+      "community": 1,
+      "norm_label": "self-service registration"
+    },
+    {
+      "label": "Setup Wizard",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.2 Setup Wizard self-service",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_setup_wizard",
+      "community": 1,
+      "norm_label": "setup wizard"
+    },
+    {
+      "label": "tenant_channels",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.2 Setup Wizard self-service",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_tenant_channels",
+      "community": 1,
+      "norm_label": "tenant_channels"
+    },
+    {
+      "label": "Knowledge Base Builder",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.3 Knowledge Base Builder",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_knowledge_base_builder",
+      "community": 1,
+      "norm_label": "knowledge base builder"
+    },
+    {
+      "label": "Catalog Builder",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.4 Catalog Builder",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_catalog_builder",
+      "community": 1,
+      "norm_label": "catalog builder"
+    },
+    {
+      "label": "Multi-tenant WhatsApp Webhook",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.5 WhatsApp Multi-tenant Webhook Refactor",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_multitenant_whatsapp_webhook",
+      "community": 2,
+      "norm_label": "multi-tenant whatsapp webhook"
+    },
+    {
+      "label": "Manual Billing",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.6 Billing Module",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_manual_billing",
+      "community": 3,
+      "norm_label": "manual billing"
+    },
+    {
+      "label": "Conversation Counter",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.7 Conversation Counter",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_conversation_counter",
+      "community": 3,
+      "norm_label": "conversation counter"
+    },
+    {
+      "label": "billing_events",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.7 Conversation Counter",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_billing_events",
+      "community": 3,
+      "norm_label": "billing_events"
+    },
+    {
+      "label": "monthly_conversation_counts",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.7 Conversation Counter",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_monthly_conversation_counts",
+      "community": 3,
+      "norm_label": "monthly_conversation_counts"
+    },
+    {
+      "label": "Global Acceptance Criteria",
+      "file_type": "concept",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "11. Criterios de aceptaci\u00f3n globales",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_global_acceptance_criteria",
+      "community": 2,
+      "norm_label": "global acceptance criteria"
+    },
+    {
+      "label": "Risk Mitigation Plan",
+      "file_type": "rationale",
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "12. Riesgos y mitigaciones",
+      "source_url": null,
+      "captured_at": null,
+      "author": "Juan (founder)",
+      "contributor": null,
+      "id": "docs_spec_cricket_spec_phase1_risk_mitigation_plan",
+      "community": 1,
+      "norm_label": "risk mitigation plan"
+    }
+  ],
+  "links": [
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "1. Resumen ejecutivo",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_cricket_phase_1_specification",
+      "target": "docs_spec_cricket_spec_phase1_cricket"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "1. Resumen ejecutivo",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_cricket",
+      "target": "docs_spec_cricket_spec_phase1_ai_plus_human_intelligence"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "1. Resumen ejecutivo",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_cricket",
+      "target": "docs_spec_cricket_spec_phase1_multitenancy"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "1. Resumen ejecutivo",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_cricket",
+      "target": "docs_spec_cricket_spec_phase1_self_service_onboarding"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "11. Criterios de aceptaci\u00f3n globales",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_global_acceptance_criteria",
+      "target": "docs_spec_cricket_spec_phase1_ai_plus_human_intelligence"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.5 WhatsApp Multi-tenant Webhook Refactor",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_multitenant_whatsapp_webhook",
+      "target": "docs_spec_cricket_spec_phase1_multitenancy"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "11. Criterios de aceptaci\u00f3n globales",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_global_acceptance_criteria",
+      "target": "docs_spec_cricket_spec_phase1_self_service_onboarding"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "12. Riesgos y mitigaciones",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_risk_mitigation_plan",
+      "target": "docs_spec_cricket_spec_phase1_self_service_onboarding"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "5. Onboarding self-service",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_self_service_onboarding",
+      "target": "docs_spec_cricket_spec_phase1_catalog_builder"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "5. Onboarding self-service",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_self_service_onboarding",
+      "target": "docs_spec_cricket_spec_phase1_knowledge_base_builder"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "5. Onboarding self-service",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_self_service_onboarding",
+      "target": "docs_spec_cricket_spec_phase1_self_service_registration"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "5. Onboarding self-service",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_self_service_onboarding",
+      "target": "docs_spec_cricket_spec_phase1_setup_wizard"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6. Sector extension: Salud",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_health_sector",
+      "target": "docs_spec_cricket_spec_phase1_health_extension"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "4 and 7.7",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_hybrid_pricing",
+      "target": "docs_spec_cricket_spec_phase1_conversation_counter"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.6 Billing Module",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_manual_billing",
+      "target": "docs_spec_cricket_spec_phase1_hybrid_pricing"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_citas_agent",
+      "target": "docs_spec_cricket_spec_phase1_schedule_appointment"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_citas_agent",
+      "target": "docs_spec_cricket_spec_phase1_schedule_lookup"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_health_extension",
+      "target": "docs_spec_cricket_spec_phase1_citas_agent"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_schedule_lookup",
+      "target": "docs_spec_cricket_spec_phase1_appointments_slots"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_schedule_appointment",
+      "target": "docs_spec_cricket_spec_phase1_appointments"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "6.1 Nuevo agente: Citas Agent",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_appointments",
+      "target": "docs_spec_cricket_spec_phase1_appointments_slots"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.2 Setup Wizard self-service",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_setup_wizard",
+      "target": "docs_spec_cricket_spec_phase1_tenant_channels"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.5 WhatsApp Multi-tenant Webhook Refactor",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_multitenant_whatsapp_webhook",
+      "target": "docs_spec_cricket_spec_phase1_tenant_channels"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "12. Riesgos y mitigaciones",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_risk_mitigation_plan",
+      "target": "docs_spec_cricket_spec_phase1_tenant_channels"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "12. Riesgos y mitigaciones",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_risk_mitigation_plan",
+      "target": "docs_spec_cricket_spec_phase1_knowledge_base_builder"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.7 Conversation Counter",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_conversation_counter",
+      "target": "docs_spec_cricket_spec_phase1_billing_events"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md",
+      "source_location": "7.7 Conversation Counter",
+      "weight": 1.0,
+      "source": "docs_spec_cricket_spec_phase1_monthly_conversation_counts",
+      "target": "docs_spec_cricket_spec_phase1_billing_events"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "phase_1_target_sectors",
+      "label": "Phase 1 Target Sectors",
+      "nodes": [
+        "docs_spec_cricket_spec_phase1_banking_sector",
+        "docs_spec_cricket_spec_phase1_retail_sector",
+        "docs_spec_cricket_spec_phase1_health_sector"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md"
+    },
+    {
+      "id": "self_service_platform_foundation",
+      "label": "Self-service Platform Foundation",
+      "nodes": [
+        "docs_spec_cricket_spec_phase1_self_service_registration",
+        "docs_spec_cricket_spec_phase1_setup_wizard",
+        "docs_spec_cricket_spec_phase1_knowledge_base_builder",
+        "docs_spec_cricket_spec_phase1_multitenant_whatsapp_webhook"
+      ],
+      "relation": "implement",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md"
+    },
+    {
+      "id": "health_scheduling_flow",
+      "label": "Health Scheduling Flow",
+      "nodes": [
+        "docs_spec_cricket_spec_phase1_citas_agent",
+        "docs_spec_cricket_spec_phase1_schedule_lookup",
+        "docs_spec_cricket_spec_phase1_schedule_appointment",
+        "docs_spec_cricket_spec_phase1_appointments_slots",
+        "docs_spec_cricket_spec_phase1_appointments"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "cricket-spec-phase1.md"
+    }
+  ],
+  "built_at_commit": "3563ad0d05f07729e0646e3362e018c9810985ef"
+}

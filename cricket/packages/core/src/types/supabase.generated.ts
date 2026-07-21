@@ -865,7 +865,9 @@ export type Database = {
       }
       tenant_users: {
         Row: {
+          auth0_sub: string | null
           created_at: string
+          email: string | null
           full_name: string | null
           id: string
           is_active: boolean
@@ -875,9 +877,11 @@ export type Database = {
           tenant_id: string
         }
         Insert: {
+          auth0_sub?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
-          id: string
+          id?: string
           is_active?: boolean
           last_seen_at?: string | null
           permissions?: Json
@@ -885,7 +889,9 @@ export type Database = {
           tenant_id: string
         }
         Update: {
+          auth0_sub?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id?: string
           is_active?: boolean

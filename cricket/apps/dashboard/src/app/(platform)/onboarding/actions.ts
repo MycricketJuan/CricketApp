@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { getAuth0 } from '@/lib/auth0'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
+import { provisionTenant, TenantProvisioningError } from '@/lib/tenants/provision'
 
 const USER_ROLE_CLAIM = 'https://mycricket.ai/user_role'
 
@@ -15,87 +16,6 @@ async function assertSuperadmin(): Promise<string> {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function defaultIhPolicies(sector: string): Record<string, unknown> {
-  if (sector === 'banking') {
-    return {
-      require_2fa_for_operators: true,
-      auto_escalate_below_confidence: 0.65,
-      max_session_duration_hours: 8,
-      human_approval_required_for_payments: true,
-      auto_escalate_on_sentiment: ['frustrated', 'angry'],
-    }
-  }
-  if (sector === 'retail') {
-    return {
-      require_2fa_for_operators: false,
-      auto_escalate_below_confidence: 0.55,
-      max_session_duration_hours: 24,
-      human_approval_required_for_payments: false,
-      auto_escalate_on_sentiment: ['angry'],
-    }
-  }
-  if (sector === 'health') {
-    return {
-      require_2fa_for_operators: true,
-      auto_escalate_below_confidence: 0.70,
-      max_session_duration_hours: 4,
-      human_approval_required_for_payments: false,
-      auto_escalate_on_sentiment: ['frustrated', 'angry'],
-    }
-  }
-  return {
-    require_2fa_for_operators: false,
-    auto_escalate_below_confidence: 0.60,
-    max_session_duration_hours: 12,
-    human_approval_required_for_payments: false,
-    auto_escalate_on_sentiment: ['angry'],
-  }
-}
-
-function defaultStagesConfig() {
-  return [
-    {
-      order: 1, stage_type: 'consultation', is_active: true,
-      agent: 'consultation_agent', fallback: null, ih_checkpoint: false,
-    },
-    {
-      order: 2, stage_type: 'sales', is_active: true,
-      agent: 'sales_agent', fallback: null, ih_checkpoint: false,
-    },
-    {
-      order: 3, stage_type: 'transactions', is_active: true,
-      agent: 'transactions_agent', fallback: 'ih_handoff', ih_checkpoint: false,
-    },
-    {
-      order: 4, stage_type: 'feedback', is_active: true,
-      agent: 'feedback_agent', fallback: 'skip', ih_checkpoint: false,
-    },
-  ]
-}
-
-function defaultIhCheckpoints(sector: string) {
-  const base = [
-    {
-      trigger: 'low_confidence',
-      action: 'create_checkpoint',
-      description: 'La IA no alcanzó el umbral de confianza mínimo',
-    },
-    {
-      trigger: 'payment_approval',
-      action: 'require_supervisor_approval',
-      description: 'Toda operación de pago requiere aprobación del supervisor',
-    },
-  ]
-  if (sector === 'banking') {
-    base.push({
-      trigger: 'sarlaft_threshold',
-      action: 'require_compliance_review',
-      description: 'Transacciones ≥ 10.000.000 COP requieren revisión SARLAFT',
-    })
-  }
-  return base
-}
 
 function buildInvitationEmail(
   tenantName: string,
@@ -116,99 +36,20 @@ function buildInvitationEmail(
 
 export async function createTenant(formData: FormData) {
   const userId = await assertSuperadmin()
-  const db = getSupabaseAdmin()
-
-  const name   = (formData.get('name') as string ?? '').trim()
-  const slug   = (formData.get('slug') as string ?? '').trim().toLowerCase()
-  const sector = (formData.get('sector') as string ?? '').trim()
-
-  if (name.length < 2)
-    redirect('/onboarding?error=' + encodeURIComponent('El nombre es demasiado corto'))
-  if (!/^[a-z0-9-]+$/.test(slug))
-    redirect('/onboarding?error=' + encodeURIComponent('El slug solo puede contener letras minúsculas, números y guiones'))
-  if (slug.length < 3)
-    redirect('/onboarding?error=' + encodeURIComponent('El slug debe tener al menos 3 caracteres'))
-
-  const validSectors = ['banking', 'retail', 'health', 'telecom', 'government']
-  if (!validSectors.includes(sector))
-    redirect('/onboarding?error=' + encodeURIComponent('Sector no válido'))
-
-  const { data: existing } = await db.from('tenants').select('id').eq('slug', slug).maybeSingle()
-  if (existing)
-    redirect('/onboarding?error=' + encodeURIComponent(`El slug "${slug}" ya está en uso`))
-
-  const { data: tenant, error: tenantError } = await db
-    .from('tenants')
-    .insert({
-      name,
-      slug,
-      sector: sector as 'banking' | 'retail' | 'health' | 'telecom' | 'government',
-      claude_config: {
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        temperature: 0.7,
-      },
-      ih_policies: defaultIhPolicies(sector) as import('@cricket/core/types').Database['public']['Tables']['tenants']['Insert']['ih_policies'],
+  let tenant
+  try {
+    tenant = await provisionTenant({
+      name: (formData.get('name') as string | null) ?? '',
+      slug: (formData.get('slug') as string | null) ?? '',
+      sector: (formData.get('sector') as string | null) ?? '',
+      actorSub: userId,
     })
-    .select('id, name, slug')
-    .single()
-
-  if (tenantError || !tenant)
-    redirect('/onboarding?error=' + encodeURIComponent(tenantError?.message ?? 'Error creando el tenant'))
-
-  await db.from('tenant_modules').insert([
-    {
-      tenant_id: tenant.id,
-      module_type: 'consultation' as const,
-      is_active: true,
-      fallback_type: 'ih_handoff' as const,
-      fallback_config: {},
-      config: { confidence_threshold: 0.65, max_turns: 20, knowledge_base_enabled: true },
-    },
-    {
-      tenant_id: tenant.id,
-      module_type: 'sales' as const,
-      is_active: true,
-      fallback_type: 'ih_handoff' as const,
-      fallback_config: {},
-      config: { confidence_threshold: 0.70, max_turns: 15, product_catalog_enabled: true },
-    },
-    {
-      tenant_id: tenant.id,
-      module_type: 'transactions' as const,
-      is_active: true,
-      fallback_type: 'ih_handoff' as const,
-      fallback_config: {},
-      config: { confidence_threshold: 0.80, always_require_ih_approval: true },
-    },
-    {
-      tenant_id: tenant.id,
-      module_type: 'feedback' as const,
-      is_active: true,
-      fallback_type: 'skip' as const,
-      fallback_config: {},
-      config: { nps_scale: 10, collect_csat: true, auto_close_after_feedback: true },
-    },
-  ])
-
-  await db.from('journey_templates').insert({
-    tenant_id: tenant.id,
-    sector: sector as 'banking' | 'retail' | 'health' | 'telecom' | 'government',
-    name: `Journey ${sector} estándar`,
-    stages_config: defaultStagesConfig(),
-    ih_checkpoints: defaultIhCheckpoints(sector),
-    is_active: true,
-    is_default: true,
-  })
-
-  // audit_log.actor_id es UUID y el sub de Auth0 no lo es —
-  // la atribución va en payload.actor_sub
-  await db.from('audit_log').insert({
-    tenant_id: tenant.id,
-    actor_type: 'HUMAN',
-    event_type: 'tenant.created',
-    payload: { name, slug, sector, actor_sub: userId },
-  })
+  } catch (error) {
+    const message = error instanceof TenantProvisioningError
+      ? error.message
+      : 'Error inesperado creando el tenant'
+    redirect('/onboarding?error=' + encodeURIComponent(message))
+  }
 
   redirect(`/onboarding?step=2&tenantId=${tenant.id}`)
 }

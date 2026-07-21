@@ -30,7 +30,11 @@ export async function middleware(request: NextRequest) {
   requestHeaders.set('x-tenant-slug', tenantSlug)
 
   // ── 3. Proteger rutas autenticadas ───────────────────────────────────
-  const isPublicRoute = pathname.startsWith('/api/webhook') || pathname === '/health'
+  const isPublicRoute =
+    pathname.startsWith('/api/webhook') ||
+    pathname === '/health' ||
+    pathname === '/register' ||
+    pathname === '/register/verify'
   const isLoginRoute = pathname === '/login'
 
   if (!isPublicRoute) {
@@ -66,16 +70,21 @@ export async function middleware(request: NextRequest) {
  * *.vercel.app         → process.env.DEV_TENANT_SLUG ?? 'dev'
  */
 function extractTenantSlug(host: string, request: NextRequest): string {
+  const hostname = host.split(':')[0]?.toLowerCase() ?? ''
+  const rootDomain = (process.env.CRICKET_ROOT_DOMAIN ?? 'mycricket.ai').toLowerCase()
+  const centralHosts = new Set([rootDomain, `www.${rootDomain}`, `app.${rootDomain}`])
+
   // Entornos locales y previews de Vercel usan cookie o variable de entorno
   if (
     host.includes('localhost') ||
     host.match(/^\d+\.\d+\.\d+\.\d+/) ||
-    host.endsWith('.vercel.app')
+    host.endsWith('.vercel.app') ||
+    centralHosts.has(hostname)
   ) {
     const cookieSlug = request.cookies.get('cricket_active_tenant')?.value
     return cookieSlug ?? process.env.DEV_TENANT_SLUG ?? 'dev'
   }
-  const subdomain = host.split('.')[0]
+  const subdomain = hostname.split('.')[0]
   return subdomain ?? 'dev'
 }
 

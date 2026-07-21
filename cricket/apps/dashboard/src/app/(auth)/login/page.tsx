@@ -24,6 +24,13 @@ export default async function LoginPage() {
           Iniciar sesión
         </a>
 
+        <p className="text-center text-sm text-gray-500">
+          ¿Tu empresa aún no usa Cricket?{' '}
+          <a href="/register" className="font-medium text-gray-900 underline underline-offset-4">
+            Crear cuenta
+          </a>
+        </p>
+
         <div className="flex items-center gap-3">
           <hr className="flex-1 border-gray-200" />
           <span className="text-xs text-gray-400">o</span>

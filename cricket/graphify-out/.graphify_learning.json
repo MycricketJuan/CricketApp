@@ -1,0 +1,231 @@
+{
+  "generated_at": "2026-07-21T17:35:41.728652+00:00",
+  "nodes": {
+    "docs_spec_cricket_spec_phase1_global_acceptance_criteria": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "Global Acceptance Criteria",
+      "last": "2026-07-21T02:53:18.011931+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-21T02:53:18.011931+00:00",
+          "outcome": "useful",
+          "q": "analiza /Users/juandavidfranco/Documents/Productos/CricketJourney/Nueva Versión/cricket/docs/spec/cricket-spec-phase1.md"
+        }
+      ],
+      "score": 0.985941657,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "tentative",
+      "uses": 1
+    },
+    "docs_spec_cricket_spec_phase1_hybrid_pricing": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "Hybrid Conversation-based Pricing",
+      "last": "2026-07-21T02:53:18.011931+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-21T02:53:18.011931+00:00",
+          "outcome": "useful",
+          "q": "analiza /Users/juandavidfranco/Documents/Productos/CricketJourney/Nueva Versión/cricket/docs/spec/cricket-spec-phase1.md"
+        }
+      ],
+      "score": 0.985941657,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "tentative",
+      "uses": 1
+    },
+    "docs_spec_cricket_spec_phase1_knowledge_base_builder": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "Knowledge Base Builder",
+      "last": "2026-07-21T03:26:26.830724+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-21T03:26:26.830724+00:00",
+          "outcome": "useful",
+          "q": "Ok, entonces con que podemos continuar para mejorar la plataforma?"
+        }
+      ],
+      "score": 0.986466166,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "tentative",
+      "uses": 1
+    },
+    "docs_spec_cricket_spec_phase1_multitenancy": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "Multi-tenancy",
+      "last": "2026-07-21T03:20:00.900127+00:00",
+      "neg": 1,
+      "provenance": [
+        {
+          "date": "2026-07-21T03:20:00.900127+00:00",
+          "outcome": "corrected",
+          "q": "Si, tenemos dos tipos de cliente el cliente de nosotros y el cliente de mi cliente. Whatsapp es el medio que se atiende a mi cliente de mi cliente. En el proceso de conseguir clientes para Cricket es por medio de la web, desde ahí se crearia todo el self-service"
+        },
+        {
+          "date": "2026-07-21T03:17:35.787686+00:00",
+          "outcome": "useful",
+          "q": "Porque esa pregunta"
+        },
+        {
+          "date": "2026-07-21T02:53:18.011931+00:00",
+          "outcome": "useful",
+          "q": "analiza /Users/juandavidfranco/Documents/Productos/CricketJourney/Nueva Versión/cricket/docs/spec/cricket-spec-phase1.md"
+        }
+      ],
+      "score": 0.985903382,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "contested",
+      "uses": 2,
+      "verdict": "useful"
+    },
+    "docs_spec_cricket_spec_phase1_multitenant_whatsapp_webhook": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "Multi-tenant WhatsApp Webhook",
+      "last": "2026-07-21T03:26:26.830724+00:00",
+      "neg": 1,
+      "provenance": [
+        {
+          "date": "2026-07-21T03:26:26.830724+00:00",
+          "outcome": "useful",
+          "q": "Ok, entonces con que podemos continuar para mejorar la plataforma?"
+        },
+        {
+          "date": "2026-07-21T03:20:00.900127+00:00",
+          "outcome": "corrected",
+          "q": "Si, tenemos dos tipos de cliente el cliente de nosotros y el cliente de mi cliente. Whatsapp es el medio que se atiende a mi cliente de mi cliente. En el proceso de conseguir clientes para Cricket es por medio de la web, desde ahí se crearia todo el self-service"
+        },
+        {
+          "date": "2026-07-21T03:17:35.787686+00:00",
+          "outcome": "useful",
+          "q": "Porque esa pregunta"
+        }
+      ],
+      "score": 0.98642789,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "contested",
+      "uses": 2,
+      "verdict": "useful"
+    },
+    "docs_spec_cricket_spec_phase1_risk_mitigation_plan": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "Risk Mitigation Plan",
+      "last": "2026-07-21T02:53:18.011931+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-21T02:53:18.011931+00:00",
+          "outcome": "useful",
+          "q": "analiza /Users/juandavidfranco/Documents/Productos/CricketJourney/Nueva Versión/cricket/docs/spec/cricket-spec-phase1.md"
+        }
+      ],
+      "score": 0.985941657,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "tentative",
+      "uses": 1
+    },
+    "docs_spec_cricket_spec_phase1_self_service_onboarding": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "Self-service Onboarding",
+      "last": "2026-07-21T03:26:26.830724+00:00",
+      "neg": 1,
+      "provenance": [
+        {
+          "date": "2026-07-21T03:26:26.830724+00:00",
+          "outcome": "useful",
+          "q": "Ok, entonces con que podemos continuar para mejorar la plataforma?"
+        },
+        {
+          "date": "2026-07-21T03:20:00.900127+00:00",
+          "outcome": "corrected",
+          "q": "Si, tenemos dos tipos de cliente el cliente de nosotros y el cliente de mi cliente. Whatsapp es el medio que se atiende a mi cliente de mi cliente. En el proceso de conseguir clientes para Cricket es por medio de la web, desde ahí se crearia todo el self-service"
+        },
+        {
+          "date": "2026-07-21T03:17:35.787686+00:00",
+          "outcome": "useful",
+          "q": "Porque esa pregunta"
+        },
+        {
+          "date": "2026-07-21T02:53:18.011931+00:00",
+          "outcome": "useful",
+          "q": "analiza /Users/juandavidfranco/Documents/Productos/CricketJourney/Nueva Versión/cricket/docs/spec/cricket-spec-phase1.md"
+        }
+      ],
+      "score": 1.972369547,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "contested",
+      "uses": 3,
+      "verdict": "useful"
+    },
+    "docs_spec_cricket_spec_phase1_self_service_registration": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "Self-service Registration",
+      "last": "2026-07-21T03:26:26.830724+00:00",
+      "neg": 1,
+      "provenance": [
+        {
+          "date": "2026-07-21T03:26:26.830724+00:00",
+          "outcome": "useful",
+          "q": "Ok, entonces con que podemos continuar para mejorar la plataforma?"
+        },
+        {
+          "date": "2026-07-21T03:20:00.900127+00:00",
+          "outcome": "corrected",
+          "q": "Si, tenemos dos tipos de cliente el cliente de nosotros y el cliente de mi cliente. Whatsapp es el medio que se atiende a mi cliente de mi cliente. En el proceso de conseguir clientes para Cricket es por medio de la web, desde ahí se crearia todo el self-service"
+        }
+      ],
+      "score": 0.000101803,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "contested",
+      "uses": 1,
+      "verdict": "useful"
+    },
+    "docs_spec_cricket_spec_phase1_setup_wizard": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "Setup Wizard",
+      "last": "2026-07-21T03:26:26.830724+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-21T03:26:26.830724+00:00",
+          "outcome": "useful",
+          "q": "Ok, entonces con que podemos continuar para mejorar la plataforma?"
+        },
+        {
+          "date": "2026-07-21T03:17:35.787686+00:00",
+          "outcome": "useful",
+          "q": "Porque esa pregunta"
+        }
+      ],
+      "score": 1.972792253,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "preferred",
+      "uses": 2
+    },
+    "docs_spec_cricket_spec_phase1_tenant_channels": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "tenant_channels",
+      "last": "2026-07-21T03:26:26.830724+00:00",
+      "neg": 1,
+      "provenance": [
+        {
+          "date": "2026-07-21T03:26:26.830724+00:00",
+          "outcome": "useful",
+          "q": "Ok, entonces con que podemos continuar para mejorar la plataforma?"
+        },
+        {
+          "date": "2026-07-21T03:20:00.900127+00:00",
+          "outcome": "corrected",
+          "q": "Si, tenemos dos tipos de cliente el cliente de nosotros y el cliente de mi cliente. Whatsapp es el medio que se atiende a mi cliente de mi cliente. En el proceso de conseguir clientes para Cricket es por medio de la web, desde ahí se crearia todo el self-service"
+        },
+        {
+          "date": "2026-07-21T03:17:35.787686+00:00",
+          "outcome": "useful",
+          "q": "Porque esa pregunta"
+        }
+      ],
+      "score": 0.98642789,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "contested",
+      "uses": 2,
+      "verdict": "useful"
+    }
+  },
+  "version": 1
+}
