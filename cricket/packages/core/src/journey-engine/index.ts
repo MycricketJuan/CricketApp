@@ -126,7 +126,12 @@ export class JourneyEngine {
     }
 
     // ── 4. Resolver la etapa destino ──────────────────────────
-    const targetStage = this.resolveStage(intent, session)
+    // Si hay un trámite en borrador para esta sesión, no dejar que una
+    // clasificación ambigua (ej. una respuesta corta a un campo del
+    // trámite mal leída como general_info/product_question) saque al
+    // cliente de `tramites` a mitad de la recolección.
+    const hasDraftTramite = await this.hasDraftTramite(session.id)
+    const targetStage = this.resolveStage(intent, session, hasDraftTramite)
 
     // ── 5. Verificar si el módulo está contratado ─────────────
     const moduleConfig = await this.getModuleConfig(tenant.id, targetStage)
@@ -226,8 +231,28 @@ Mensaje: "${message}"`,
     return { ...parsed, targetStage }
   }
 
-  private resolveStage(intent: IntentResult, session: Session): ModuleType {
+  private resolveStage(
+    intent: IntentResult,
+    session: Session,
+    hasDraftTramite: boolean,
+  ): ModuleType {
+    if (hasDraftTramite && session.current_stage === 'tramites' && intent.targetStage !== 'tramites') {
+      return 'tramites'
+    }
     return intent.targetStage ?? session.current_stage ?? 'consultation'
+  }
+
+  // Trámite en borrador (aún no radicado) atado a esta sesión — usado
+  // para "anclar" la conversación en `tramites` mientras se recolectan
+  // campos, sin depender de que la clasificación de intención acierte
+  // en cada turno (ver resolveStage()).
+  private async hasDraftTramite(sessionId: string): Promise<boolean> {
+    const { count } = await this.supabase
+      .from('tramites')
+      .select('id', { count: 'exact', head: true })
+      .eq('session_id', sessionId)
+      .eq('status', 'draft')
+    return (count ?? 0) > 0
   }
 
   // ── Helpers IH ───────────────────────────────────────────

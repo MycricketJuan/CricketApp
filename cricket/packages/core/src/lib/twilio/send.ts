@@ -7,9 +7,11 @@
 export interface SendWhatsAppParams {
   to: string
   body: string
+  /** URL pública/firmada de un adjunto (PDF, imagen) a enviar como media del mensaje */
+  mediaUrl?: string
 }
 
-export async function sendWhatsAppMessage({ to, body }: SendWhatsAppParams): Promise<void> {
+export async function sendWhatsAppMessage({ to, body, mediaUrl }: SendWhatsAppParams): Promise<void> {
   const accountSid = process.env.TWILIO_ACCOUNT_SID
   const authToken = process.env.TWILIO_AUTH_TOKEN
   const from = process.env.TWILIO_WHATSAPP_NUMBER
@@ -23,6 +25,7 @@ export async function sendWhatsAppMessage({ to, body }: SendWhatsAppParams): Pro
   const normalizedFrom = from.startsWith('whatsapp:') ? from : `whatsapp:${from}`
 
   const params = new URLSearchParams({ To: normalizedTo, From: normalizedFrom, Body: body })
+  if (mediaUrl) params.set('MediaUrl', mediaUrl)
 
   const response = await fetch(
     `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,

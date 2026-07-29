@@ -4,11 +4,75 @@ import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { getSupabaseAdmin } from '@cricket/core/supabase/admin'
+import { uploadTramiteDocument } from '@cricket/core/supabase/storage'
 import { sendWhatsAppMessage } from '@cricket/core/twilio'
 import { getTramiteTemplate } from '@cricket/agents/tramites/templates'
+import { generatePazYSalvoPdf } from '@cricket/agents/tramites/pdf'
 import { getTramitesAdmin } from '@/lib/tramites/db'
 import { getAuth0 } from '@/lib/auth0'
 import { VALID_TRANSITIONS, RESOLVED_STATUSES } from './status'
+
+// Re-valida la deuda y genera + envía el certificado por WhatsApp
+// cuando un operador aprueba un paz_y_salvo. Nunca se genera de forma
+// autónoma por la IA — solo tras aprobación humana explícita.
+async function issuePazYSalvoPdf(params: {
+  tramiteId: string
+  tenantId: string
+  tenantName: string
+  collectedData: Record<string, unknown>
+  whatsapp: string | null
+  customerName: string | null
+}): Promise<{ pdfUrl: string } | { error: string }> {
+  const { tramiteId, tenantId, tenantName, collectedData, whatsapp, customerName } = params
+  const documentNumber = collectedData.numero_documento as string | undefined
+
+  if (!documentNumber) {
+    return { error: 'El trámite no tiene número de documento registrado — no se puede generar el certificado' }
+  }
+
+  const db = getSupabaseAdmin()
+  const { data: debt } = await db
+    .from('mock_client_debts')
+    .select('has_debt, debt_detail')
+    .eq('tenant_id', tenantId)
+    .eq('document_number', documentNumber)
+    .maybeSingle()
+
+  if (debt?.has_debt) {
+    return { error: `El cliente tiene una deuda pendiente (${debt.debt_detail ?? 'sin detalle'}) — no se puede emitir el paz y salvo` }
+  }
+
+  const pdfBytes = await generatePazYSalvoPdf({
+    tenantName,
+    tramiteId,
+    customerName,
+    documentNumber,
+    producto: (collectedData.producto as string) ?? 'no especificado',
+    destinoCertificado: (collectedData.destino_certificado as string) ?? 'no especificado',
+    issuedAt: new Date(),
+  })
+
+  let pdfUrl: string
+  try {
+    pdfUrl = await uploadTramiteDocument(
+      `${tenantId}/${tramiteId}/paz-y-salvo.pdf`,
+      pdfBytes,
+      'application/pdf',
+    )
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : 'No se pudo subir el certificado' }
+  }
+
+  if (whatsapp) {
+    await sendWhatsAppMessage({
+      to: whatsapp,
+      body: 'Tu certificado de paz y salvo fue aprobado. Adjunto encontrarás el documento.',
+      mediaUrl: pdfUrl,
+    })
+  }
+
+  return { pdfUrl }
+}
 
 // Pasos del levantamiento de prenda que solo puede disparar un
 // operador humano (IA First, IH Always) — la IA nunca los avanza.
@@ -61,7 +125,7 @@ export async function updateTramiteStatus(formData: FormData): Promise<ActionRes
   const tenantSlug = headersList.get('x-tenant-slug') ?? ''
   const { data: tenant } = await db
     .from('tenants')
-    .select('id')
+    .select('id, name')
     .eq('slug', tenantSlug)
     .single()
 
@@ -73,7 +137,7 @@ export async function updateTramiteStatus(formData: FormData): Promise<ActionRes
 
   const { data: tramite } = await tramitesDb
     .from('tramites')
-    .select('id, status, sla_hours, session_id, tramite_type, assigned_to')
+    .select('id, status, sla_hours, session_id, tramite_type, assigned_to, collected_data, end_users(channel_ids, profile)')
     .eq('id', tramiteId)
     .eq('tenant_id', tenant.id)
     .single()
@@ -96,6 +160,25 @@ export async function updateTramiteStatus(formData: FormData): Promise<ActionRes
     status: newStatus,
     internal_notes: internalNotes,
     customer_message: customerMessage,
+  }
+
+  // Al aprobar un paz_y_salvo, re-validar deuda, generar el certificado
+  // y enviarlo por WhatsApp antes de confirmar el cambio de estado —
+  // si algo falla, el trámite se queda como estaba y el operador ve el error.
+  if (statusChanged && newStatus === 'approved' && tramite.tramite_type === 'paz_y_salvo') {
+    const endUser = tramite.end_users as { channel_ids?: Record<string, string>; profile?: Record<string, unknown> } | null
+    const result = await issuePazYSalvoPdf({
+      tramiteId,
+      tenantId: tenant.id,
+      tenantName: tenant.name,
+      collectedData: tramite.collected_data as Record<string, unknown>,
+      whatsapp: endUser?.channel_ids?.whatsapp ?? null,
+      customerName: typeof endUser?.profile?.name === 'string' ? (endUser.profile.name as string) : null,
+    })
+    if ('error' in result) {
+      return { error: result.error }
+    }
+    updateData.collected_data = { ...(tramite.collected_data as Record<string, unknown>), pdf_url: result.pdfUrl }
   }
 
   if (assignedTo !== tramite.assigned_to) {
@@ -139,6 +222,7 @@ export async function updateTramiteStatus(formData: FormData): Promise<ActionRes
       to_status: newStatus,
       assigned_to: assignedTo,
       has_customer_message: Boolean(customerMessage),
+      pdf_generated: Boolean((updateData.collected_data as Record<string, unknown> | undefined)?.pdf_url),
       actor_sub: actorId,
     },
   })

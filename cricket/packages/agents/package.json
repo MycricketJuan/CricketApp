@@ -6,14 +6,16 @@
     "./registry": "./src/registry.ts",
     "./consultation": "./src/consultation/index.ts",
     "./handoff": "./src/handoff/index.ts",
-    "./tramites/templates": "./src/tramites/templates.ts"
+    "./tramites/templates": "./src/tramites/templates.ts",
+    "./tramites/pdf": "./src/tramites/pdf/paz-y-salvo.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
     "@cricket/core": "workspace:*",
     "@cricket/sectors": "workspace:*",
     "@supabase/supabase-js": "^2.45.0",
-    "openai": "^4.77.0"
+    "openai": "^4.77.0",
+    "pdf-lib": "^1.17.1"
   },
   "devDependencies": {
     "typescript": "^5.5.0"

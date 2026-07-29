@@ -8,6 +8,7 @@
     "./supabase/client": "./src/lib/supabase/client.ts",
     "./supabase/server": "./src/lib/supabase/server.ts",
     "./supabase/admin": "./src/lib/supabase/admin.ts",
+    "./supabase/storage": "./src/lib/supabase/storage.ts",
     "./twilio": "./src/lib/twilio/send.ts"
   },
   "dependencies": {
