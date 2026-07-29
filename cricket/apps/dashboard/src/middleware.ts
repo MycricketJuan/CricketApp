@@ -5,8 +5,20 @@ import { getAuth0 } from './lib/auth0'
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // ── 0. Webhooks y páginas públicas sin sesión: nunca pasar por el SDK
+  // de Auth0. getAuth0().middleware() lee/clona el stream del request —
+  // en rutas POST con body (ej. el webhook de Twilio, que envía
+  // application/x-www-form-urlencoded) eso deja el body corrupto para
+  // el `req.formData()` que hace el route handler más adelante.
+  if (pathname.startsWith('/api/webhook') || pathname.startsWith('/firmar')) {
+    const tenantSlug = extractTenantSlug(request.headers.get('host') ?? '', request)
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-tenant-slug', tenantSlug)
+    return NextResponse.next({ request: { headers: requestHeaders } })
+  }
+
   // ── 1. Auth0 gestiona las rutas /auth/* + refresca rolling sessions ──
-  // Debe correr en TODAS las rutas para que las rolling sessions funcionen.
+  // Debe correr en TODAS las demás rutas para que las rolling sessions funcionen.
   let authResponse: NextResponse
   try {
     authResponse = await getAuth0().middleware(request)
@@ -30,9 +42,8 @@ export async function middleware(request: NextRequest) {
   requestHeaders.set('x-tenant-slug', tenantSlug)
 
   // ── 3. Proteger rutas autenticadas ───────────────────────────────────
+  // /api/webhook y /firmar ya retornaron arriba (paso 0), antes de tocar Auth0.
   const isPublicRoute =
-    pathname.startsWith('/api/webhook') ||
-    pathname.startsWith('/firmar') ||
     pathname === '/health' ||
     pathname === '/register' ||
     pathname === '/register/verify'
