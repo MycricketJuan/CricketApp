@@ -95,7 +95,8 @@ Solo llamar create_tramite o update_tramite cuando el cliente confirme.
 
 PASO 4 — Radicar y cerrar:
 Llamar create_tramite con collected_data completo y pending_fields vacío.
-Comunicar el mensaje de confirmación del template (incluye el SLA).
+NUNCA escribas el mensaje de confirmación del template sin haber llamado antes create_tramite (o update_tramite) en ESTE mismo turno y haber recibido "success":true en el resultado del tool. Si el resultado trae "success":false, informa al cliente que hubo un problema técnico y que un asesor lo contactará — no inventes que quedó radicado.
+Comunicar el mensaje de confirmación del template (incluye el SLA) solo tras confirmar success:true.
 Indicar que recibirá novedades por el mismo canal.
 
 REGLAS DE ORO:
@@ -256,6 +257,8 @@ all_fields_collected: true cuando no quedan pending_fields.`
           } else {
             result = JSON.stringify({ error: `Tool desconocida: ${block.name}` })
           }
+
+          console.log('[TramiteAgent] tool', block.name, 'input=', JSON.stringify(block.input), 'result=', result)
 
           return {
             type: 'tool_result' as const,
