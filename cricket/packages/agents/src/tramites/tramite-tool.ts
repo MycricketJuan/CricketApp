@@ -174,7 +174,7 @@ export const IDENTIFY_TRAMITE_TOOL = {
       tramite_type: {
         type: 'string',
         description:
-          'Tipo detectado: apertura_cuenta, solicitud_credito, tarjeta_credito, actualizacion_datos, cdt, reclamacion, paz_y_salvo',
+          'Tipo detectado: apertura_cuenta, solicitud_credito, tarjeta_credito, actualizacion_datos, cdt, reclamacion, paz_y_salvo, levantamiento_de_prenda',
       },
     },
     required: ['tramite_type'],

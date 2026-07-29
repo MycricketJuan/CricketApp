@@ -7,6 +7,7 @@ import { getTramitesAdmin } from '@/lib/tramites/db'
 import { getTramiteTemplate } from '@cricket/agents/tramites/templates'
 import { TramiteDetail } from '../tramite-detail'
 import type { TramiteDetailRow, OperatorRow } from '../tramite-detail'
+import { PrendaActions } from '../prenda-actions'
 import { STATUS_LABEL } from '../status'
 
 interface AuditEntry {
@@ -192,7 +193,10 @@ export default async function TramiteDetailPage({
         </div>
 
         {/* Columna lateral — panel de gestión */}
-        <div>
+        <div className="space-y-6">
+          {row.tramite_type === 'levantamiento_de_prenda' && (
+            <PrendaActions tramiteId={row.id} stage={row.collected_data?.stage as string | undefined} />
+          )}
           <TramiteDetail
             tramite={row}
             operators={(operators ?? []) as unknown as OperatorRow[]}

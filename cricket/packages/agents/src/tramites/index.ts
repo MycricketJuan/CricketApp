@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { AgentInput, AgentOutput } from '@cricket/core/types'
-import { TRAMITE_TEMPLATES, getTramiteTemplate } from './templates'
+import { TRAMITE_TEMPLATES, getTramiteTemplate, PRENDA_STAGES } from './templates'
 import {
   createTramite,
   updateTramite,
@@ -8,6 +8,9 @@ import {
   CREATE_TRAMITE_TOOL,
   UPDATE_TRAMITE_TOOL,
 } from './tramite-tool'
+import { checkDebtStatus, CHECK_DEBT_TOOL } from './debt-tool'
+import { extractVehicleDocument, EXTRACT_DOCUMENT_TOOL } from './vision-tool'
+import { advancePrendaStage, ADVANCE_PRENDA_TOOL } from './prenda-tool'
 
 interface ParsedResponse {
   content: string
@@ -101,8 +104,23 @@ REGLAS DE ORO:
 - Si el cliente cancela el trámite, llamar create_tramite con los datos recopilados y los campos faltantes en pending_fields (queda en draft) para que no se pierda la información
 - Documentos: informar qué documentos necesitará pero aclarar que los entregará en sucursal o por el canal que indique el especialista asignado
 
+CASO ESPECIAL — paz_y_salvo:
+Tras recopilar numero_documento, llama SIEMPRE check_debt_status antes de pedir confirmación final.
+Si has_debt es true: informa el detalle de la deuda con empatía, indica que no se puede emitir el paz y salvo mientras exista deuda pendiente, y llama create_tramite con collected_data (incluyendo blocked_reason con el detalle) y pending_fields: ["pago_deuda"] para dejar registro sin radicar.
+Si has_debt es false: continúa el flujo normal hasta radicar.
+
+CASO ESPECIAL — levantamiento_de_prenda (flujo por etapas, en collected_data.stage):
+Etapas: ${PRENDA_STAGES.join(', ')}.
+1. Recopila placa y entidad_prendaria, luego llama create_tramite con collected_data: {placa, entidad_prendaria, stage: "awaiting_document"} y pending_fields: ["tarjeta_propiedad", "comprobante_pago"]. Pide al cliente que adjunte una foto de la tarjeta de propiedad.
+2. Cuando el mensaje del cliente traiga un adjunto y stage sea awaiting_document, llama extract_document_data para leerlo, luego advance_prenda_stage con new_stage: "document_extracted" y los datos leídos.
+3. Presenta los datos extraídos y pide confirmación. Si el cliente confirma, llama advance_prenda_stage con new_stage: "document_confirmed".
+4. Al llegar a document_confirmed, informa al cliente que un especialista generará el documento de levantamiento para firma digital y le llegará un enlace por este mismo canal — NO intentes avanzar más la etapa tú mismo, eso lo hace el operador.
+5. Cuando el cliente indique que ya firmó y stage sea awaiting_payment (lo mueve el operador), pide que adjunte el comprobante de pago; al recibirlo llama advance_prenda_stage con new_stage: "payment_uploaded".
+6. De ahí en adelante (validación de pago y despacho a domicilio) es responsabilidad exclusiva de un operador humano — informa al cliente que su comprobante quedó en revisión.
+Nunca simules que un humano firmó, validó un pago o despachó el documento: esas transiciones solo las dispara un operador.
+
 CONTEXTO:
-Canal: ${context.channel} | Etapa: ${context.currentStage} | Cliente ID: ${context.endUserId}
+Canal: ${context.channel} | Etapa: ${context.currentStage} | Cliente ID: ${context.endUserId}${context.attachmentUrl ? ' | Adjunto recibido: sí' : ''}
 
 FORMATO DE RESPUESTA — incluir al final de cada mensaje (en línea separada):
 {"confidence":0.00,"reasoning":"...","needsHuman":true,"tramite_type":"","all_fields_collected":false}
@@ -127,6 +145,9 @@ all_fields_collected: true cuando no quedan pending_fields.`
       IDENTIFY_TRAMITE_TOOL,
       CREATE_TRAMITE_TOOL,
       UPDATE_TRAMITE_TOOL,
+      CHECK_DEBT_TOOL,
+      EXTRACT_DOCUMENT_TOOL,
+      ADVANCE_PRENDA_TOOL,
     ]
 
     let response = await this.client.messages.create({
@@ -196,6 +217,39 @@ all_fields_collected: true cuando no quedan pending_fields.`
               collectedData: inp.collected_data,
               pendingFields: inp.pending_fields,
               tenantId: this.tenantId,
+              supabaseUrl: this.supabaseUrl,
+              supabaseKey: this.supabaseKey,
+            })
+          } else if (block.name === 'check_debt_status') {
+            const { document_number } = block.input as { document_number: string }
+            result = await checkDebtStatus({
+              tenantId: this.tenantId,
+              documentNumber: document_number,
+              supabaseUrl: this.supabaseUrl,
+              supabaseKey: this.supabaseKey,
+            })
+          } else if (block.name === 'extract_document_data') {
+            if (!context.attachmentUrl) {
+              result = JSON.stringify({ error: 'No hay ningún adjunto en este mensaje' })
+            } else {
+              try {
+                const extracted = await extractVehicleDocument(context.attachmentUrl, this.client)
+                result = JSON.stringify(extracted)
+              } catch (err) {
+                result = JSON.stringify({ error: err instanceof Error ? err.message : 'Error leyendo el documento' })
+              }
+            }
+          } else if (block.name === 'advance_prenda_stage') {
+            const inp = block.input as {
+              tramite_id: string
+              new_stage: string
+              data: Record<string, unknown>
+            }
+            result = await advancePrendaStage({
+              tramiteId: inp.tramite_id,
+              tenantId: this.tenantId,
+              newStage: inp.new_stage,
+              data: inp.data,
               supabaseUrl: this.supabaseUrl,
               supabaseKey: this.supabaseKey,
             })

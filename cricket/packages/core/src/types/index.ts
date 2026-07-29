@@ -36,6 +36,7 @@ export type TramiteType =
   | 'cdt'
   | 'reclamacion'
   | 'paz_y_salvo'
+  | 'levantamiento_de_prenda'
 
 export type TramiteStatus =
   | 'draft'
@@ -131,6 +132,8 @@ export interface AgentContext {
   conversationHistory: MessageTurn[]
   /** Slug del sector ('retail', 'banking', etc.) o undefined si el tenant no tiene extensión sectorial */
   sectorExtension?: string
+  /** URL del adjunto (imagen/PDF) del mensaje entrante, si lo hay (ej. tarjeta de propiedad, comprobante de pago) */
+  attachmentUrl?: string
 }
 
 export interface MessageTurn {

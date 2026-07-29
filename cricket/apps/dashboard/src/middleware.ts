@@ -32,6 +32,7 @@ export async function middleware(request: NextRequest) {
   // ── 3. Proteger rutas autenticadas ───────────────────────────────────
   const isPublicRoute =
     pathname.startsWith('/api/webhook') ||
+    pathname.startsWith('/firmar') ||
     pathname === '/health' ||
     pathname === '/register' ||
     pathname === '/register/verify'

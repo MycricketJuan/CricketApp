@@ -103,10 +103,26 @@ export const TRAMITE_TEMPLATES = {
     required_fields: [
       { key: 'producto', label: 'Producto', question: '¿Para qué producto necesitas el paz y salvo? (crédito, tarjeta, cuenta)' },
       { key: 'destino_certificado', label: 'Destino del certificado', question: '¿Para qué lo necesitas? (traspaso de vehículo, notaría, visa, libre destinación)' },
+      { key: 'numero_documento', label: 'Número de documento', question: '¿Cuál es tu número de documento de identidad?' },
     ],
     documents_required: [],
     sla_hours: 72,
     confirmation_message: 'Tu solicitud de paz y salvo fue radicada. Lo recibirás por email en máximo 3 días hábiles.',
+  },
+
+  levantamiento_de_prenda: {
+    label: 'Levantamiento de prenda',
+    description: 'Liberar la prenda de un vehículo tras el pago total del crédito',
+    required_fields: [
+      { key: 'placa', label: 'Placa del vehículo', question: '¿Cuál es la placa del vehículo?' },
+      { key: 'entidad_prendaria', label: 'Entidad acreedora', question: '¿A nombre de qué entidad está constituida la prenda actualmente?' },
+    ],
+    documents_required: [
+      { name: 'tarjeta_propiedad', description: 'Foto o PDF de la tarjeta de propiedad del vehículo' },
+      { name: 'comprobante_pago', description: 'Comprobante del pago total del crédito' },
+    ],
+    sla_hours: 120,
+    confirmation_message: 'Tu levantamiento de prenda fue radicado. El documento se enviará a tu domicilio una vez completado el proceso de firma y validación de pago.',
   },
 } as const
 
@@ -141,4 +157,30 @@ export const TRAMITE_INTENT_MAPPING: Record<string, TramiteType> = {
   'reclamacion':             'reclamacion',
   'paz y salvo':             'paz_y_salvo',
   'certificado paz':         'paz_y_salvo',
+  'levantamiento de prenda': 'levantamiento_de_prenda',
+  'levantar prenda':         'levantamiento_de_prenda',
+  'liberar prenda':          'levantamiento_de_prenda',
+  'quitar prenda':           'levantamiento_de_prenda',
+  'desprendarizar':          'levantamiento_de_prenda',
 }
+
+// ── Máquina de estados del levantamiento de prenda ─────────────
+// Se persiste en tramites.collected_data.stage. Cada paso hacia
+// 'awaiting_signature', 'payment_uploaded' y 'dispatched' requiere
+// una acción humana explícita (IA First, IH Always) — el agente
+// nunca puede avanzar la etapa por sí mismo más allá de lo que el
+// cliente confirma conversacionalmente.
+export const PRENDA_STAGES = [
+  'awaiting_document',
+  'document_extracted',
+  'document_confirmed',
+  'awaiting_signature',
+  'signed',
+  'awaiting_payment',
+  'payment_uploaded',
+  'payment_confirmed',
+  'dispatched',
+  'completed',
+] as const
+
+export type PrendaStage = (typeof PRENDA_STAGES)[number]

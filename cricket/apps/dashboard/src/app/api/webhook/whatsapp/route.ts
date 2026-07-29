@@ -76,18 +76,22 @@ export async function POST(req: NextRequest) {
 
     const from        = params['From'] ?? ''
     const messageText = params['Body'] ?? ''
+    const numMedia     = Number(params['NumMedia'] ?? '0')
+    const mediaUrl      = numMedia > 0 ? params['MediaUrl0'] : undefined
+    const mediaContentType = numMedia > 0 ? params['MediaContentType0'] : undefined
 
     const tenantSlug =
       req.headers.get('x-tenant-slug') ||
       process.env.DEV_TENANT_SLUG ||
       'moda-xyz'
 
-    log(`tenantSlug=${tenantSlug} from=${from} message="${messageText}"`)
+    log(`tenantSlug=${tenantSlug} from=${from} message="${messageText}" media=${mediaUrl ?? 'none'}`)
 
     const senderId = from.replace(/^whatsapp:/i, '')
 
-    if (!senderId || !messageText) {
-      log('ERROR: senderId o messageText vacíos')
+    // El Body llega vacío cuando el cliente envía solo un adjunto (foto/PDF)
+    if (!senderId || (!messageText && !mediaUrl)) {
+      log('ERROR: senderId vacío o mensaje sin texto ni adjunto')
       return xmlResponse(TWIML_EMPTY)
     }
 
@@ -171,9 +175,10 @@ export async function POST(req: NextRequest) {
     const channelMessage: ChannelMessage = {
       channelType: 'whatsapp',
       senderId,
-      content: messageText,
+      content: messageText || '(adjunto sin texto)',
+      mediaUrl,
       timestamp: new Date().toISOString(),
-      raw: {},
+      raw: mediaContentType ? { mediaContentType } : {},
     }
 
     const anthropic   = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })

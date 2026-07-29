@@ -215,6 +215,20 @@ ON CONFLICT (tenant_id, module_type) DO UPDATE SET
   config          = EXCLUDED.config;
 
 
+-- Deudas simuladas para probar el trámite de paz y salvo
+-- (requiere la migración 20260729000000_mock_client_debts.sql aplicada)
+INSERT INTO mock_client_debts (tenant_id, document_number, has_debt, debt_amount, debt_detail)
+VALUES
+  ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', '1000111222', false, NULL, NULL),
+  ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', '1000333444', true, 850000, 'Cuota vencida de tarjeta de crédito Clásica'),
+  ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', '1000555666', true, 120000, 'Saldo pendiente en cuenta de ahorros por manejo')
+ON CONFLICT (tenant_id, document_number) DO UPDATE SET
+  has_debt    = EXCLUDED.has_debt,
+  debt_amount = EXCLUDED.debt_amount,
+  debt_detail = EXCLUDED.debt_detail,
+  updated_at  = NOW();
+
+
 -- ============================================================
 -- SECCIÓN 4 — Journey template bancario
 -- ============================================================

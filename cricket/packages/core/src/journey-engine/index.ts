@@ -79,6 +79,7 @@ const INTENT_TO_STAGE: Record<string, ModuleType> = {
   abrir_cdt:           'tramites',
   radicar_queja:       'tramites',
   paz_y_salvo:         'tramites',
+  levantamiento_de_prenda: 'tramites',
 }
 
 // El enum module_type de la DB en supabase.generated.ts no incluye
@@ -130,7 +131,7 @@ export class JourneyEngine {
     }
 
     // ── 6. Construir contexto y ejecutar el agente ────────────
-    const context = await this.buildContext(session, tenant)
+    const context = await this.buildContext(session, tenant, message.mediaUrl)
     let output: AgentOutput
 
     try {
@@ -194,11 +195,13 @@ export class JourneyEngine {
 Intents: product_question, general_info, complaint, buy_intent, upgrade_request,
          transaction_request, status_check, positive_feedback, negative_feedback,
          tramite_request, apertura_cuenta, solicitud_credito, solicitar_tarjeta,
-         actualizar_datos, abrir_cdt, radicar_queja, paz_y_salvo, other.
+         actualizar_datos, abrir_cdt, radicar_queja, paz_y_salvo,
+         levantamiento_de_prenda, other.
 Nota trámites: usa los intents de trámite cuando el cliente quiere INICIAR una
 solicitud formal (abrir cuenta/CDT, pedir crédito o tarjeta, actualizar datos,
-radicar una queja formal, pedir paz y salvo). complaint es para quejas
-conversacionales; radicar_queja para reclamaciones formales.
+radicar una queja formal, pedir paz y salvo, levantar/liberar una prenda de
+vehículo). complaint es para quejas conversacionales; radicar_queja para
+reclamaciones formales.
 Sentiment: positive, neutral, negative, frustrated, angry.
 Formato exacto: {"intent":"...","sentiment":"...","confidence":0.00}`,
       messages: [{
@@ -332,7 +335,11 @@ Mensaje: "${message}"`,
     }
   }
 
-  private async buildContext(session: Session, tenant: Tenant): Promise<AgentContext> {
+  private async buildContext(
+    session: Session,
+    tenant: Tenant,
+    attachmentUrl?: string,
+  ): Promise<AgentContext> {
     const { data: interactions } = await this.supabase
       .from('interactions')
       .select('actor_type, content, created_at')
@@ -348,6 +355,7 @@ Mensaje: "${message}"`,
       channel: 'whatsapp',
       ihPolicies: tenant.ih_policies,
       sectorExtension: tenant.sector,
+      attachmentUrl,
       conversationHistory: (interactions ?? []).reverse().map(i => ({
         role: i.actor_type === 'AI' ? 'assistant' : 'user',
         content: i.content,
