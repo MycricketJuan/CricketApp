@@ -1,21 +1,42 @@
 {
-  "generated_at": "2026-07-21T17:35:41.728652+00:00",
+  "generated_at": "2026-07-21T18:24:20.479760+00:00",
   "nodes": {
+    "docs_spec_cricket_spec_phase1_cricket_phase_1_specification": {
+      "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
+      "label": "Cricket Phase 1 Specification",
+      "last": "2026-07-21T18:09:17.787048+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-21T18:09:17.787048+00:00",
+          "outcome": "useful",
+          "q": "Generame un documento que me indique lo que se ha realizado vs el documento docs/spec/cricket-spec-phase1.md"
+        }
+      ],
+      "score": 0.999758633,
+      "source_file": "cricket-spec-phase1.md",
+      "status": "tentative",
+      "uses": 1
+    },
     "docs_spec_cricket_spec_phase1_global_acceptance_criteria": {
       "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
       "label": "Global Acceptance Criteria",
-      "last": "2026-07-21T02:53:18.011931+00:00",
+      "last": "2026-07-21T18:09:17.787048+00:00",
       "provenance": [
+        {
+          "date": "2026-07-21T18:09:17.787048+00:00",
+          "outcome": "useful",
+          "q": "Generame un documento que me indique lo que se ha realizado vs el documento docs/spec/cricket-spec-phase1.md"
+        },
         {
           "date": "2026-07-21T02:53:18.011931+00:00",
           "outcome": "useful",
           "q": "analiza /Users/juandavidfranco/Documents/Productos/CricketJourney/Nueva Versión/cricket/docs/spec/cricket-spec-phase1.md"
         }
       ],
-      "score": 0.985941657,
+      "score": 1.984931037,
       "source_file": "cricket-spec-phase1.md",
-      "status": "tentative",
-      "uses": 1
+      "status": "preferred",
+      "uses": 2
     },
     "docs_spec_cricket_spec_phase1_hybrid_pricing": {
       "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
@@ -28,7 +49,7 @@
           "q": "analiza /Users/juandavidfranco/Documents/Productos/CricketJourney/Nueva Versión/cricket/docs/spec/cricket-spec-phase1.md"
         }
       ],
-      "score": 0.985941657,
+      "score": 0.985172404,
       "source_file": "cricket-spec-phase1.md",
       "status": "tentative",
       "uses": 1
@@ -36,18 +57,23 @@
     "docs_spec_cricket_spec_phase1_knowledge_base_builder": {
       "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
       "label": "Knowledge Base Builder",
-      "last": "2026-07-21T03:26:26.830724+00:00",
+      "last": "2026-07-21T18:09:17.787048+00:00",
       "provenance": [
+        {
+          "date": "2026-07-21T18:09:17.787048+00:00",
+          "outcome": "useful",
+          "q": "Generame un documento que me indique lo que se ha realizado vs el documento docs/spec/cricket-spec-phase1.md"
+        },
         {
           "date": "2026-07-21T03:26:26.830724+00:00",
           "outcome": "useful",
           "q": "Ok, entonces con que podemos continuar para mejorar la plataforma?"
         }
       ],
-      "score": 0.986466166,
+      "score": 1.985455136,
       "source_file": "cricket-spec-phase1.md",
-      "status": "tentative",
-      "uses": 1
+      "status": "preferred",
+      "uses": 2
     },
     "docs_spec_cricket_spec_phase1_multitenancy": {
       "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
@@ -71,7 +97,7 @@
           "q": "analiza /Users/juandavidfranco/Documents/Productos/CricketJourney/Nueva Versión/cricket/docs/spec/cricket-spec-phase1.md"
         }
       ],
-      "score": 0.985903382,
+      "score": 0.985134158,
       "source_file": "cricket-spec-phase1.md",
       "status": "contested",
       "uses": 2,
@@ -80,9 +106,14 @@
     "docs_spec_cricket_spec_phase1_multitenant_whatsapp_webhook": {
       "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
       "label": "Multi-tenant WhatsApp Webhook",
-      "last": "2026-07-21T03:26:26.830724+00:00",
+      "last": "2026-07-21T18:09:17.787048+00:00",
       "neg": 1,
       "provenance": [
+        {
+          "date": "2026-07-21T18:09:17.787048+00:00",
+          "outcome": "useful",
+          "q": "Generame un documento que me indique lo que se ha realizado vs el documento docs/spec/cricket-spec-phase1.md"
+        },
         {
           "date": "2026-07-21T03:26:26.830724+00:00",
           "outcome": "useful",
@@ -99,10 +130,10 @@
           "q": "Porque esa pregunta"
         }
       ],
-      "score": 0.98642789,
+      "score": 1.98541689,
       "source_file": "cricket-spec-phase1.md",
       "status": "contested",
-      "uses": 2,
+      "uses": 3,
       "verdict": "useful"
     },
     "docs_spec_cricket_spec_phase1_risk_mitigation_plan": {
@@ -116,7 +147,7 @@
           "q": "analiza /Users/juandavidfranco/Documents/Productos/CricketJourney/Nueva Versión/cricket/docs/spec/cricket-spec-phase1.md"
         }
       ],
-      "score": 0.985941657,
+      "score": 0.985172404,
       "source_file": "cricket-spec-phase1.md",
       "status": "tentative",
       "uses": 1
@@ -124,9 +155,19 @@
     "docs_spec_cricket_spec_phase1_self_service_onboarding": {
       "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
       "label": "Self-service Onboarding",
-      "last": "2026-07-21T03:26:26.830724+00:00",
+      "last": "2026-07-21T18:09:17.787048+00:00",
       "neg": 1,
       "provenance": [
+        {
+          "date": "2026-07-21T18:09:17.787048+00:00",
+          "outcome": "useful",
+          "q": "Generame un documento que me indique lo que se ha realizado vs el documento docs/spec/cricket-spec-phase1.md"
+        },
+        {
+          "date": "2026-07-21T17:42:15.968836+00:00",
+          "outcome": "useful",
+          "q": "Implementar Registro empresarial mediante Auth0."
+        },
         {
           "date": "2026-07-21T03:26:26.830724+00:00",
           "outcome": "useful",
@@ -141,25 +182,25 @@
           "date": "2026-07-21T03:17:35.787686+00:00",
           "outcome": "useful",
           "q": "Porque esa pregunta"
-        },
-        {
-          "date": "2026-07-21T02:53:18.011931+00:00",
-          "outcome": "useful",
-          "q": "analiza /Users/juandavidfranco/Documents/Productos/CricketJourney/Nueva Versión/cricket/docs/spec/cricket-spec-phase1.md"
         }
       ],
-      "score": 1.972369547,
+      "score": 3.969914423,
       "source_file": "cricket-spec-phase1.md",
       "status": "contested",
-      "uses": 3,
+      "uses": 5,
       "verdict": "useful"
     },
     "docs_spec_cricket_spec_phase1_self_service_registration": {
       "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
       "label": "Self-service Registration",
-      "last": "2026-07-21T03:26:26.830724+00:00",
+      "last": "2026-07-21T17:42:15.968836+00:00",
       "neg": 1,
       "provenance": [
+        {
+          "date": "2026-07-21T17:42:15.968836+00:00",
+          "outcome": "useful",
+          "q": "Implementar Registro empresarial mediante Auth0."
+        },
         {
           "date": "2026-07-21T03:26:26.830724+00:00",
           "outcome": "useful",
@@ -171,17 +212,27 @@
           "q": "Si, tenemos dos tipos de cliente el cliente de nosotros y el cliente de mi cliente. Whatsapp es el medio que se atiende a mi cliente de mi cliente. En el proceso de conseguir clientes para Cricket es por medio de la web, desde ahí se crearia todo el self-service"
         }
       ],
-      "score": 0.000101803,
+      "score": 0.999426852,
       "source_file": "cricket-spec-phase1.md",
       "status": "contested",
-      "uses": 1,
+      "uses": 2,
       "verdict": "useful"
     },
     "docs_spec_cricket_spec_phase1_setup_wizard": {
       "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
       "label": "Setup Wizard",
-      "last": "2026-07-21T03:26:26.830724+00:00",
+      "last": "2026-07-21T18:09:17.787048+00:00",
       "provenance": [
+        {
+          "date": "2026-07-21T18:09:17.787048+00:00",
+          "outcome": "useful",
+          "q": "Generame un documento que me indique lo que se ha realizado vs el documento docs/spec/cricket-spec-phase1.md"
+        },
+        {
+          "date": "2026-07-21T17:42:15.968836+00:00",
+          "outcome": "useful",
+          "q": "Implementar Registro empresarial mediante Auth0."
+        },
         {
           "date": "2026-07-21T03:26:26.830724+00:00",
           "outcome": "useful",
@@ -193,10 +244,10 @@
           "q": "Porque esa pregunta"
         }
       ],
-      "score": 1.972792253,
+      "score": 3.970336799,
       "source_file": "cricket-spec-phase1.md",
       "status": "preferred",
-      "uses": 2
+      "uses": 4
     },
     "docs_spec_cricket_spec_phase1_tenant_channels": {
       "code_fingerprint": "55db3ade687682890fa24dc7b6a986efc52090d9d0a82db52b980d27672755ad",
@@ -220,7 +271,7 @@
           "q": "Porque esa pregunta"
         }
       ],
-      "score": 0.98642789,
+      "score": 0.985658257,
       "source_file": "cricket-spec-phase1.md",
       "status": "contested",
       "uses": 2,
