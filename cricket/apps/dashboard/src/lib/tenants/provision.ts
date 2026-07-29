@@ -148,6 +148,17 @@ function defaultModules(tenantId: string): TenantModuleInsert[] {
       fallback_config: {},
       config: { nps_scale: 10, collect_csat: true, auto_close_after_feedback: true },
     },
+    {
+      tenant_id: tenantId,
+      // El enum module_type generado (supabase.generated.ts) no incluye
+      // 'tramites' hasta correr `pnpm db:types` tras la migración
+      // 20240103000000_tramites.sql — mismo caveat documentado allí.
+      module_type: 'tramites' as TenantModuleInsert['module_type'],
+      is_active: true,
+      fallback_type: 'ih_handoff',
+      fallback_config: { message: 'Un asesor te ayudará con tu trámite en breve.' },
+      config: { confidence_threshold: 0.80 },
+    },
   ]
 }
 
@@ -182,6 +193,7 @@ function defaultJourney(tenantId: string, sector: SectorType): JourneyTemplateIn
       { order: 2, stage_type: 'sales', is_active: true, agent: 'sales_agent', fallback: null, ih_checkpoint: false },
       { order: 3, stage_type: 'transactions', is_active: true, agent: 'transactions_agent', fallback: 'ih_handoff', ih_checkpoint: false },
       { order: 4, stage_type: 'feedback', is_active: true, agent: 'feedback_agent', fallback: 'skip', ih_checkpoint: false },
+      { order: 5, stage_type: 'tramites', is_active: true, agent: 'tramites_agent', fallback: 'ih_handoff', ih_checkpoint: false },
     ],
     ih_checkpoints: ihCheckpoints,
     is_active: true,
