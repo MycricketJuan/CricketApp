@@ -52,7 +52,7 @@ export type TramiteResolution = 'approved' | 'rejected' | 'more_info_needed'
 
 export type ChannelType = 'whatsapp' | 'web_chat' | 'email'
 
-export type ActorType = 'AI' | 'HUMAN' | 'SYSTEM'
+export type ActorType = 'AI' | 'HUMAN' | 'SYSTEM' | 'CUSTOMER'
 
 export type ActorControl = 'AI' | 'HUMAN' | 'MIXED'
 

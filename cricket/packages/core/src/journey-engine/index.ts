@@ -87,6 +87,11 @@ const INTENT_TO_STAGE: Record<string, ModuleType> = {
 // 20240103000000_tramites.sql aplicada. El cast es inocuo después.
 type DbModuleType = Database['public']['Enums']['module_type']
 
+// El enum actor_type de la DB en supabase.generated.ts no incluye
+// 'CUSTOMER' hasta regenerar tipos (pnpm db:types) con la migración
+// 20260730000000_customer_actor_type.sql aplicada. El cast es inocuo después.
+type DbActorType = Database['public']['Enums']['actor_type']
+
 // ── Journey Engine ────────────────────────────────────────────
 
 export class JourneyEngine {
@@ -305,6 +310,21 @@ Mensaje: "${message}"`,
     stage: ModuleType,
     tenantId: string,
   ): Promise<void> {
+    // Se persiste primero el mensaje del cliente — buildContext() lee
+    // esta misma tabla para reconstruir el historial del próximo turno.
+    // Sin esto, el agente solo ve sus propias preguntas pasadas y nunca
+    // las respuestas del cliente, y termina repitiendo las preguntas.
+    await this.supabase
+      .from('interactions')
+      .insert({
+        session_id: session.id,
+        tenant_id: tenantId,
+        actor_type: 'CUSTOMER' as DbActorType,
+        content: message.content,
+        stage: stage as DbModuleType,
+        channel: message.channelType,
+      })
+
     const { data: interaction } = await this.supabase
       .from('interactions')
       .insert({
@@ -359,7 +379,7 @@ Mensaje: "${message}"`,
       conversationHistory: (interactions ?? []).reverse().map(i => ({
         role: i.actor_type === 'AI' ? 'assistant' : 'user',
         content: i.content,
-        actorType: i.actor_type as 'AI' | 'HUMAN' | 'SYSTEM',
+        actorType: i.actor_type as 'AI' | 'HUMAN' | 'SYSTEM' | 'CUSTOMER',
         createdAt: i.created_at,
       })),
     }
