@@ -12,7 +12,7 @@
     "dev": "pnpm --parallel --filter './apps/**' --filter './services/**' dev",
     "build": "pnpm --filter './packages/**' build && pnpm --filter './apps/**' --filter './services/**' build",
     "type-check": "pnpm -r type-check",
-    "db:types": "supabase gen types typescript --project-id $SUPABASE_PROJECT_REF --schema public > packages/core/src/types/supabase.generated.ts && echo '✓ tipos generados'",
+    "db:types": "bash scripts/generate-supabase-types.sh",
     "db:push": "supabase db push",
     "db:studio": "supabase studio",
     "db:reset": "supabase db reset"

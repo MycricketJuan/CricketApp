@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "next build",
+  "buildCommand": "cd ../.. && bash scripts/generate-supabase-types.sh && cd apps/dashboard && next build",
   "outputDirectory": ".next"
 }

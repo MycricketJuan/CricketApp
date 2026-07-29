@@ -25,3 +25,4 @@ Thumbs.db
 .idea/
 
 # TypeScript generated — supabase.generated.ts is committed as placeholder; regenerar con pnpm db:types
+*.tsbuildinfo
