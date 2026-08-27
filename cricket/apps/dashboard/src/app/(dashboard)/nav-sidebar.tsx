@@ -69,6 +69,9 @@ interface NavSidebarProps {
 
 export function NavSidebar({ role, userName, profiles, activeSlug }: NavSidebarProps) {
   const items = NAV_BY_ROLE[role] ?? NAV_BY_ROLE.operator
+  const pathname = usePathname()
+
+  if (pathname.startsWith('/admin/agente')) return null
 
   return (
     <aside className="fixed inset-y-0 left-0 flex w-56 flex-col border-r border-gray-200 bg-white">

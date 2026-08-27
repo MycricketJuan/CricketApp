@@ -62,7 +62,7 @@ export function AgenteWizard() {
   }
 
   return (
-    <div className={`${archivo.className} h-screen w-screen overflow-hidden bg-[#0b0c0d] text-[#e8e8e8]`}>
+    <div className={`${archivo.className} fixed inset-0 z-50 overflow-hidden bg-[#0b0c0d] text-[#e8e8e8]`}>
       <style>{`
         @keyframes agenteOrbPulse {
           0%,100% { transform:scale(1); box-shadow:0 0 0 1px rgba(74,222,128,.35), 0 0 26px 2px rgba(74,222,128,.30); }
