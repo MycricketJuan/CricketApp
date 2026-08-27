@@ -23,6 +23,7 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
   tenant_admin: [
     { label: 'Resumen',         href: '/admin' },
     { label: 'Configuración',   href: '/admin/config' },
+    { label: 'Agente IA',       href: '/admin/agente' },
     { label: 'Usuarios',        href: '/admin/users' },
     { label: 'Módulos',          href: '/admin/modules' },
     { label: 'Trámites',        href: '/tramites' },

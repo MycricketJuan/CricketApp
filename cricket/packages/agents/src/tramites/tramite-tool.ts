@@ -1,6 +1,48 @@
 import { createClient } from '@supabase/supabase-js'
 import { getTramiteTemplate } from './templates'
 
+// ── findDraftTramite ──────────────────────────────────────────────
+// Busca un trámite en borrador ya existente para esta sesión, para
+// que el agente no dependa de "recordar" el tramite_id a través del
+// historial de conversación en texto plano (que no incluye los
+// bloques tool_use/tool_result de turnos anteriores).
+
+export interface DraftTramite {
+  id: string
+  tramiteType: string
+  label: string
+  collectedData: Record<string, unknown>
+  pendingFields: string[]
+}
+
+export async function findDraftTramite(params: {
+  sessionId: string
+  supabaseUrl: string
+  supabaseKey: string
+}): Promise<DraftTramite | null> {
+  const { sessionId, supabaseUrl, supabaseKey } = params
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  const { data } = await supabase
+    .from('tramites')
+    .select('id, tramite_type, label, collected_data, pending_fields')
+    .eq('session_id', sessionId)
+    .eq('status', 'draft')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (!data) return null
+
+  return {
+    id: data.id,
+    tramiteType: data.tramite_type,
+    label: data.label,
+    collectedData: data.collected_data as Record<string, unknown>,
+    pendingFields: data.pending_fields as string[],
+  }
+}
+
 // ── createTramite ─────────────────────────────────────────────────
 
 export interface CreateTramiteParams {
@@ -184,7 +226,7 @@ export const IDENTIFY_TRAMITE_TOOL = {
 export const CREATE_TRAMITE_TOOL = {
   name: 'create_tramite',
   description:
-    'Crea el registro del trámite cuando el cliente confirmó todos sus datos. Llamar UNA sola vez al final. Si los datos no están completos, usar update_tramite.',
+    'Crea el registro en borrador (draft) del trámite. Llamar UNA sola vez, inmediatamente después de identify_tramite, con collected_data vacío y pending_fields igual a todos los campos requeridos del template — NO esperar a que el cliente termine de responder. Los datos que se vayan recopilando después se guardan con update_tramite. Si ya existe un trámite en curso para esta sesión (ver TRÁMITE EN CURSO en el contexto), no volver a llamar esta tool.',
   input_schema: {
     type: 'object' as const,
     properties: {
@@ -206,7 +248,7 @@ export const CREATE_TRAMITE_TOOL = {
 export const UPDATE_TRAMITE_TOOL = {
   name: 'update_tramite',
   description:
-    'Actualiza un trámite en borrador con nuevos datos recopilados. Usar si ya existe un trámite draft para esta sesión.',
+    'Actualiza el trámite en borrador con cada nuevo dato recopilado (una llamada por campo). Cuando pending_fields queda vacío, el trámite pasa automáticamente de draft a submitted — llamar así solo tras la confirmación explícita del cliente.',
   input_schema: {
     type: 'object' as const,
     properties: {
