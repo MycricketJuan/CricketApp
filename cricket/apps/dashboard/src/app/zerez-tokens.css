@@ -4,7 +4,7 @@
    2. Put data-theme="light" on <html>. The demo opens in light for everyone; a "Tema oscuro" toggle sets data-theme="dark".
       Without the attribute, dark follows the operating system (that is why a viewer in dark mode saw a different demo). */
 :root {
-  --surface-000: #f5f7fd;
+  --surface-000: #fbfcff;
   --surface-100: #ffffff;
   --surface-200: #eef2fc;
   --surface-glass: rgba(255, 255, 255, 0.72);
@@ -148,7 +148,7 @@
 }
 /* IntroScreen and every client representation stay light: */
 [data-theme="light"] {
-  --surface-000: #f5f7fd;
+  --surface-000: #fbfcff;
   --surface-100: #ffffff;
   --surface-200: #eef2fc;
   --surface-glass: rgba(255, 255, 255, 0.72);
