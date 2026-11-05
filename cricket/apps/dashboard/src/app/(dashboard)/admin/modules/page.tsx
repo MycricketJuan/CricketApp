@@ -31,7 +31,7 @@ export default async function AdminModulesPage() {
   if (!tenant) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-gray-500">Tenant no encontrado: {tenantSlug}</p>
+        <p className="text-sm text-ink-subtle">Tenant no encontrado: {tenantSlug}</p>
       </div>
     )
   }
@@ -55,36 +55,36 @@ export default async function AdminModulesPage() {
   return (
     <div className="p-6 space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">Módulos</h1>
-        <p className="text-sm text-gray-500">{tenant.name}</p>
+        <h1 className="text-xl font-semibold text-ink">Módulos</h1>
+        <p className="text-sm text-ink-subtle">{tenant.name}</p>
       </div>
 
       <div className="space-y-4">
         {(!modules || modules.length === 0) && (
-          <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-400 shadow-sm">
+          <div className="rounded-xl border border-border-soft bg-surface-100 p-8 text-center text-sm text-ink-subtle shadow-sm">
             Sin módulos configurados
           </div>
         )}
         {(modules ?? []).map(m => (
-          <div key={m.id} className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div key={m.id} className="rounded-xl border border-border-soft bg-surface-100 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border-soft">
               <div className="flex items-center gap-3">
-                <p className="font-medium text-gray-900">{MODULE_LABELS[m.module_type] ?? m.module_type}</p>
+                <p className="font-medium text-ink">{MODULE_LABELS[m.module_type] ?? m.module_type}</p>
                 <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                  m.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                  m.is_active ? 'bg-green-100 text-green-700' : 'bg-surface-200 text-ink-subtle'
                 }`}>
                   {m.is_active ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-ink-subtle">
                 Fallback: {FALLBACK_LABELS[m.fallback_type] ?? m.fallback_type}
               </span>
             </div>
 
             {Object.keys(m.config).length > 0 && (
-              <div className="px-5 py-3 border-b border-gray-100">
-                <p className="text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Configuración del agente</p>
-                <pre className="text-xs text-gray-700 bg-gray-50 rounded-lg p-3 overflow-x-auto">
+              <div className="px-5 py-3 border-b border-border-soft">
+                <p className="text-xs font-medium text-ink-subtle mb-2 uppercase tracking-wide">Configuración del agente</p>
+                <pre className="text-xs text-ink-muted bg-surface-000 rounded-lg p-3 overflow-x-auto">
                   {JSON.stringify(m.config, null, 2)}
                 </pre>
               </div>
@@ -92,8 +92,8 @@ export default async function AdminModulesPage() {
 
             {Object.keys(m.fallback_config).length > 0 && (
               <div className="px-5 py-3">
-                <p className="text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Configuración de fallback</p>
-                <pre className="text-xs text-gray-700 bg-gray-50 rounded-lg p-3 overflow-x-auto">
+                <p className="text-xs font-medium text-ink-subtle mb-2 uppercase tracking-wide">Configuración de fallback</p>
+                <pre className="text-xs text-ink-muted bg-surface-000 rounded-lg p-3 overflow-x-auto">
                   {JSON.stringify(m.fallback_config, null, 2)}
                 </pre>
               </div>

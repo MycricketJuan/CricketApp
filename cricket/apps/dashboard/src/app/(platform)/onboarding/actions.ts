@@ -26,7 +26,7 @@ function buildInvitationEmail(
   const name = fullName ?? 'Hola'
   const link = `https://${slug}.mycricket.ai/invite?token=${token}`
   return `
-<p>${name}, fuiste invitado como administrador de <strong>${tenantName}</strong> en la plataforma Cricket.</p>
+<p>${name}, fuiste invitado como administrador de <strong>${tenantName}</strong> en la plataforma ZEREZ.</p>
 <p><a href="${link}">${link}</a></p>
 <p>Este link expira en 7 días.</p>
 `
@@ -144,7 +144,7 @@ export async function sendInvitation(formData: FormData) {
         body: JSON.stringify({
           from: process.env.EMAIL_FROM ?? 'noreply@mycricket.ai',
           to: email,
-          subject: `Invitación a Cricket — ${tenant.name}`,
+          subject: `Invitación a ZEREZ — ${tenant.name}`,
           html: buildInvitationEmail(tenant.name, tenant.slug, invitation.token, fullName),
         }),
       })

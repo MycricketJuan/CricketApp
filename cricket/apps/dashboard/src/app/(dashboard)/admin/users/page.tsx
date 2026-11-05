@@ -34,7 +34,7 @@ export default async function AdminUsersPage() {
   if (!tenant) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-gray-500">Tenant no encontrado: {tenantSlug}</p>
+        <p className="text-sm text-ink-subtle">Tenant no encontrado: {tenantSlug}</p>
       </div>
     )
   }
@@ -59,49 +59,49 @@ export default async function AdminUsersPage() {
   return (
     <div className="p-6 space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">Usuarios</h1>
-        <p className="text-sm text-gray-500">{tenant.name} · {users?.length ?? 0} registros</p>
+        <h1 className="text-xl font-semibold text-ink">Usuarios</h1>
+        <p className="text-sm text-ink-subtle">{tenant.name} · {users?.length ?? 0} registros</p>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border-soft bg-surface-100 shadow-sm">
         <table className="w-full text-sm">
-          <thead className="border-b border-gray-100 bg-gray-50">
+          <thead className="border-b border-border-soft bg-surface-000">
             <tr>
               {['Nombre / Email', 'Rol', 'Estado', 'Último acceso', 'Alta'].map(h => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-ink-subtle">
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border-soft">
             {(!users || users.length === 0) && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-400">
+                <td colSpan={5} className="px-4 py-8 text-center text-sm text-ink-subtle">
                   Sin usuarios registrados
                 </td>
               </tr>
             )}
             {(users ?? []).map(u => (
-              <tr key={u.id} className={`hover:bg-gray-50 ${!u.is_active ? 'opacity-50' : ''}`}>
+              <tr key={u.id} className={`hover:bg-surface-000 ${!u.is_active ? 'opacity-50' : ''}`}>
                 <td className="px-4 py-3">
-                  <p className="font-medium text-gray-900">{u.full_name ?? '—'}</p>
-                  {u.email && <p className="text-xs text-gray-400">{u.email}</p>}
+                  <p className="font-medium text-ink">{u.full_name ?? '—'}</p>
+                  {u.email && <p className="text-xs text-ink-subtle">{u.email}</p>}
                 </td>
                 <td className="px-4 py-3">
-                  <span className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                  <span className="inline-flex rounded-full bg-surface-200 px-2 py-0.5 text-xs font-medium text-ink-muted">
                     {ROLE_LABELS[u.role] ?? u.role}
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                    u.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                    u.is_active ? 'bg-green-100 text-green-700' : 'bg-surface-200 text-ink-subtle'
                   }`}>
                     {u.is_active ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500">{formatRelative(u.last_seen_at)}</td>
-                <td className="px-4 py-3 text-xs text-gray-400">
+                <td className="px-4 py-3 text-xs text-ink-subtle">{formatRelative(u.last_seen_at)}</td>
+                <td className="px-4 py-3 text-xs text-ink-subtle">
                   {new Date(u.created_at).toLocaleDateString('es')}
                 </td>
               </tr>

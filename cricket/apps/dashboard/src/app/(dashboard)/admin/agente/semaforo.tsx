@@ -1,6 +1,6 @@
 import { getSemaforo } from './constants'
 
-const COLORS = ['#f0603f', '#f5c451', '#4ade80']
+const COLORS = ['var(--danger)', 'var(--spark-amber)', 'var(--primary)']
 
 function Lamp({ level, tier }: { level: 0 | 1 | 2; tier: 0 | 1 | 2 }) {
   const color = COLORS[tier]
@@ -20,7 +20,7 @@ function Lamp({ level, tier }: { level: 0 | 1 | 2; tier: 0 | 1 | 2 }) {
       />
     )
   }
-  return <div className="h-[11px] w-[11px] flex-none rounded-full border border-[#232623] bg-[#141614]" />
+  return <div className="h-[11px] w-[11px] flex-none rounded-full border border-border-soft bg-surface-000" />
 }
 
 export function Semaforo({ screenIndex }: { screenIndex: number }) {
@@ -28,8 +28,8 @@ export function Semaforo({ screenIndex }: { screenIndex: number }) {
   const color = COLORS[s.level]
 
   return (
-    <div className="mb-3 border border-[#1a1c1a] bg-[#050605] p-3.5">
-      <div className="text-[10px] font-semibold uppercase tracking-[.14em] text-[#5f645f]">
+    <div className="mb-3 border border-border-soft bg-surface-000 p-3.5">
+      <div className="text-[10px] font-semibold uppercase tracking-[.14em] text-ink-subtle">
         Estado del empleado
       </div>
       <div className="mt-3 flex items-center gap-2.5">
@@ -44,7 +44,7 @@ export function Semaforo({ screenIndex }: { screenIndex: number }) {
       <div className="mt-3 text-[13.5px] font-medium tracking-tight" style={{ color }}>
         {s.name}
       </div>
-      <div className="mt-1 text-[11px] leading-[1.45] text-[#5f645f]">{s.note}</div>
+      <div className="mt-1 text-[11px] leading-[1.45] text-ink-subtle">{s.note}</div>
     </div>
   )
 }

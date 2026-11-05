@@ -81,33 +81,33 @@ export function TramiteDetail({
   }
 
   return (
-    <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500">
+    <div className="space-y-4 rounded-xl border border-border-soft bg-surface-100 p-4 shadow-sm">
+      <h2 className="text-sm font-medium uppercase tracking-wide text-ink-subtle">
         Gestión del trámite
       </h2>
 
       {/* Contacto del cliente */}
-      <div className="rounded-lg bg-gray-50 p-3 space-y-1">
+      <div className="rounded-lg bg-surface-000 p-3 space-y-1">
         {customerName && (
-          <p className="text-sm font-medium text-gray-900">{customerName}</p>
+          <p className="text-sm font-medium text-ink">{customerName}</p>
         )}
-        {whatsapp && <p className="text-sm text-gray-600">WhatsApp: {whatsapp}</p>}
-        {email && <p className="text-sm text-gray-600">Email: {email}</p>}
+        {whatsapp && <p className="text-sm text-ink-muted">WhatsApp: {whatsapp}</p>}
+        {email && <p className="text-sm text-ink-muted">Email: {email}</p>}
         {!customerName && !whatsapp && !email && (
-          <p className="text-sm text-gray-400">Sin datos de contacto</p>
+          <p className="text-sm text-ink-subtle">Sin datos de contacto</p>
         )}
       </div>
 
       {/* Asignación */}
       <section className="space-y-1">
-        <label htmlFor="assigned_to" className="text-sm font-medium text-gray-700">
+        <label htmlFor="assigned_to" className="text-sm font-medium text-ink-muted">
           Asignado a
         </label>
         <select
           id="assigned_to"
           value={selectedOperator}
           onChange={(e) => setSelectedOperator(e.target.value)}
-          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700"
+          className="w-full rounded-lg border border-border-soft bg-surface-100 px-3 py-1.5 text-sm text-ink-muted"
         >
           <option value="">Sin asignar</option>
           {operators.map((op) => (
@@ -120,7 +120,7 @@ export function TramiteDetail({
 
       {/* Cambio de estado */}
       <section className="space-y-1">
-        <label htmlFor="status" className="text-sm font-medium text-gray-700">
+        <label htmlFor="status" className="text-sm font-medium text-ink-muted">
           Estado del trámite
         </label>
         <select
@@ -128,8 +128,8 @@ export function TramiteDetail({
           value={status}
           onChange={(e) => setStatus(e.target.value)}
           disabled={isFinal}
-          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                     text-gray-700 disabled:bg-gray-50 disabled:text-gray-400"
+          className="w-full rounded-lg border border-border-soft bg-surface-100 px-3 py-1.5 text-sm
+                     text-ink-muted disabled:bg-surface-000 disabled:text-ink-subtle"
         >
           <option value={tramite.status}>
             {STATUS_LABEL[tramite.status] ?? tramite.status} (actual)
@@ -141,15 +141,15 @@ export function TramiteDetail({
           ))}
         </select>
         {isFinal && (
-          <p className="text-xs text-gray-400">Este trámite está en un estado final</p>
+          <p className="text-xs text-ink-subtle">Este trámite está en un estado final</p>
         )}
       </section>
 
       {/* Notas internas */}
       <section className="space-y-1">
-        <label htmlFor="internal_notes" className="text-sm font-medium text-gray-700">
+        <label htmlFor="internal_notes" className="text-sm font-medium text-ink-muted">
           Notas internas{' '}
-          <span className="font-normal text-gray-400">(no visibles para el cliente)</span>
+          <span className="font-normal text-ink-subtle">(no visibles para el cliente)</span>
         </label>
         <textarea
           id="internal_notes"
@@ -158,15 +158,15 @@ export function TramiteDetail({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Observaciones del analista..."
-          className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm
-                     placeholder:text-gray-400 focus:border-gray-400 focus:outline-none"
+          className="w-full rounded-lg border border-border-soft px-3 py-1.5 text-sm
+                     placeholder:text-ink-subtle focus:border-primary focus:outline-none"
         />
       </section>
 
       {/* Mensaje al cliente — solo en estados resueltos */}
       {showCustomerMessage && (
         <section className="space-y-1">
-          <label htmlFor="customer_message" className="text-sm font-medium text-gray-700">
+          <label htmlFor="customer_message" className="text-sm font-medium text-ink-muted">
             Mensaje para el cliente
           </label>
           <textarea
@@ -176,10 +176,10 @@ export function TramiteDetail({
             value={customerMessage}
             onChange={(e) => setCustomerMessage(e.target.value)}
             placeholder="Este mensaje se enviará al cliente por WhatsApp..."
-            className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm
-                       placeholder:text-gray-400 focus:border-gray-400 focus:outline-none"
+            className="w-full rounded-lg border border-border-soft px-3 py-1.5 text-sm
+                       placeholder:text-ink-subtle focus:border-primary focus:outline-none"
           />
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-ink-subtle">
             Si dejas este campo vacío, se usará el mensaje estándar del trámite.
           </p>
         </section>
@@ -193,8 +193,8 @@ export function TramiteDetail({
         type="button"
         onClick={handleSubmit}
         disabled={isPending}
-        className="w-full rounded-lg bg-black py-2 text-sm font-medium text-white
-                   hover:bg-gray-900 disabled:opacity-60"
+        className="w-full rounded-lg bg-primary py-2 text-sm font-medium text-white
+                   hover:bg-primary-hover disabled:opacity-60"
       >
         {isPending ? 'Guardando...' : 'Guardar cambios'}
       </button>

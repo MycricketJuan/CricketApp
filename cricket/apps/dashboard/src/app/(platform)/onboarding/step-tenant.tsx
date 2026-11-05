@@ -102,11 +102,11 @@ export function StepTenant() {
             placeholder="banco-xyz"
             style={{
               ...inputStyle,
-              borderColor: slugError ? '#D85A30' : undefined,
+              borderColor: slugError ? 'var(--danger)' : undefined,
             }}
           />
           {slugError ? (
-            <p style={{ fontSize: 12, color: '#D85A30', marginTop: 4 }}>{slugError}</p>
+            <p style={{ fontSize: 12, color: 'var(--danger)', marginTop: 4 }}>{slugError}</p>
           ) : slug ? (
             <p style={{ fontSize: 12, color: 'var(--color-text-tertiary)', marginTop: 4 }}>
               {slug}.mycricket.ai

@@ -101,9 +101,9 @@ export default async function TramiteDetailPage({
   return (
     <main className="mx-auto max-w-6xl p-6 space-y-6">
       <div>
-        <p className="text-xs uppercase tracking-wide text-gray-400">Trámite</p>
-        <h1 className="text-xl font-semibold text-gray-900">{row.label}</h1>
-        <p className="mt-0.5 text-sm text-gray-500">
+        <p className="text-xs uppercase tracking-wide text-ink-subtle">Trámite</p>
+        <h1 className="text-xl font-semibold text-ink">{row.label}</h1>
+        <p className="mt-0.5 text-sm text-ink-subtle">
           {STATUS_LABEL[row.status] ?? row.status} · Creado {formatDateTime(row.created_at)}
         </p>
       </div>
@@ -112,18 +112,18 @@ export default async function TramiteDetailPage({
         {/* Columna principal */}
         <div className="space-y-6 lg:col-span-2">
           {/* Datos recopilados */}
-          <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-gray-500">
+          <section className="rounded-xl border border-border-soft bg-surface-100 p-4 shadow-sm">
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-ink-subtle">
               Datos recopilados por el agente
             </h2>
             {collectedEntries.length === 0 ? (
-              <p className="text-sm text-gray-400">Aún no hay datos recopilados</p>
+              <p className="text-sm text-ink-subtle">Aún no hay datos recopilados</p>
             ) : (
-              <dl className="divide-y divide-gray-100">
+              <dl className="divide-y divide-border-soft">
                 {collectedEntries.map(([key, value]) => (
                   <div key={key} className="flex items-baseline justify-between gap-4 py-2">
-                    <dt className="text-sm text-gray-500">{fieldLabel[key] ?? key}</dt>
-                    <dd className="text-sm font-medium text-gray-900">{String(value)}</dd>
+                    <dt className="text-sm text-ink-subtle">{fieldLabel[key] ?? key}</dt>
+                    <dd className="text-sm font-medium text-ink">{String(value)}</dd>
                   </div>
                 ))}
               </dl>
@@ -131,17 +131,17 @@ export default async function TramiteDetailPage({
           </section>
 
           {/* Documentos requeridos */}
-          <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-gray-500">
+          <section className="rounded-xl border border-border-soft bg-surface-100 p-4 shadow-sm">
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-ink-subtle">
               Documentos requeridos
             </h2>
             {documents.length === 0 ? (
-              <p className="text-sm text-gray-400">Este trámite no requiere documentos</p>
+              <p className="text-sm text-ink-subtle">Este trámite no requiere documentos</p>
             ) : (
               <ul className="space-y-2">
                 {documents.map((doc) => (
                   <li key={doc.name} className="flex items-center justify-between gap-4">
-                    <span className="text-sm text-gray-700">{doc.description}</span>
+                    <span className="text-sm text-ink-muted">{doc.description}</span>
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                         doc.provided
@@ -158,22 +158,22 @@ export default async function TramiteDetailPage({
           </section>
 
           {/* Historial */}
-          <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-gray-500">
+          <section className="rounded-xl border border-border-soft bg-surface-100 p-4 shadow-sm">
+            <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-ink-subtle">
               Historial
             </h2>
             {auditEntries.length === 0 ? (
-              <p className="text-sm text-gray-400">Sin eventos registrados</p>
+              <p className="text-sm text-ink-subtle">Sin eventos registrados</p>
             ) : (
               <ol className="space-y-3">
                 {auditEntries.map((entry, i) => (
                   <li key={i} className="flex gap-3">
-                    <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-gray-300" />
+                    <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-wash-strong" />
                     <div>
-                      <p className="text-sm text-gray-700">
+                      <p className="text-sm text-ink-muted">
                         {EVENT_LABEL[entry.event_type] ?? entry.event_type}
                         {entry.event_type === 'tramite.status_changed' && (
-                          <span className="text-gray-500">
+                          <span className="text-ink-subtle">
                             {' '}
                             ({STATUS_LABEL[String(entry.payload.from_status)] ?? entry.payload.from_status as string}
                             {' → '}
@@ -181,7 +181,7 @@ export default async function TramiteDetailPage({
                           </span>
                         )}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-ink-subtle">
                         {formatDateTime(entry.created_at)} · {entry.actor_type}
                       </p>
                     </div>

@@ -7,9 +7,9 @@ interface StatCard {
 
 function Card({ label, value }: StatCard) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="mt-1 text-3xl font-semibold text-gray-900">{value}</p>
+    <div className="rounded-xl border border-border-soft bg-surface-100 p-5 shadow-sm">
+      <p className="text-sm text-ink-subtle">{label}</p>
+      <p className="mt-1 text-3xl font-semibold text-ink">{value}</p>
     </div>
   )
 }
@@ -35,8 +35,8 @@ export default async function PlatformPage() {
     <div className="p-6 space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">Plataforma Cricket</h1>
-        <p className="text-sm text-gray-500">Superadministración</p>
+        <h1 className="text-xl font-semibold text-ink">Plataforma ZEREZ</h1>
+        <p className="text-sm text-ink-subtle">Superadministración</p>
       </div>
 
       {/* Stats */}
@@ -49,42 +49,42 @@ export default async function PlatformPage() {
 
       {/* Tenants table */}
       <section className="space-y-3">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500">
+        <h2 className="text-sm font-medium uppercase tracking-wide text-ink-subtle">
           Todos los tenants
         </h2>
 
         {!tenants || tenants.length === 0 ? (
-          <div className="flex items-center justify-center rounded-xl border border-dashed border-gray-200 py-12 text-gray-400">
+          <div className="flex items-center justify-center rounded-xl border border-dashed border-border-soft py-12 text-ink-subtle">
             <p className="text-sm">Sin tenants registrados</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-border-soft bg-surface-100 shadow-sm">
             <table className="w-full text-sm">
-              <thead className="border-b border-gray-100 bg-gray-50">
+              <thead className="border-b border-border-soft bg-surface-000">
                 <tr>
                   {['Nombre', 'Slug', 'Sector', 'Estado', 'Creado'].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                    <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-ink-subtle">
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border-soft">
                 {tenants.map((t) => (
-                  <tr key={t.slug} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{t.name}</td>
-                    <td className="px-4 py-3 font-mono text-gray-600">{t.slug}</td>
-                    <td className="px-4 py-3 text-gray-600">{t.sector ?? '—'}</td>
+                  <tr key={t.slug} className="hover:bg-surface-000">
+                    <td className="px-4 py-3 font-medium text-ink">{t.name}</td>
+                    <td className="px-4 py-3 font-mono text-ink-muted">{t.slug}</td>
+                    <td className="px-4 py-3 text-ink-muted">{t.sector ?? '—'}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
                         t.is_active
                           ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-500'
+                          : 'bg-surface-200 text-ink-subtle'
                       }`}>
                         {t.is_active ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-500">
+                    <td className="px-4 py-3 text-ink-subtle">
                       {new Date(t.created_at).toLocaleDateString('es', {
                         day: '2-digit', month: 'short', year: 'numeric',
                       })}

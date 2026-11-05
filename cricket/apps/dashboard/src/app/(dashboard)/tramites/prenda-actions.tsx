@@ -43,23 +43,23 @@ export function PrendaActions({
   }
 
   return (
-    <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-      <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500">
+    <div className="space-y-3 rounded-xl border border-border-soft bg-surface-100 p-4 shadow-sm">
+      <h2 className="text-sm font-medium uppercase tracking-wide text-ink-subtle">
         Levantamiento de prenda — progreso
       </h2>
-      <p className="text-sm text-gray-700">{STAGE_LABEL[stage ?? ''] ?? stage ?? 'Sin etapa registrada'}</p>
+      <p className="text-sm text-ink-muted">{STAGE_LABEL[stage ?? ''] ?? stage ?? 'Sin etapa registrada'}</p>
       {nextAction && (
         <button
           type="button"
           onClick={handleClick}
           disabled={isPending}
-          className="w-full rounded-lg bg-black py-2 text-sm font-medium text-white hover:bg-gray-900 disabled:opacity-60"
+          className="w-full rounded-lg bg-primary py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-60"
         >
           {isPending ? 'Procesando...' : nextAction.label}
         </button>
       )}
       {!nextAction && stage !== 'completed' && (
-        <p className="text-xs text-gray-400">Esperando al cliente antes de la siguiente acción del operador.</p>
+        <p className="text-xs text-ink-subtle">Esperando al cliente antes de la siguiente acción del operador.</p>
       )}
     </div>
   )

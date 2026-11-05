@@ -17,7 +17,7 @@ export default async function QueuePage() {
   if (!tenant) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-gray-500">Tenant no encontrado: {tenantSlug}</p>
+        <p className="text-sm text-ink-subtle">Tenant no encontrado: {tenantSlug}</p>
       </div>
     )
   }
@@ -49,8 +49,8 @@ export default async function QueuePage() {
   return (
     <div className="p-6 space-y-8">
       <div className="flex items-center gap-4">
-        <h1 className="text-xl font-semibold text-gray-900">Cola de atención</h1>
-        <span className="rounded-full bg-gray-100 px-3 py-0.5 text-sm text-gray-600">
+        <h1 className="text-xl font-semibold text-ink">Cola de atención</h1>
+        <span className="rounded-full bg-surface-200 px-3 py-0.5 text-sm text-ink-muted">
           {escalations?.length ?? 0} escalaciones · {checkpoints?.length ?? 0} checkpoints
         </span>
       </div>

@@ -65,14 +65,14 @@ const CHANNEL_LABEL: Record<string, string> = {
 const SENTIMENT_BADGE: Record<string, string> = {
   frustrated: 'bg-red-100 text-red-700',
   negative: 'bg-amber-100 text-amber-700',
-  neutral: 'bg-gray-100 text-gray-600',
+  neutral: 'bg-surface-200 text-ink-muted',
   positive: 'bg-green-100 text-green-700',
 }
 
 const CHANNEL_BADGE: Record<string, string> = {
   whatsapp: 'bg-green-100 text-green-700',
-  web_chat: 'bg-blue-100 text-blue-700',
-  email: 'bg-gray-100 text-gray-600',
+  web_chat: 'bg-primary-tint text-primary',
+  email: 'bg-surface-200 text-ink-muted',
 }
 
 const TRIGGER_BADGE: Record<string, string> = {
@@ -85,25 +85,25 @@ const TRIGGER_BADGE: Record<string, string> = {
 // null → el handoff aún corre en background; texto plano → fallback.
 function ContextSummary({ summary }: { summary: string | null }) {
   if (!summary) {
-    return <span className="text-xs text-gray-400">Generando resumen…</span>
+    return <span className="text-xs text-ink-subtle">Generando resumen…</span>
   }
   if (summary.includes('👤')) {
     return (
       <div>
         {summary.split('\n').map((line, i) => (
-          <div key={i} className="text-xs text-gray-600 mb-0.5">
+          <div key={i} className="text-xs text-ink-muted mb-0.5">
             {line}
           </div>
         ))}
       </div>
     )
   }
-  return <div className="text-xs text-gray-600">{summary}</div>
+  return <div className="text-xs text-ink-muted">{summary}</div>
 }
 
 function Badge({ label, className }: { label: string; className?: string }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${className ?? 'bg-gray-100 text-gray-600'}`}>
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${className ?? 'bg-surface-200 text-ink-muted'}`}>
       {label}
     </span>
   )
@@ -138,12 +138,12 @@ export function QueueRealtime({
     <>
       {/* Sección A — Escalaciones */}
       <section className="space-y-3">
-        <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+        <h2 className="text-sm font-medium text-ink-subtle uppercase tracking-wide">
           Escalaciones activas
         </h2>
 
         {escalations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 py-12 text-gray-400">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border-soft py-12 text-ink-subtle">
             <p className="text-sm">No hay escalaciones activas</p>
           </div>
         ) : (
@@ -160,12 +160,12 @@ export function QueueRealtime({
 
       {/* Sección B — Checkpoints */}
       <section className="space-y-3">
-        <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+        <h2 className="text-sm font-medium text-ink-subtle uppercase tracking-wide">
           Checkpoints pendientes
         </h2>
 
         {checkpoints.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 py-12 text-gray-400">
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border-soft py-12 text-ink-subtle">
             <p className="text-sm">No hay checkpoints pendientes</p>
           </div>
         ) : (
@@ -208,7 +208,7 @@ function EscalationCard({ escalation: esc }: { escalation: EscalationRow }) {
   const session = esc.sessions
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
+    <div className="rounded-xl border border-border-soft bg-surface-100 p-4 shadow-sm space-y-3">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
           <Badge
@@ -227,9 +227,9 @@ function EscalationCard({ escalation: esc }: { escalation: EscalationRow }) {
           {esc.metadata?.briefing?.urgency === 'high' && (
             <Badge label="Urgente" className="bg-red-100 text-red-700" />
           )}
-          <span className="text-xs text-gray-400">{esc.trigger_reason}</span>
+          <span className="text-xs text-ink-subtle">{esc.trigger_reason}</span>
         </div>
-        <span className="shrink-0 text-xs text-gray-400">{timeAgo}</span>
+        <span className="shrink-0 text-xs text-ink-subtle">{timeAgo}</span>
       </div>
 
       <ContextSummary summary={esc.context_summary} />
@@ -239,8 +239,8 @@ function EscalationCard({ escalation: esc }: { escalation: EscalationRow }) {
           type="button"
           disabled={isPending}
           onClick={() => startTransition(() => takeControl(session.id))}
-          className="flex-1 rounded-lg bg-black py-1.5 text-sm font-medium text-white
-                     hover:bg-gray-900 disabled:opacity-60"
+          className="flex-1 rounded-lg bg-primary py-1.5 text-sm font-medium text-white
+                     hover:bg-primary-hover disabled:opacity-60"
         >
           {isPending ? 'Tomando control…' : 'Tomar control'}
         </button>
@@ -248,8 +248,8 @@ function EscalationCard({ escalation: esc }: { escalation: EscalationRow }) {
           type="button"
           disabled
           title="Próximamente"
-          className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm
-                     text-gray-400 cursor-not-allowed"
+          className="rounded-lg border border-border-soft px-3 py-1.5 text-sm
+                     text-ink-subtle cursor-not-allowed"
         >
           Ver historial
         </button>
@@ -279,12 +279,12 @@ function CheckpointCard({
   const conf = chk.confidence_at_trigger
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
+    <div className="rounded-xl border border-border-soft bg-surface-100 p-4 shadow-sm space-y-3">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
           <Badge
             label={chk.trigger_reason}
-            className={TRIGGER_BADGE[chk.trigger_reason] ?? 'bg-gray-100 text-gray-600'}
+            className={TRIGGER_BADGE[chk.trigger_reason] ?? 'bg-surface-200 text-ink-muted'}
           />
           {chk.sessions.current_stage && (
             <Badge label={chk.sessions.current_stage} className="bg-purple-100 text-purple-700" />
@@ -296,13 +296,13 @@ function CheckpointCard({
       </div>
 
       {conf !== null && (
-        <p className={`text-xs font-medium ${conf < 0.6 ? 'text-red-600' : 'text-gray-500'}`}>
+        <p className={`text-xs font-medium ${conf < 0.6 ? 'text-red-600' : 'text-ink-subtle'}`}>
           Confianza: {conf.toFixed(2)}
         </p>
       )}
 
       {chk.ai_recommendation && (
-        <p className="text-sm text-gray-600 line-clamp-2">
+        <p className="text-sm text-ink-muted line-clamp-2">
           {chk.ai_recommendation.length > 150
             ? chk.ai_recommendation.slice(0, 150) + '…'
             : chk.ai_recommendation}
@@ -312,8 +312,8 @@ function CheckpointCard({
       <button
         type="button"
         onClick={onResolve}
-        className="w-full rounded-lg border border-gray-300 py-1.5 text-sm font-medium
-                   text-gray-700 hover:bg-gray-50"
+        className="w-full rounded-lg border border-border-strong py-1.5 text-sm font-medium
+                   text-ink-muted hover:bg-surface-000"
       >
         Resolver
       </button>

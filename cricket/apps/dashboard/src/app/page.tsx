@@ -7,12 +7,12 @@ export default async function DashboardPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8">
       <div className="w-full max-w-2xl space-y-4 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Cricket Dashboard</h1>
-        <p className="text-lg text-gray-600">
+        <h1 className="text-4xl font-bold tracking-tight">ZEREZ Dashboard</h1>
+        <p className="text-lg text-ink-muted">
           Plataforma de agentes IA para el customer journey
         </p>
-        <div className="rounded-lg border border-gray-200 bg-white px-6 py-4 text-sm text-gray-500">
-          Tenant: <span className="font-mono font-medium text-gray-900">{tenantSlug}</span>
+        <div className="rounded-lg border border-border-soft bg-surface-100 px-6 py-4 text-sm text-ink-subtle">
+          Tenant: <span className="font-mono font-medium text-ink">{tenantSlug}</span>
         </div>
       </div>
     </main>

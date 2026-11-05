@@ -26,11 +26,11 @@ function ConfidenceBar({ value }: { value: number }) {
   const color = value < 0.6 ? 'bg-red-500' : value < 0.8 ? 'bg-amber-400' : 'bg-green-500'
   return (
     <div className="space-y-1">
-      <div className="flex justify-between text-xs text-gray-500">
+      <div className="flex justify-between text-xs text-ink-subtle">
         <span>Confianza de la IA</span>
         <span className={value < 0.6 ? 'text-red-600 font-medium' : ''}>{pct}%</span>
       </div>
-      <div className="h-1.5 w-full rounded-full bg-gray-100">
+      <div className="h-1.5 w-full rounded-full bg-surface-200">
         <div className={`h-1.5 rounded-full ${color}`} style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -57,16 +57,16 @@ export function CheckpointModal({ checkpoint, onClose }: Props) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl">
+      <div className="w-full max-w-lg rounded-2xl bg-surface-100 shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-          <h2 className="text-base font-semibold text-gray-900">
+        <div className="flex items-center justify-between border-b border-border-soft px-6 py-4">
+          <h2 className="text-base font-semibold text-ink">
             Resolución del checkpoint
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-ink-subtle hover:text-ink-muted"
             aria-label="Cerrar"
           >
             ✕
@@ -76,7 +76,7 @@ export function CheckpointModal({ checkpoint, onClose }: Props) {
         {/* Body */}
         <div className="px-6 py-4 space-y-4">
           {/* Trigger badge */}
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${TRIGGER_BADGE[checkpoint.trigger_reason] ?? 'bg-gray-100 text-gray-600'}`}>
+          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${TRIGGER_BADGE[checkpoint.trigger_reason] ?? 'bg-surface-200 text-ink-muted'}`}>
             {TRIGGER_LABEL[checkpoint.trigger_reason] ?? checkpoint.trigger_reason}
           </span>
 
@@ -88,8 +88,8 @@ export function CheckpointModal({ checkpoint, onClose }: Props) {
           {/* AI Recommendation */}
           {checkpoint.ai_recommendation && (
             <div className="space-y-1">
-              <p className="text-xs font-medium text-gray-500">Recomendación de la IA</p>
-              <div className="max-h-32 overflow-y-auto rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
+              <p className="text-xs font-medium text-ink-subtle">Recomendación de la IA</p>
+              <div className="max-h-32 overflow-y-auto rounded-lg bg-surface-000 px-3 py-2 text-sm text-ink-muted">
                 {checkpoint.ai_recommendation}
               </div>
             </div>
@@ -98,7 +98,7 @@ export function CheckpointModal({ checkpoint, onClose }: Props) {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
-              <label htmlFor="ih_decision" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="ih_decision" className="block text-sm font-medium text-ink-muted">
                 Decisión <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -108,8 +108,8 @@ export function CheckpointModal({ checkpoint, onClose }: Props) {
                 minLength={10}
                 rows={3}
                 placeholder="Describe tu decisión y los pasos a seguir…"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-                           focus:outline-none focus:ring-2 focus:ring-black resize-none"
+                className="w-full rounded-lg border border-border-strong px-3 py-2 text-sm
+                           focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
             </div>
 
@@ -119,16 +119,16 @@ export function CheckpointModal({ checkpoint, onClose }: Props) {
                 id="override_toggle"
                 checked={overrideToggled}
                 onChange={(e) => setOverrideToggled(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 accent-black"
+                className="h-4 w-4 rounded border-border-strong accent-black"
               />
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-ink-muted">
                 Difiero de la recomendación de la IA
               </span>
             </label>
 
             {overrideToggled && (
               <div className="space-y-1">
-                <label htmlFor="ih_override_reason" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="ih_override_reason" className="block text-sm font-medium text-ink-muted">
                   Motivo del cambio <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -138,8 +138,8 @@ export function CheckpointModal({ checkpoint, onClose }: Props) {
                   minLength={10}
                   rows={2}
                   placeholder="Explica por qué difiere tu decisión de la recomendación…"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-                             focus:outline-none focus:ring-2 focus:ring-black resize-none"
+                  className="w-full rounded-lg border border-border-strong px-3 py-2 text-sm
+                             focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 />
               </div>
             )}
@@ -149,16 +149,16 @@ export function CheckpointModal({ checkpoint, onClose }: Props) {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 rounded-lg border border-gray-300 py-2 text-sm
-                           font-medium text-gray-700 hover:bg-gray-50"
+                className="flex-1 rounded-lg border border-border-strong py-2 text-sm
+                           font-medium text-ink-muted hover:bg-surface-000"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isPending}
-                className="flex-1 rounded-lg bg-black py-2 text-sm font-medium
-                           text-white hover:bg-gray-900 disabled:opacity-60"
+                className="flex-1 rounded-lg bg-primary py-2 text-sm font-medium
+                           text-white hover:bg-primary-hover disabled:opacity-60"
               >
                 {isPending ? 'Guardando…' : 'Confirmar decisión'}
               </button>

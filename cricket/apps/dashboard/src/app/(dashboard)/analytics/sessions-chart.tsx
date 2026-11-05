@@ -84,9 +84,9 @@ export function SessionsChart({ data }: Props) {
             color: 'var(--color-text-secondary)',
           }}
         />
-        <Bar dataKey="total" name="Total" fill="#D85A30" radius={[3, 3, 0, 0]} />
-        <Bar dataKey="completed" name="Completadas" fill="#1D9E75" radius={[3, 3, 0, 0]} />
-        <Bar dataKey="escalated" name="Escaladas" fill="#BA7517" radius={[3, 3, 0, 0]} />
+        <Bar dataKey="total" name="Total" fill="var(--danger)" radius={[3, 3, 0, 0]} />
+        <Bar dataKey="completed" name="Completadas" fill="var(--success)" radius={[3, 3, 0, 0]} />
+        <Bar dataKey="escalated" name="Escaladas" fill="var(--spark-amber)" radius={[3, 3, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )

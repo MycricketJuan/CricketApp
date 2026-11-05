@@ -66,7 +66,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const role = jwtRole !== 'operator' ? jwtRole : (activeProfile?.role ?? 'operator')
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-surface-000">
       <NavSidebar
         role={role}
         userName={name}

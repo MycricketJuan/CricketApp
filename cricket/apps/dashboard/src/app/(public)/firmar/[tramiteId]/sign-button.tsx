@@ -32,7 +32,7 @@ export function SignButton({ tramiteId }: { tramiteId: string }) {
         type="button"
         onClick={handleClick}
         disabled={isPending}
-        className="w-full rounded-lg bg-black py-3 text-sm font-medium text-white hover:bg-gray-900 disabled:opacity-60"
+        className="w-full rounded-lg bg-primary py-3 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-60"
       >
         {isPending ? 'Firmando...' : 'Firmar documento digitalmente'}
       </button>

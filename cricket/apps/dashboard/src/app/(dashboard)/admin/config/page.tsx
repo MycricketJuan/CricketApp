@@ -27,17 +27,17 @@ const FALLBACK_LABELS: Record<string, string> = {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="space-y-3">
-      <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500">{title}</h2>
-      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">{children}</div>
+      <h2 className="text-sm font-medium uppercase tracking-wide text-ink-subtle">{title}</h2>
+      <div className="rounded-xl border border-border-soft bg-surface-100 shadow-sm">{children}</div>
     </section>
   )
 }
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between px-5 py-3 border-b border-gray-100 last:border-0">
-      <span className="text-sm text-gray-500 w-64 shrink-0">{label}</span>
-      <span className="text-sm text-gray-900 text-right">{value}</span>
+    <div className="flex items-start justify-between px-5 py-3 border-b border-border-soft last:border-0">
+      <span className="text-sm text-ink-subtle w-64 shrink-0">{label}</span>
+      <span className="text-sm text-ink text-right">{value}</span>
     </div>
   )
 }
@@ -67,7 +67,7 @@ export default async function AdminConfigPage() {
   if (!tenant) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-gray-500">Tenant no encontrado: {tenantSlug}</p>
+        <p className="text-sm text-ink-subtle">Tenant no encontrado: {tenantSlug}</p>
       </div>
     )
   }
@@ -91,21 +91,21 @@ export default async function AdminConfigPage() {
   return (
     <div className="p-6 space-y-8 max-w-3xl">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">Configuración</h1>
-        <p className="text-sm text-gray-500">{tenant.name}</p>
+        <h1 className="text-xl font-semibold text-ink">Configuración</h1>
+        <p className="text-sm text-ink-subtle">{tenant.name}</p>
       </div>
 
       <Section title="Información general">
         <Row label="Nombre" value={tenant.name} />
-        <Row label="Subdominio (slug)" value={<code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{tenant.slug}</code>} />
+        <Row label="Subdominio (slug)" value={<code className="text-xs bg-surface-200 px-1.5 py-0.5 rounded">{tenant.slug}</code>} />
         <Row label="Sector" value={
-          <span className="inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+          <span className="inline-flex rounded-full bg-primary-tint px-2 py-0.5 text-xs font-medium text-primary">
             {SECTOR_LABELS[tenant.sector] ?? tenant.sector}
           </span>
         } />
         <Row label="Estado" value={
           <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-            tenant.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+            tenant.is_active ? 'bg-green-100 text-green-700' : 'bg-surface-200 text-ink-subtle'
           }`}>
             {tenant.is_active ? 'Activo' : 'Inactivo'}
           </span>
@@ -141,36 +141,36 @@ export default async function AdminConfigPage() {
 
       <Section title="Módulos contratados">
         <table className="w-full text-sm">
-          <thead className="border-b border-gray-100 bg-gray-50">
+          <thead className="border-b border-border-soft bg-surface-000">
             <tr>
               {['Módulo', 'Estado', 'Fallback'].map(h => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-ink-subtle">
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-border-soft">
             {(!modules || modules.length === 0) && (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-sm text-gray-400">
+                <td colSpan={3} className="px-4 py-8 text-center text-sm text-ink-subtle">
                   Sin módulos configurados
                 </td>
               </tr>
             )}
             {(modules ?? []).map(m => (
-              <tr key={m.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">
+              <tr key={m.id} className="hover:bg-surface-000">
+                <td className="px-4 py-3 font-medium text-ink">
                   {MODULE_LABELS[m.module_type] ?? m.module_type}
                 </td>
                 <td className="px-4 py-3">
                   <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                    m.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                    m.is_active ? 'bg-green-100 text-green-700' : 'bg-surface-200 text-ink-subtle'
                   }`}>
                     {m.is_active ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-500">
+                <td className="px-4 py-3 text-xs text-ink-subtle">
                   {FALLBACK_LABELS[m.fallback_type] ?? m.fallback_type}
                 </td>
               </tr>

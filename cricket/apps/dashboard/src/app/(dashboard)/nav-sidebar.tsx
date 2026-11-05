@@ -51,8 +51,8 @@ function NavItem({ href, label }: NavItem) {
       href={href}
       className={`block rounded-lg px-3 py-2 text-sm transition-colors ${
         isActive
-          ? 'bg-gray-100 font-medium text-gray-900'
-          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          ? 'bg-surface-200 font-medium text-ink'
+          : 'text-ink-muted hover:bg-surface-000 hover:text-ink'
       }`}
     >
       {label}
@@ -74,10 +74,10 @@ export function NavSidebar({ role, userName, profiles, activeSlug }: NavSidebarP
   if (pathname.startsWith('/admin/agente')) return null
 
   return (
-    <aside className="fixed inset-y-0 left-0 flex w-56 flex-col border-r border-gray-200 bg-white">
+    <aside className="fixed inset-y-0 left-0 flex w-56 flex-col border-r border-border-soft bg-surface-100">
       {/* Logo */}
-      <div className="flex h-14 items-center border-b border-gray-100 px-4">
-        <span className="text-base font-bold tracking-tight text-gray-900">🏏 Cricket</span>
+      <div className="flex h-14 items-center border-b border-border-soft px-4">
+        <span className="text-base font-bold tracking-tight text-ink">ZEREZ</span>
       </div>
 
       {/* Nav */}
@@ -88,17 +88,17 @@ export function NavSidebar({ role, userName, profiles, activeSlug }: NavSidebarP
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-gray-100 p-3 space-y-1">
+      <div className="border-t border-border-soft p-3 space-y-1">
         <NavItem href="/help" label="Ayuda" />
         <a
           href="/auth/logout"
-          className="block rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+          className="block rounded-lg px-3 py-2 text-sm text-ink-subtle hover:bg-surface-000 hover:text-ink"
         >
           Cerrar sesión
         </a>
 
         {/* Profile switcher */}
-        <div className="border-t border-gray-100 pt-2 mt-1">
+        <div className="border-t border-border-soft pt-2 mt-1">
           <ProfileSwitcher
             profiles={profiles}
             activeSlug={activeSlug}

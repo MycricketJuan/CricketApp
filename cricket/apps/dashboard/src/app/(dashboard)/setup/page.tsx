@@ -24,22 +24,22 @@ export default async function SetupPage() {
     <div className="mx-auto max-w-3xl space-y-6 p-8">
       <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
         <p className="text-sm font-semibold text-emerald-700">Registro completado</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-950">Bienvenido a {tenant.name}</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-ink">Bienvenido a {tenant.name}</h1>
+        <p className="mt-2 text-sm text-ink-muted">
           Tu cuenta quedó vinculada como administradora de <strong>{tenant.slug}.mycricket.ai</strong>.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">Siguiente paso</h2>
-        <p className="mt-2 text-sm leading-6 text-gray-600">
+      <div className="rounded-2xl border border-border-soft bg-surface-100 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-ink">Siguiente paso</h2>
+        <p className="mt-2 text-sm leading-6 text-ink-muted">
           El espacio y sus módulos iniciales ya están listos. Continúa configurando la base de conocimiento mientras habilitamos la conexión guiada de WhatsApp.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
-          <a href="/admin/knowledge" className="rounded-lg bg-gray-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800">
+          <a href="/admin/knowledge" className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-hover">
             Configurar conocimiento
           </a>
-          <a href="/admin" className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+          <a href="/admin" className="rounded-lg border border-border-strong px-4 py-2.5 text-sm font-semibold text-ink-muted hover:bg-surface-000">
             Ir al panel administrativo
           </a>
         </div>

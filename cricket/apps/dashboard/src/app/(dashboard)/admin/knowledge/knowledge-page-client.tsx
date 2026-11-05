@@ -137,9 +137,9 @@ function DocDetailPanel({
 
   function Row({ label, children }: { label: string; children: React.ReactNode }) {
     return (
-      <div className="flex items-start justify-between gap-4 py-2.5 border-b border-gray-100 last:border-0">
-        <span className="text-sm text-gray-500 shrink-0 w-36">{label}</span>
-        <span className="text-sm text-gray-900 text-right break-all">{children}</span>
+      <div className="flex items-start justify-between gap-4 py-2.5 border-b border-border-soft last:border-0">
+        <span className="text-sm text-ink-subtle shrink-0 w-36">{label}</span>
+        <span className="text-sm text-ink text-right break-all">{children}</span>
       </div>
     )
   }
@@ -162,13 +162,13 @@ function DocDetailPanel({
       <div className="fixed inset-0 bg-black/20 z-40" onClick={onClose} />
 
       {/* Slide-over */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col">
+      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-surface-100 shadow-2xl z-50 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-          <h2 className="text-sm font-semibold text-gray-900">Detalle del documento</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border-soft">
+          <h2 className="text-sm font-semibold text-ink">Detalle del documento</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-700 transition-colors text-lg leading-none"
+            className="text-ink-subtle hover:text-ink-muted transition-colors text-lg leading-none"
           >
             ✕
           </button>
@@ -186,7 +186,7 @@ function DocDetailPanel({
                   href={current.source_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-primary hover:underline"
                 >
                   {current.source_url}
                 </a>
@@ -337,7 +337,7 @@ function DocumentList({
 }) {
   if (docs.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-gray-400">
+      <p className="py-8 text-center text-sm text-ink-subtle">
         No hay documentos cargados todavía.
       </p>
     )
@@ -350,18 +350,18 @@ function DocumentList({
   }
 
   return (
-    <ul className="mt-4 divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white">
+    <ul className="mt-4 divide-y divide-border-soft rounded-lg border border-border-soft bg-surface-100">
       {docs.map(doc => (
         <li
           key={doc.id}
-          className="flex items-center justify-between px-4 py-3 gap-3 cursor-pointer hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-between px-4 py-3 gap-3 cursor-pointer hover:bg-surface-000 transition-colors"
           onClick={() => onSelect(doc)}
         >
           <div className="flex items-start gap-3 min-w-0">
             <span className="mt-0.5 text-lg">{sourceIcon[doc.source_type] ?? '📄'}</span>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-gray-900">{doc.title}</p>
-              <p className="text-xs text-gray-400">
+              <p className="truncate text-sm font-medium text-ink">{doc.title}</p>
+              <p className="text-xs text-ink-subtle">
                 {doc.chunk_count > 0 ? `${doc.chunk_count} fragmentos` : ''}
                 {doc.source_url ? ` · ${doc.source_url}` : ''}
                 {doc.file_name  ? ` · ${doc.file_name}` : ''}
@@ -373,7 +373,7 @@ function DocumentList({
             {onEdit && (
               <button
                 onClick={(e) => { e.stopPropagation(); onEdit(doc) }}
-                className="text-gray-300 hover:text-blue-500 transition-colors"
+                className="text-ink-subtle hover:text-primary transition-colors"
                 title="Editar"
               >
                 ✎
@@ -381,7 +381,7 @@ function DocumentList({
             )}
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(doc.id) }}
-              className="text-gray-300 hover:text-red-500 transition-colors"
+              className="text-ink-subtle hover:text-red-500 transition-colors"
               title="Eliminar"
             >
               ✕
@@ -568,15 +568,15 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
       {success && <div className="mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">{success}</div>}
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-lg bg-gray-100 p-1 w-fit">
+      <div className="flex gap-1 rounded-lg bg-surface-200 p-1 w-fit">
         {tabs.map(t => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               tab === t.id
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-surface-100 text-ink shadow-sm'
+                : 'text-ink-subtle hover:text-ink-muted'
             }`}
           >
             {t.label}
@@ -589,7 +589,7 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
         {tab === 'files' && (
           <div>
             <div
-              className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer"
+              className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border-strong bg-surface-000 px-6 py-10 text-center hover:border-primary hover:bg-primary-tint transition-colors cursor-pointer"
               onClick={() => fileRef.current?.click()}
               onDragOver={e => e.preventDefault()}
               onDrop={e => {
@@ -604,10 +604,10 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
               }}
             >
               <span className="text-3xl mb-2">☁️</span>
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-sm font-medium text-ink-muted">
                 {uploading ? 'Procesando…' : 'Arrastra un archivo o haz clic para seleccionar'}
               </p>
-              <p className="mt-1 text-xs text-gray-400">PDF, DOCX o TXT — máx 10 MB</p>
+              <p className="mt-1 text-xs text-ink-subtle">PDF, DOCX o TXT — máx 10 MB</p>
               <input
                 ref={fileRef}
                 type="file"
@@ -635,13 +635,13 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
                 onChange={e => setUrlInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleUrlImport()}
                 placeholder="https://ejemplo.com/pagina"
-                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 rounded-lg border border-border-strong px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 disabled={uploading}
               />
               <button
                 onClick={handleUrlImport}
                 disabled={uploading || !urlInput.trim()}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
               >
                 {uploading ? 'Importando…' : 'Importar'}
               </button>
@@ -660,31 +660,31 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
             <button
               onClick={handleGenerateFaqs}
               disabled={generating || uploading}
-              className="mb-4 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50 transition-colors"
+              className="mb-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
             >
               {generating ? 'Generando…' : '✨ Generar FAQs desde URLs'}
             </button>
 
-            <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
+            <div className="rounded-xl border border-border-soft bg-surface-100 p-4 space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Pregunta</label>
+                <label className="block text-xs font-medium text-ink-muted mb-1">Pregunta</label>
                 <input
                   type="text"
                   value={faqQ}
                   onChange={e => setFaqQ(e.target.value)}
                   placeholder="¿Cómo abro una cuenta de ahorros?"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-lg border border-border-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   disabled={uploading}
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Respuesta</label>
+                <label className="block text-xs font-medium text-ink-muted mb-1">Respuesta</label>
                 <textarea
                   value={faqA}
                   onChange={e => setFaqA(e.target.value)}
                   rows={4}
                   placeholder="Para abrir una cuenta de ahorros necesitas…"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full rounded-lg border border-border-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                   disabled={uploading}
                 />
               </div>
@@ -692,7 +692,7 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
                 <button
                   onClick={handleFaqSave}
                   disabled={uploading || !faqQ.trim() || !faqA.trim()}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50 transition-colors"
                 >
                   {uploading ? 'Guardando…' : editingId ? 'Guardar cambios' : 'Guardar FAQ'}
                 </button>
@@ -700,7 +700,7 @@ export function KnowledgePageClient({ tenantId, initialDocuments }: Props) {
                   <button
                     onClick={handleFaqCancelEdit}
                     disabled={uploading}
-                    className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                    className="text-sm text-ink-subtle hover:text-ink-muted transition-colors"
                   >
                     Cancelar
                   </button>

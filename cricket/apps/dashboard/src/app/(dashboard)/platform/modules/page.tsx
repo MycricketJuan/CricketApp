@@ -12,7 +12,7 @@ const MODULE_LABELS: Record<string, string> = {
 }
 
 const MODULE_COLORS: Record<string, string> = {
-  consultation: 'bg-blue-50 text-blue-700 border-blue-200',
+  consultation: 'bg-primary-tint text-primary border-primary-tint',
   sales:        'bg-purple-50 text-purple-700 border-purple-200',
   transactions: 'bg-amber-50 text-amber-700 border-amber-200',
   feedback:     'bg-green-50 text-green-700 border-green-200',
@@ -56,8 +56,8 @@ export default async function ModulesPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">Módulos</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-xl font-semibold text-ink">Módulos</h1>
+        <p className="text-sm text-ink-subtle">
           {totalActive} activos · {totalInactive} inactivos en todos los tenants
         </p>
       </div>
@@ -84,24 +84,24 @@ export default async function ModulesPage() {
         const items = byType[type] ?? []
         return (
           <section key={type} className="space-y-2">
-            <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500">
+            <h2 className="text-sm font-medium uppercase tracking-wide text-ink-subtle">
               {MODULE_LABELS[type]}
             </h2>
-            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-border-soft bg-surface-100 shadow-sm">
               <table className="w-full text-sm">
-                <thead className="border-b border-gray-100 bg-gray-50">
+                <thead className="border-b border-border-soft bg-surface-000">
                   <tr>
                     {['Tenant', 'Sector', 'Estado', 'Fallback', 'Confianza mín.'].map((h) => (
-                      <th key={h} className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                      <th key={h} className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-subtle">
                         {h}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-border-soft">
                   {items.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-6 text-center text-xs text-gray-400">
+                      <td colSpan={5} className="px-4 py-6 text-center text-xs text-ink-subtle">
                         Sin tenants con este módulo
                       </td>
                     </tr>
@@ -109,20 +109,20 @@ export default async function ModulesPage() {
                     const config = (m.config ?? {}) as Record<string, unknown>
                     const threshold = config.confidence_threshold as number | undefined
                     return (
-                      <tr key={m.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-2.5 font-medium text-gray-900">{t.name}</td>
-                        <td className="px-4 py-2.5 text-gray-500 text-xs">{t.sector}</td>
+                      <tr key={m.id} className="hover:bg-surface-000">
+                        <td className="px-4 py-2.5 font-medium text-ink">{t.name}</td>
+                        <td className="px-4 py-2.5 text-ink-subtle text-xs">{t.sector}</td>
                         <td className="px-4 py-2.5">
                           <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                            m.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                            m.is_active ? 'bg-green-100 text-green-700' : 'bg-surface-200 text-ink-subtle'
                           }`}>
                             {m.is_active ? 'Activo' : 'Inactivo'}
                           </span>
                         </td>
-                        <td className="px-4 py-2.5 text-gray-500">
+                        <td className="px-4 py-2.5 text-ink-subtle">
                           {FALLBACK_LABELS[m.fallback_type ?? ''] ?? m.fallback_type ?? '—'}
                         </td>
-                        <td className="px-4 py-2.5 text-gray-500">
+                        <td className="px-4 py-2.5 text-ink-subtle">
                           {threshold != null ? threshold.toFixed(2) : '—'}
                         </td>
                       </tr>

@@ -63,14 +63,14 @@ interface SessionMetrics {
 
 function metricColor(type: 'nps' | 'escalation' | 'neutral', value: number): string {
   if (type === 'nps') {
-    if (value > 50) return '#1D9E75'
-    if (value >= 0) return '#BA7517'
-    return '#D85A30'
+    if (value > 50) return 'var(--success)'
+    if (value >= 0) return 'var(--spark-amber)'
+    return 'var(--danger)'
   }
   if (type === 'escalation') {
-    if (value < 20) return '#1D9E75'
-    if (value <= 40) return '#BA7517'
-    return '#D85A30'
+    if (value < 20) return 'var(--success)'
+    if (value <= 40) return 'var(--spark-amber)'
+    return 'var(--danger)'
   }
   return 'var(--color-text-primary)'
 }
@@ -141,9 +141,9 @@ function ChannelBreakdown({
   }
 
   const channels = [
-    { key: 'whatsapp', label: 'WhatsApp', count: byChannel.whatsapp, color: '#1D9E75' },
-    { key: 'web_chat', label: 'Web Chat', count: byChannel.web_chat, color: '#7F77DD' },
-    { key: 'email', label: 'Email', count: byChannel.email, color: '#BA7517' },
+    { key: 'whatsapp', label: 'WhatsApp', count: byChannel.whatsapp, color: 'var(--success)' },
+    { key: 'web_chat', label: 'Web Chat', count: byChannel.web_chat, color: 'var(--spark-violet)' },
+    { key: 'email', label: 'Email', count: byChannel.email, color: 'var(--spark-amber)' },
   ]
 
   return (

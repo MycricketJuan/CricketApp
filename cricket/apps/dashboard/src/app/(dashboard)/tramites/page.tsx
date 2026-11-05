@@ -23,7 +23,7 @@ export default async function TramitesPage() {
   if (!tenant) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-gray-500">Tenant no encontrado: {tenantSlug}</p>
+        <p className="text-sm text-ink-subtle">Tenant no encontrado: {tenantSlug}</p>
       </div>
     )
   }
@@ -55,14 +55,14 @@ export default async function TramitesPage() {
     <main className="mx-auto max-w-6xl p-6 space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">Trámites</h1>
-          <p className="mt-0.5 text-sm text-gray-500">{pendingCount} por gestionar</p>
+          <h1 className="text-xl font-semibold text-ink">Trámites</h1>
+          <p className="mt-0.5 text-sm text-ink-subtle">{pendingCount} por gestionar</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {PENDING_STATUSES.map((status) => (
             <span
               key={status}
-              className="rounded-full bg-gray-100 px-3 py-0.5 text-sm text-gray-600"
+              className="rounded-full bg-surface-200 px-3 py-0.5 text-sm text-ink-muted"
             >
               {countByStatus[status] ?? 0} {STATUS_LABEL[status].toLowerCase()}
             </span>

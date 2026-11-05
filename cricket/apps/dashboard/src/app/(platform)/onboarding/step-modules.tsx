@@ -42,7 +42,7 @@ function Toggle({ active, onToggle }: { active: boolean; onToggle: () => void })
         width: 36,
         height: 20,
         borderRadius: 10,
-        background: active ? '#1D9E75' : 'var(--color-border-secondary)',
+        background: active ? 'var(--success)' : 'var(--color-border-secondary)',
         position: 'relative',
         cursor: 'pointer',
         transition: 'background .2s',
@@ -155,7 +155,7 @@ export function StepModules({ tenantId, modules }: Props) {
 
               {/* Transactions warning */}
               {mod === 'transactions' && !s.active && (
-                <p style={{ fontSize: 12, color: 'var(--color-text-warning, #BA7517)', marginTop: 10 }}>
+                <p style={{ fontSize: 12, color: 'var(--color-text-warning, var(--spark-amber))', marginTop: 10 }}>
                   El agente de Transacciones siempre requiere aprobación IH cuando está activo.
                   Si lo desactivas, las solicitudes de operaciones se derivarán al fallback elegido.
                 </p>

@@ -4,7 +4,7 @@ const AGENT_META: Record<string, { label: string; desc: string; color: string }>
   consultation_agent: {
     label: 'Consulta',
     desc:  'Responde preguntas usando el knowledge base del tenant.',
-    color: 'bg-blue-50 border-blue-200 text-blue-700',
+    color: 'bg-primary-tint border-primary-tint text-primary',
   },
   sales_agent: {
     label: 'Ventas',
@@ -67,22 +67,22 @@ export default async function AgentsPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">Agentes IA</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-xl font-semibold text-ink">Agentes IA</h1>
+        <p className="text-sm text-ink-subtle">
           Rendimiento de los últimos 30 días · {totalDecisions.toLocaleString('es')} decisiones totales
         </p>
       </div>
 
       {/* Resumen global */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Decisiones (30 d)</p>
-          <p className="mt-1 text-3xl font-semibold text-gray-900">{totalDecisions.toLocaleString('es')}</p>
+        <div className="rounded-xl border border-border-soft bg-surface-100 p-5 shadow-sm">
+          <p className="text-sm text-ink-subtle">Decisiones (30 d)</p>
+          <p className="mt-1 text-3xl font-semibold text-ink">{totalDecisions.toLocaleString('es')}</p>
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Confianza promedio</p>
+        <div className="rounded-xl border border-border-soft bg-surface-100 p-5 shadow-sm">
+          <p className="text-sm text-ink-subtle">Confianza promedio</p>
           <p className={`mt-1 text-3xl font-semibold ${
-            globalAvgConf == null ? 'text-gray-400'
+            globalAvgConf == null ? 'text-ink-subtle'
             : globalAvgConf >= 0.7 ? 'text-green-600'
             : globalAvgConf >= 0.5 ? 'text-amber-600'
             : 'text-red-600'
@@ -90,9 +90,9 @@ export default async function AgentsPage() {
             {globalAvgConf != null ? `${(globalAvgConf * 100).toFixed(1)}%` : '—'}
           </p>
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Latencia promedio</p>
-          <p className="mt-1 text-3xl font-semibold text-gray-900">
+        <div className="rounded-xl border border-border-soft bg-surface-100 p-5 shadow-sm">
+          <p className="text-sm text-ink-subtle">Latencia promedio</p>
+          <p className="mt-1 text-3xl font-semibold text-ink">
             {globalAvgMs != null ? `${(globalAvgMs / 1000).toFixed(1)} s` : '—'}
           </p>
         </div>
@@ -137,14 +137,14 @@ export default async function AgentsPage() {
       </div>
 
       {/* Modelo en uso */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-        <p className="text-sm font-medium text-gray-700 mb-3">Modelos en uso</p>
+      <div className="rounded-xl border border-border-soft bg-surface-100 p-5 shadow-sm">
+        <p className="text-sm font-medium text-ink-muted mb-3">Modelos en uso</p>
         {rows.length === 0 ? (
-          <p className="text-sm text-gray-400">Sin datos aún</p>
+          <p className="text-sm text-ink-subtle">Sin datos aún</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {[...new Set(rows.map((r) => r.model))].map((model) => (
-              <span key={model} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-mono text-gray-600">
+              <span key={model} className="rounded-full bg-surface-200 px-3 py-1 text-xs font-mono text-ink-muted">
                 {model}
               </span>
             ))}
@@ -154,32 +154,32 @@ export default async function AgentsPage() {
 
       {/* Últimas decisiones */}
       <section className="space-y-2">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-gray-500">
+        <h2 className="text-sm font-medium uppercase tracking-wide text-ink-subtle">
           Últimas decisiones
         </h2>
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-border-soft bg-surface-100 shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-gray-100 bg-gray-50">
+            <thead className="border-b border-border-soft bg-surface-000">
               <tr>
                 {['Agente', 'Confianza', 'Latencia', 'Tokens', 'Fecha'].map((h) => (
-                  <th key={h} className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <th key={h} className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-ink-subtle">
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border-soft">
               {recent.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-400">
+                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-ink-subtle">
                     Sin decisiones registradas en los últimos 30 días
                   </td>
                 </tr>
               ) : recent.map((r) => {
                 const conf = Number(r.confidence ?? 0)
                 return (
-                  <tr key={`${r.agent_type}-${r.created_at}`} className="hover:bg-gray-50">
-                    <td className="px-4 py-2.5 text-gray-700">
+                  <tr key={`${r.agent_type}-${r.created_at}`} className="hover:bg-surface-000">
+                    <td className="px-4 py-2.5 text-ink-muted">
                       {AGENT_META[r.agent_type]?.label ?? r.agent_type}
                     </td>
                     <td className={`px-4 py-2.5 font-medium ${
@@ -187,13 +187,13 @@ export default async function AgentsPage() {
                     }`}>
                       {(conf * 100).toFixed(0)}%
                     </td>
-                    <td className="px-4 py-2.5 text-gray-500">
+                    <td className="px-4 py-2.5 text-ink-subtle">
                       {r.latency_ms != null ? `${(r.latency_ms / 1000).toFixed(1)} s` : '—'}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-500">
+                    <td className="px-4 py-2.5 text-ink-subtle">
                       {((r.prompt_tokens ?? 0) + (r.completion_tokens ?? 0)).toLocaleString('es')}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-400 text-xs">
+                    <td className="px-4 py-2.5 text-ink-subtle text-xs">
                       {new Date(r.created_at).toLocaleString('es', {
                         day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
                       })}

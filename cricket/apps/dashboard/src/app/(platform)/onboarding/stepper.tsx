@@ -22,7 +22,7 @@ export function Stepper({ currentStep }: { currentStep: number }) {
         const isLast  = idx === STEPS.length - 1
 
         const circleStyle: React.CSSProperties = done
-          ? { background: '#1D9E75', color: '#fff', border: 'none' }
+          ? { background: 'var(--success)', color: '#fff', border: 'none' }
           : active
             ? {
                 background: 'var(--color-text-primary)',
@@ -91,7 +91,7 @@ export function Stepper({ currentStep }: { currentStep: number }) {
                   marginBottom: 18,
                   marginLeft: 6,
                   marginRight: 6,
-                  background: done ? '#1D9E75' : 'var(--color-border-tertiary)',
+                  background: done ? 'var(--success)' : 'var(--color-border-tertiary)',
                 }}
               />
             )}

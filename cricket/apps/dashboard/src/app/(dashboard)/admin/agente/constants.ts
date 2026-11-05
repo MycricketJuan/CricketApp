@@ -69,7 +69,7 @@ export function getSectorInfo(sector: Sector): SectorInfo {
   return SECTORS.find((s) => s.key === sector) ?? SECTORS[0]
 }
 
-export const SHIRT_COLORS = ['#2f7f52', '#1f4f8c', '#8c2f3a', '#c9a227', '#2b2b2b']
+export const SHIRT_COLORS = ['var(--primary-tint)', '#1f4f8c', '#8c2f3a', '#c9a227', '#2b2b2b']
 
 export function getSemaforo(screenIndex: number): {
   level: 0 | 1 | 2

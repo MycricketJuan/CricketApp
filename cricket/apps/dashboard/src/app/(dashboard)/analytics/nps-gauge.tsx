@@ -9,9 +9,9 @@ interface Props {
 }
 
 function scoreColor(score: number): string {
-  if (score > 50) return '#1D9E75'
-  if (score >= 0) return '#BA7517'
-  return '#D85A30'
+  if (score > 50) return 'var(--success)'
+  if (score >= 0) return 'var(--spark-amber)'
+  return 'var(--danger)'
 }
 
 export function NpsGauge({ score, promoterPct, passivePct, detractorPct, totalResponses }: Props) {
@@ -51,13 +51,13 @@ export function NpsGauge({ score, promoterPct, passivePct, detractorPct, totalRe
         {totalResponses > 0 && (
           <>
             {promoterPct > 0 && (
-              <div style={{ width: `${promoterPct}%`, background: '#1D9E75' }} />
+              <div style={{ width: `${promoterPct}%`, background: 'var(--success)' }} />
             )}
             {passivePct > 0 && (
-              <div style={{ width: `${passivePct}%`, background: '#BA7517' }} />
+              <div style={{ width: `${passivePct}%`, background: 'var(--spark-amber)' }} />
             )}
             {detractorPct > 0 && (
-              <div style={{ width: `${detractorPct}%`, background: '#D85A30' }} />
+              <div style={{ width: `${detractorPct}%`, background: 'var(--danger)' }} />
             )}
           </>
         )}
@@ -66,9 +66,9 @@ export function NpsGauge({ score, promoterPct, passivePct, detractorPct, totalRe
       {/* Leyenda */}
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         {[
-          { label: 'Promotores', pct: promoterPct, col: '#1D9E75' },
-          { label: 'Pasivos', pct: passivePct, col: '#BA7517' },
-          { label: 'Detractores', pct: detractorPct, col: '#D85A30' },
+          { label: 'Promotores', pct: promoterPct, col: 'var(--success)' },
+          { label: 'Pasivos', pct: passivePct, col: 'var(--spark-amber)' },
+          { label: 'Detractores', pct: detractorPct, col: 'var(--danger)' },
         ].map((item) => (
           <div key={item.label} style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 14, fontWeight: 500, color: item.col }}>{item.pct}%</div>

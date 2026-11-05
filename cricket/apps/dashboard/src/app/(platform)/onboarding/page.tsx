@@ -80,12 +80,12 @@ export default async function OnboardingPage({
         <div
           style={{
             background: 'var(--color-background-danger, #FEF2F2)',
-            color: 'var(--color-text-danger, #D85A30)',
+            color: 'var(--color-text-danger, var(--danger))',
             borderRadius: 'var(--border-radius-md, 8px)',
             padding: '12px 16px',
             marginBottom: 16,
             fontSize: 13,
-            border: '0.5px solid var(--color-border-danger, #D85A30)',
+            border: '0.5px solid var(--color-border-danger, var(--danger))',
           }}
         >
           {decodeURIComponent(errorRaw)}

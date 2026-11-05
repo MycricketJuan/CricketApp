@@ -90,7 +90,7 @@ const SECTIONS: Section[] = [
   {
     id: 'superadmin',
     label: 'Superadmin',
-    role: 'Equipo Cricket',
+    role: 'Equipo ZEREZ',
     roleColor: '#5048BB',
     articles: [
       {
@@ -99,7 +99,7 @@ const SECTIONS: Section[] = [
         content: (
           <div style={prose}>
             <p style={p}>
-              Cricket es una plataforma SaaS multi-tenant que implementa agentes IA para gestionar
+              ZEREZ es una plataforma SaaS multi-tenant que implementa agentes IA para gestionar
               el customer journey completo. Cada cliente opera en su propio subdominio
               (<code>cliente.mycricket.ai</code>) y tiene su configuración aislada.
             </p>
@@ -115,7 +115,7 @@ const SECTIONS: Section[] = [
             </ul>
             <h3 style={h3}>Roles en la plataforma</h3>
             <ul style={ul}>
-              <li style={li}><span style={badge('#5048BB')}>superadmin</span> Equipo Cricket. Acceso total a todos los tenants.</li>
+              <li style={li}><span style={badge('#5048BB')}>superadmin</span> Equipo ZEREZ. Acceso total a todos los tenants.</li>
               <li style={li}><span style={badge('#1D9E75')}>tenant_admin</span> Administrador del cliente. Configura módulos y usuarios de su tenant.</li>
               <li style={li}><span style={badge('#BA7517')}>supervisor</span> Ve métricas, cola de atención y puede intervenir en cualquier sesión.</li>
               <li style={li}><span style={badge('#7F77DD')}>operator</span> Atiende la cola asignada y resuelve cognitive checkpoints.</li>
@@ -208,7 +208,7 @@ const SECTIONS: Section[] = [
         content: (
           <div style={prose}>
             <p style={p}>
-              Como administrador de tu organización en Cricket, tienes control completo sobre la
+              Como administrador de tu organización en ZEREZ, tienes control completo sobre la
               configuración del agente IA, los usuarios de tu equipo y el comportamiento del journey.
               No tienes acceso a otros tenants — tu vista está siempre limitada a tu organización.
             </p>
@@ -256,7 +256,7 @@ const SECTIONS: Section[] = [
               debe aprobar antes de que se ejecute cualquier acción.
             </div>
             <p style={p}>
-              Esto es un requisito de diseño de Cricket, no configurable. Aplica a transferencias,
+              Esto es un requisito de diseño de ZEREZ, no configurable. Aplica a transferencias,
               pagos y cambios de datos sensibles.
             </p>
             <h3 style={h3}>Módulo de Feedback</h3>
@@ -290,7 +290,7 @@ const SECTIONS: Section[] = [
             </ul>
             <div style={callout('info')}>
               No puedes asignarte el rol <code>superadmin</code> — ese rol solo puede
-              asignarlo el equipo Cricket a través de la administración de plataforma.
+              asignarlo el equipo ZEREZ a través de la administración de plataforma.
             </div>
           </div>
         ),
@@ -368,7 +368,7 @@ const SECTIONS: Section[] = [
         content: (
           <div style={prose}>
             <p style={p}>
-              Un cognitive checkpoint es el mecanismo central del principio IA + IH de Cricket.
+              Un cognitive checkpoint es el mecanismo central del principio IA + IH de ZEREZ.
               La IA propone una acción pero no puede ejecutarla sola — tú decides si aprobarla,
               rechazarla o tomar el control de la sesión.
             </p>
@@ -462,7 +462,7 @@ const SECTIONS: Section[] = [
           <div style={prose}>
             <p style={p}>
               Cuando usas el chat de atención de esta empresa, estás hablando con un asistente de
-              inteligencia artificial desarrollado sobre la plataforma Cricket. El asistente puede
+              inteligencia artificial desarrollado sobre la plataforma ZEREZ. El asistente puede
               responder preguntas, ayudarte a encontrar productos o servicios, y gestionar
               solicitudes de operaciones.
             </p>
@@ -529,7 +529,7 @@ const SECTIONS: Section[] = [
         content: (
           <div style={prose}>
             <p style={p}>
-              Cricket almacena el historial de tus conversaciones para mejorar la atención
+              ZEREZ almacena el historial de tus conversaciones para mejorar la atención
               y cumplir con requisitos legales. Tu información personal está protegida por las
               políticas de privacidad de la empresa que te atiende.
             </p>

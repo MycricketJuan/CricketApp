@@ -1,0 +1,210 @@
+/* ZEREZ — design tokens v15 (CSS custom properties). Generated; do not edit by hand.
+   Same values as the Demo ZEREZ. To render exactly like the demo:
+   1. Load Plus Jakarta Sans 400/500/600/700 and expose it as --font-sans (or keep the fallback stack).
+   2. Put data-theme="light" on <html>. The demo opens in light for everyone; a "Tema oscuro" toggle sets data-theme="dark".
+      Without the attribute, dark follows the operating system (that is why a viewer in dark mode saw a different demo). */
+:root {
+  --surface-000: #f5f7fd;
+  --surface-100: #ffffff;
+  --surface-200: #eef2fc;
+  --surface-glass: rgba(255, 255, 255, 0.72);
+  --border-soft: #e2e7f4;
+  --border-strong: #78829f;
+  --wash: rgba(15, 27, 76, 0.05);
+  --wash-strong: rgba(15, 27, 76, 0.09);
+  --ink: #0f1b4c;
+  --ink-muted: #4a5578;
+  --ink-subtle: #5f6889;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --on-primary: #ffffff;
+  --primary-tint: #e7eeff;
+  --brand-blue: #3b82f6;
+  --spark-cyan: #4fc6f8;
+  --spark-blue: #0a2bfe;
+  --spark-violet: #6f03fd;
+  --spark-amber: #feb215;
+  --logo-ink: #22262d;
+  --aura-cyan: rgba(79, 198, 248, 0.22);
+  --aura-violet: rgba(111, 3, 253, 0.10);
+  --aura-amber: rgba(254, 178, 21, 0.16);
+  --success: #0b7a55;
+  --danger: #c2410c;
+  --shadow-card: 0 1px 2px rgba(15, 27, 76, 0.04), 0 8px 24px rgba(15, 27, 76, 0.06);
+  --shadow-float: 0 12px 40px rgba(37, 99, 235, 0.14), 0 2px 6px rgba(15, 27, 76, 0.06);
+  --shadow-glow: 0 0 0 4px rgba(37, 99, 235, 0.14), 0 6px 20px rgba(111, 3, 253, 0.22);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-full: 999px;
+  --blur-glass: 20px;
+  --rail-width: 300px;
+  --conversation-max: 620px;
+  --panel-width: 390px;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --page-max: 1360px;
+  --dock-max: 760px;
+  --insight-nav-width: 248px;
+  --insight-panel-width: 400px;
+  --insight-panel-wide: 500px;
+  --stage-rail-width: 64px;
+  --stage-console-width: 360px;
+  --topbar-padding-y: 12px;
+  --topbar-padding-x: 48px;
+  --topbar-item-size: 15px;
+  --topbar-item-padding: 8px 16px;
+  --topbar-control-height: 36px;
+  --topbar-logo-height: 26px;
+  --dock-offset: 24px;
+  --dock-sheet-radius: 28px;
+  --dock-sheet-max-height: min(62vh, 600px);
+  --z-dock: 20;
+  --z-topbar: 30;
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-progress: 400ms;
+  --duration-enter: 500ms;
+  --duration-meter: 600ms;
+  --duration-orb-breathe: 4s;
+  --duration-orb-spin: 3.2s;
+  --ease-standard: ease;
+  --ease-rise: cubic-bezier(.2, .7, .2, 1);
+  --bp-mobile: 520px;
+  --bp-compact: 760px;
+  --bp-panel: 1180px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface-000: #090c18;
+    --surface-100: #121729;
+    --surface-200: #1a2138;
+    --surface-glass: rgba(18, 23, 41, 0.72);
+    --border-soft: #262e4a;
+    --border-strong: #5d6790;
+    --wash: rgba(238, 241, 255, 0.07);
+    --wash-strong: rgba(238, 241, 255, 0.12);
+    --ink: #eef1ff;
+    --ink-muted: #b2b9d6;
+    --ink-subtle: #959ec0;
+    --primary: #7aa2ff;
+    --primary-hover: #9bb9ff;
+    --on-primary: #0a1236;
+    --primary-tint: #1c2a55;
+    --brand-blue: #3b82f6;
+    --spark-cyan: #4fc6f8;
+    --spark-blue: #0a2bfe;
+    --spark-violet: #6f03fd;
+    --spark-amber: #feb215;
+    --logo-ink: #22262d;
+    --aura-cyan: rgba(79, 198, 248, 0.14);
+    --aura-violet: rgba(111, 3, 253, 0.22);
+    --aura-amber: rgba(254, 178, 21, 0.10);
+    --success: #4fd1a1;
+    --danger: #ff9a6b;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 0 4px rgba(122, 162, 255, 0.2), 0 6px 24px rgba(111, 3, 253, 0.45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --surface-000: #090c18;
+  --surface-100: #121729;
+  --surface-200: #1a2138;
+  --surface-glass: rgba(18, 23, 41, 0.72);
+  --border-soft: #262e4a;
+  --border-strong: #5d6790;
+  --wash: rgba(238, 241, 255, 0.07);
+  --wash-strong: rgba(238, 241, 255, 0.12);
+  --ink: #eef1ff;
+  --ink-muted: #b2b9d6;
+  --ink-subtle: #959ec0;
+  --primary: #7aa2ff;
+  --primary-hover: #9bb9ff;
+  --on-primary: #0a1236;
+  --primary-tint: #1c2a55;
+  --brand-blue: #3b82f6;
+  --spark-cyan: #4fc6f8;
+  --spark-blue: #0a2bfe;
+  --spark-violet: #6f03fd;
+  --spark-amber: #feb215;
+  --logo-ink: #22262d;
+  --aura-cyan: rgba(79, 198, 248, 0.14);
+  --aura-violet: rgba(111, 3, 253, 0.22);
+  --aura-amber: rgba(254, 178, 21, 0.10);
+  --success: #4fd1a1;
+  --danger: #ff9a6b;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 0 4px rgba(122, 162, 255, 0.2), 0 6px 24px rgba(111, 3, 253, 0.45);
+  color-scheme: dark;
+}
+/* IntroScreen and every client representation stay light: */
+[data-theme="light"] {
+  --surface-000: #f5f7fd;
+  --surface-100: #ffffff;
+  --surface-200: #eef2fc;
+  --surface-glass: rgba(255, 255, 255, 0.72);
+  --border-soft: #e2e7f4;
+  --border-strong: #78829f;
+  --wash: rgba(15, 27, 76, 0.05);
+  --wash-strong: rgba(15, 27, 76, 0.09);
+  --ink: #0f1b4c;
+  --ink-muted: #4a5578;
+  --ink-subtle: #5f6889;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --on-primary: #ffffff;
+  --primary-tint: #e7eeff;
+  --brand-blue: #3b82f6;
+  --spark-cyan: #4fc6f8;
+  --spark-blue: #0a2bfe;
+  --spark-violet: #6f03fd;
+  --spark-amber: #feb215;
+  --logo-ink: #22262d;
+  --aura-cyan: rgba(79, 198, 248, 0.22);
+  --aura-violet: rgba(111, 3, 253, 0.10);
+  --aura-amber: rgba(254, 178, 21, 0.16);
+  --success: #0b7a55;
+  --danger: #c2410c;
+  --shadow-card: 0 1px 2px rgba(15, 27, 76, 0.04), 0 8px 24px rgba(15, 27, 76, 0.06);
+  --shadow-float: 0 12px 40px rgba(37, 99, 235, 0.14), 0 2px 6px rgba(15, 27, 76, 0.06);
+  --shadow-glow: 0 0 0 4px rgba(37, 99, 235, 0.14), 0 6px 20px rgba(111, 3, 253, 0.22);
+  color-scheme: light;
+}
+
+/* Type styles */
+.zz-type-display { font-family: var(--font-sans); font-size: 56px; line-height: 60px; font-weight: 700; letter-spacing: -0.02em; }
+.zz-type-slogan { font-family: var(--font-sans); font-size: 40px; line-height: 48px; font-weight: 400; letter-spacing: -0.005em; }
+.zz-type-question { font-family: var(--font-sans); font-size: 30px; line-height: 36px; font-weight: 700; letter-spacing: -0.01em; }
+.zz-type-message { font-family: var(--font-sans); font-size: 17px; line-height: 26px; font-weight: 400; }
+.zz-type-body { font-family: var(--font-sans); font-size: 15px; line-height: 22px; font-weight: 400; }
+.zz-type-title { font-family: var(--font-sans); font-size: 16px; line-height: 22px; font-weight: 600; }
+.zz-type-label { font-family: var(--font-sans); font-size: 11px; line-height: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.zz-type-caption { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 400; }
+.zz-type-numeral { font-family: var(--font-sans); font-size: 14px; line-height: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) {
+  .zz-type-display { font-size: 40px; line-height: 44px; }
+  .zz-type-slogan { font-size: 24px; line-height: 30px; }
+  .zz-type-question { font-size: 24px; line-height: 30px; }
+}
+
+/* The spark gradient (the R of the logo). Only for the orb, overall progress fills, image placeholders and the @ of "¡Bienvenid@!". */
+.zz-spark { background: linear-gradient(120deg, var(--spark-cyan) 0%, var(--spark-blue) 38%, var(--spark-violet) 72%, var(--spark-amber) 100%); }
+
+/* Surfaces — the new look: "if it doesn't float, it has no box". */
+.zz-surface-glass { background: var(--surface-glass); -webkit-backdrop-filter: blur(var(--blur-glass)); backdrop-filter: blur(var(--blur-glass)); box-shadow: var(--shadow-float); }
+.zz-surface-wash { background: var(--wash); border: 0; }
+.zz-hairline { border-bottom: 1px solid var(--border-soft); }
+
+/* Focus, everywhere interactive */
+.zz-focus:focus-visible, .zz :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) { :root { --duration-fast: 0ms; --duration-base: 0ms; --duration-progress: 0ms; --duration-enter: 0ms; --duration-meter: 0ms; } }

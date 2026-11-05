@@ -14,14 +14,14 @@ export const STATUS_LABEL: Record<string, string> = {
 }
 
 export const STATUS_BADGE: Record<string, string> = {
-  draft: 'bg-gray-100 text-gray-600',
+  draft: 'bg-surface-200 text-ink-muted',
   submitted: 'bg-amber-100 text-amber-700',
-  in_review: 'bg-blue-100 text-blue-700',
+  in_review: 'bg-primary-tint text-primary',
   pending_docs: 'bg-amber-100 text-amber-700',
   approved: 'bg-green-100 text-green-700',
   rejected: 'bg-red-100 text-red-700',
   completed: 'bg-green-100 text-green-700',
-  cancelled: 'bg-gray-100 text-gray-600',
+  cancelled: 'bg-surface-200 text-ink-muted',
 }
 
 // Transiciones de estado permitidas. Se renderizan en el panel de

@@ -141,30 +141,30 @@ async function renderPage() {
   return (
     <div className="p-6 space-y-10 max-w-6xl">
 
-      {/* ── Equipo Cricket (superadmins activos) ──────────────────────────── */}
+      {/* ── Equipo ZEREZ (superadmins activos) ──────────────────────────── */}
       <section>
         <div className="mb-4">
-          <h1 className="text-xl font-semibold text-gray-900">Equipo Cricket</h1>
-          <p className="text-sm text-gray-500">{admins.length} superadmins con acceso total a la plataforma</p>
+          <h1 className="text-xl font-semibold text-ink">Equipo ZEREZ</h1>
+          <p className="text-sm text-ink-subtle">{admins.length} superadmins con acceso total a la plataforma</p>
         </div>
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-border-soft bg-surface-100 shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-gray-100 bg-gray-50">
+            <thead className="border-b border-border-soft bg-surface-000">
               <tr>
                 {['Nombre', 'Email', 'Desde'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-ink-subtle">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border-soft">
               {admins.length === 0 && (
-                <tr><td colSpan={3} className="px-4 py-8 text-center text-sm text-gray-400">Sin superadmins registrados</td></tr>
+                <tr><td colSpan={3} className="px-4 py-8 text-center text-sm text-ink-subtle">Sin superadmins registrados</td></tr>
               )}
               {admins.map(a => (
-                <tr key={a.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">{a.full_name ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-600">{a.email}</td>
-                  <td className="px-4 py-3 text-gray-500">{formatDate(a.created_at)}</td>
+                <tr key={a.id} className="hover:bg-surface-000">
+                  <td className="px-4 py-3 font-medium text-ink">{a.full_name ?? '—'}</td>
+                  <td className="px-4 py-3 text-ink-muted">{a.email}</td>
+                  <td className="px-4 py-3 text-ink-subtle">{formatDate(a.created_at)}</td>
                 </tr>
               ))}
             </tbody>
@@ -173,28 +173,28 @@ async function renderPage() {
 
         {/* Agregar superadmin */}
         <details className="mt-3">
-          <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700 select-none">
+          <summary className="cursor-pointer text-sm text-ink-subtle hover:text-ink-muted select-none">
             + Agregar superadmin
           </summary>
-          <form action={assignSuperadmin} className="mt-3 flex flex-wrap gap-3 items-end rounded-xl border border-gray-200 bg-white p-4">
+          <form action={assignSuperadmin} className="mt-3 flex flex-wrap gap-3 items-end rounded-xl border border-border-soft bg-surface-100 p-4">
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-700">Email</label>
+              <label className="text-xs font-medium text-ink-muted">Email</label>
               <input
                 type="email" name="email" required placeholder="admin@mycricket.ai"
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 w-64"
+                className="rounded-lg border border-border-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-64"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-700">Nombre (opcional)</label>
+              <label className="text-xs font-medium text-ink-muted">Nombre (opcional)</label>
               <input
                 type="text" name="full_name" placeholder="Juan García"
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 w-48"
+                className="rounded-lg border border-border-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-48"
               />
             </div>
-            <button type="submit" className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors">
+            <button type="submit" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover transition-colors">
               Agregar
             </button>
-            <p className="w-full text-xs text-gray-400">
+            <p className="w-full text-xs text-ink-subtle">
               El acceso se activa automáticamente la próxima vez que el usuario ingrese con ese email.
             </p>
           </form>
@@ -221,31 +221,31 @@ async function renderPage() {
       {/* ── Asignar usuario a tenant ───────────────────────────────────────── */}
       <section>
         <div className="mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">Asignar usuario a tenant</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-semibold text-ink">Asignar usuario a tenant</h2>
+          <p className="text-sm text-ink-subtle">
             El acceso se activa automáticamente la próxima vez que el usuario ingrese con ese email.
           </p>
         </div>
-        <form action={assignUserToTenant} className="flex flex-wrap gap-3 items-end rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <form action={assignUserToTenant} className="flex flex-wrap gap-3 items-end rounded-xl border border-border-soft bg-surface-100 p-4 shadow-sm">
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-700">Email</label>
+            <label className="text-xs font-medium text-ink-muted">Email</label>
             <input
               type="email" name="email" required placeholder="usuario@empresa.com"
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 w-64"
+              className="rounded-lg border border-border-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-64"
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-700">Nombre (opcional)</label>
+            <label className="text-xs font-medium text-ink-muted">Nombre (opcional)</label>
             <input
               type="text" name="full_name" placeholder="María López"
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 w-44"
+              className="rounded-lg border border-border-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-44"
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-700">Tenant</label>
+            <label className="text-xs font-medium text-ink-muted">Tenant</label>
             <select
               name="tenant_id" required
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className="rounded-lg border border-border-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">Seleccionar…</option>
               {tenantList.map(t => (
@@ -254,17 +254,17 @@ async function renderPage() {
             </select>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-700">Rol</label>
+            <label className="text-xs font-medium text-ink-muted">Rol</label>
             <select
               name="role"
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className="rounded-lg border border-border-strong px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             >
               {ROLE_OPTIONS.map(r => (
                 <option key={r} value={r}>{ROLE_LABELS[r]}</option>
               ))}
             </select>
           </div>
-          <button type="submit" className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 transition-colors">
+          <button type="submit" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover transition-colors">
             Asignar acceso
           </button>
         </form>
@@ -283,18 +283,18 @@ async function renderPage() {
                   const removeAction = removeUserGrant.bind(null, g.id)
                   return (
                     <tr key={g.id} className="hover:bg-amber-50/50">
-                      <td className="px-4 py-3 text-gray-900">{g.email}</td>
-                      <td className="px-4 py-3 text-xs text-gray-500">{g.full_name ?? '—'}</td>
+                      <td className="px-4 py-3 text-ink">{g.email}</td>
+                      <td className="px-4 py-3 text-xs text-ink-subtle">{g.full_name ?? '—'}</td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex items-center rounded-full bg-white border border-amber-200 px-2 py-0.5 text-xs text-gray-700">
+                        <span className="inline-flex items-center rounded-full bg-surface-100 border border-amber-200 px-2 py-0.5 text-xs text-ink-muted">
                           {tenant?.name ?? g.tenant_id.slice(0, 8)}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-600">{ROLE_LABELS[g.role] ?? g.role}</td>
-                      <td className="px-4 py-3 text-xs text-gray-400">{formatDate(g.created_at)}</td>
+                      <td className="px-4 py-3 text-xs text-ink-muted">{ROLE_LABELS[g.role] ?? g.role}</td>
+                      <td className="px-4 py-3 text-xs text-ink-subtle">{formatDate(g.created_at)}</td>
                       <td className="px-4 py-3">
                         <form action={removeAction}>
-                          <button type="submit" className="rounded px-2 py-1 text-xs bg-white border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
+                          <button type="submit" className="rounded px-2 py-1 text-xs bg-surface-100 border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
                             Quitar
                           </button>
                         </form>
@@ -311,22 +311,22 @@ async function renderPage() {
       {/* ── Usuarios activos por tenant ───────────────────────────────────── */}
       <section>
         <div className="mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">Usuarios activos</h2>
-          <p className="text-sm text-gray-500">{users.length} usuarios con acceso activo</p>
+          <h2 className="text-xl font-semibold text-ink">Usuarios activos</h2>
+          <p className="text-sm text-ink-subtle">{users.length} usuarios con acceso activo</p>
         </div>
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-border-soft bg-surface-100 shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-gray-100 bg-gray-50">
+            <thead className="border-b border-border-soft bg-surface-000">
               <tr>
                 {['Nombre / Email', 'Tenant', 'Rol', 'Estado', 'Último acceso', 'Acciones'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-ink-subtle">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border-soft">
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-ink-subtle">
                     Sin usuarios activos. Los usuarios aparecerán aquí tras su primer ingreso.
                   </td>
                 </tr>
@@ -337,13 +337,13 @@ async function renderPage() {
                 const toggleAction = toggleUserActive.bind(null, u.id)
                 const deleteAction = deleteUser.bind(null, u.id)
                 return (
-                  <tr key={u.id} className={`hover:bg-gray-50 ${!u.is_active ? 'opacity-50' : ''}`}>
+                  <tr key={u.id} className={`hover:bg-surface-000 ${!u.is_active ? 'opacity-50' : ''}`}>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-gray-900">{u.full_name ?? '—'}</p>
-                      {u.email && <p className="text-xs text-gray-400">{u.email}</p>}
+                      <p className="font-medium text-ink">{u.full_name ?? '—'}</p>
+                      {u.email && <p className="text-xs text-ink-subtle">{u.email}</p>}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+                      <span className="inline-flex items-center rounded-full bg-surface-200 px-2 py-0.5 text-xs font-medium text-ink-muted">
                         {tenant?.name ?? u.tenant_id.slice(0, 8)}
                       </span>
                     </td>
@@ -352,23 +352,23 @@ async function renderPage() {
                         <select
                           name="role"
                           defaultValue={u.role}
-                          className="rounded border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                          className="rounded border border-border-soft bg-surface-100 px-2 py-1 text-xs text-ink-muted focus:outline-none focus:ring-1 focus:ring-primary"
                         >
                           {ROLE_OPTIONS.map(r => (
                             <option key={r} value={r}>{ROLE_LABELS[r]}</option>
                           ))}
                         </select>
-                        <button type="submit" title="Guardar rol" className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600 hover:bg-gray-200">✓</button>
+                        <button type="submit" title="Guardar rol" className="rounded bg-surface-200 px-2 py-1 text-xs text-ink-muted hover:bg-wash-strong">✓</button>
                       </form>
                     </td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                        u.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                        u.is_active ? 'bg-green-100 text-green-700' : 'bg-surface-200 text-ink-subtle'
                       }`}>
                         {u.is_active ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-500">{formatRelative(u.last_seen_at)}</td>
+                    <td className="px-4 py-3 text-xs text-ink-subtle">{formatRelative(u.last_seen_at)}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <form action={toggleAction}>

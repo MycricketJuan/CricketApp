@@ -24,11 +24,11 @@ const ROLE_LABELS: Record<string, string> = {
 }
 
 const SECTOR_COLORS: Record<string, string> = {
-  banking:    'bg-blue-100 text-blue-700',
+  banking:    'bg-primary-tint text-primary',
   retail:     'bg-purple-100 text-purple-700',
   health:     'bg-green-100 text-green-700',
   telecom:    'bg-orange-100 text-orange-700',
-  government: 'bg-gray-100 text-gray-600',
+  government: 'bg-surface-200 text-ink-muted',
 }
 
 function initials(name: string): string {
@@ -45,12 +45,12 @@ export function ProfileSwitcher({ profiles, activeSlug, userName }: Props) {
     // Superadmin sin perfiles de tenant — solo muestra nombre
     return (
       <div className="flex items-center gap-2 rounded-lg px-3 py-2">
-        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white shrink-0">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shrink-0">
           {initials(userName)}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-xs font-medium text-gray-900">{userName}</p>
-          <p className="text-xs text-gray-400">Cricket Platform</p>
+          <p className="truncate text-xs font-medium text-ink">{userName}</p>
+          <p className="text-xs text-ink-subtle">ZEREZ Platform</p>
         </div>
       </div>
     )
@@ -66,7 +66,7 @@ export function ProfileSwitcher({ profiles, activeSlug, userName }: Props) {
     <div className="relative">
       {/* Dropdown hacia arriba */}
       {open && (
-        <div className="absolute bottom-full left-0 right-0 mb-1 rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden">
+        <div className="absolute bottom-full left-0 right-0 mb-1 rounded-xl border border-border-soft bg-surface-100 shadow-lg overflow-hidden">
           <div className="p-1.5 space-y-0.5">
             {profiles.map(p => {
               const isActive  = p.tenantSlug === activeSlug
@@ -77,20 +77,20 @@ export function ProfileSwitcher({ profiles, activeSlug, userName }: Props) {
                   onClick={() => handleSwitch(p.tenantSlug)}
                   disabled={isLoading}
                   className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-left transition-colors ${
-                    isActive ? 'bg-gray-100' : 'hover:bg-gray-50'
+                    isActive ? 'bg-surface-200' : 'hover:bg-surface-000'
                   }`}
                 >
                   <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold shrink-0 ${
-                    isActive ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-600'
+                    isActive ? 'bg-primary text-white' : 'bg-wash-strong text-ink-muted'
                   }`}>
                     {isLoading ? '…' : initials(p.tenantName)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium text-gray-900">{p.tenantName}</p>
-                    <p className="text-xs text-gray-400">{ROLE_LABELS[p.role] ?? p.role}</p>
+                    <p className="truncate text-xs font-medium text-ink">{p.tenantName}</p>
+                    <p className="text-xs text-ink-subtle">{ROLE_LABELS[p.role] ?? p.role}</p>
                   </div>
                   {isActive && (
-                    <span className="text-gray-400 text-xs">✓</span>
+                    <span className="text-ink-subtle text-xs">✓</span>
                   )}
                 </button>
               )
@@ -98,8 +98,8 @@ export function ProfileSwitcher({ profiles, activeSlug, userName }: Props) {
           </div>
 
           {profiles.length > 1 && (
-            <div className="border-t border-gray-100 px-3 py-2">
-              <p className="text-xs text-gray-400">{profiles.length} perfiles disponibles</p>
+            <div className="border-t border-border-soft px-3 py-2">
+              <p className="text-xs text-ink-subtle">{profiles.length} perfiles disponibles</p>
             </div>
           )}
         </div>
@@ -108,21 +108,21 @@ export function ProfileSwitcher({ profiles, activeSlug, userName }: Props) {
       {/* Trigger */}
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-surface-000 transition-colors"
       >
-        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-900 text-xs font-bold text-white shrink-0">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-white shrink-0">
           {initials(activeProfile?.tenantName ?? userName)}
         </div>
         <div className="min-w-0 flex-1 text-left">
-          <p className="truncate text-xs font-medium text-gray-900">
+          <p className="truncate text-xs font-medium text-ink">
             {activeProfile?.tenantName ?? userName}
           </p>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-ink-subtle">
             {ROLE_LABELS[activeProfile?.role ?? ''] ?? activeProfile?.role ?? ''}
           </p>
         </div>
         {profiles.length > 1 && (
-          <span className={`text-gray-400 text-xs transition-transform ${open ? 'rotate-180' : ''}`}>
+          <span className={`text-ink-subtle text-xs transition-transform ${open ? 'rotate-180' : ''}`}>
             ▲
           </span>
         )}

@@ -35,7 +35,7 @@ const TYPE_OPTIONS = Object.entries(TRAMITE_TEMPLATES).map(([type, tpl]) => ({
 
 function Badge({ label, className }: { label: string; className?: string }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${className ?? 'bg-gray-100 text-gray-600'}`}>
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${className ?? 'bg-surface-200 text-ink-muted'}`}>
       {label}
     </span>
   )
@@ -61,7 +61,7 @@ function formatDate(iso: string | null): string {
 
 function SlaIndicator({ deadline, now }: { deadline: string | null; now: number | null }) {
   // now es null hasta el primer render en cliente (evita hydration mismatch)
-  if (!deadline || now === null) return <span className="text-xs text-gray-400">—</span>
+  if (!deadline || now === null) return <span className="text-xs text-ink-subtle">—</span>
 
   const horasRestantes = (new Date(deadline).getTime() - now) / 3600000
 
@@ -125,13 +125,13 @@ export function TramitesTable({ initialData }: { initialData: TramiteRow[] }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar por cliente o trámite…"
-          className="w-64 rounded-lg border border-gray-200 px-3 py-1.5 text-sm
-                     placeholder:text-gray-400 focus:border-gray-400 focus:outline-none"
+          className="w-64 rounded-lg border border-border-soft px-3 py-1.5 text-sm
+                     placeholder:text-ink-subtle focus:border-primary focus:outline-none"
         />
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700"
+          className="rounded-lg border border-border-soft bg-surface-100 px-3 py-1.5 text-sm text-ink-muted"
         >
           <option value="">Todos los estados</option>
           {Object.entries(STATUS_LABEL).map(([value, label]) => (
@@ -141,7 +141,7 @@ export function TramitesTable({ initialData }: { initialData: TramiteRow[] }) {
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
-          className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700"
+          className="rounded-lg border border-border-soft bg-surface-100 px-3 py-1.5 text-sm text-ink-muted"
         >
           <option value="">Todos los tipos</option>
           {TYPE_OPTIONS.map((opt) => (
@@ -152,46 +152,46 @@ export function TramitesTable({ initialData }: { initialData: TramiteRow[] }) {
 
       {/* Tabla */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 py-12 text-gray-400">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border-soft py-12 text-ink-subtle">
           <p className="text-sm">No hay trámites que coincidan</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-border-soft bg-surface-100 shadow-sm">
           <table className="w-full text-sm">
-            <thead className="border-b border-gray-100 bg-gray-50">
+            <thead className="border-b border-border-soft bg-surface-000">
               <tr>
                 {['Trámite', 'Cliente', 'Estado', 'Asignado', 'SLA', 'Radicado'].map((h) => (
                   <th
                     key={h}
-                    className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                    className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-ink-subtle"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border-soft">
               {filtered.map((t) => (
                 <tr
                   key={t.id}
                   onClick={() => router.push(`/tramites/${t.id}`)}
-                  className="cursor-pointer hover:bg-gray-50"
+                  className="cursor-pointer hover:bg-surface-000"
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900">{t.label}</td>
-                  <td className="px-4 py-3 text-gray-600">{customerName(t)}</td>
+                  <td className="px-4 py-3 font-medium text-ink">{t.label}</td>
+                  <td className="px-4 py-3 text-ink-muted">{customerName(t)}</td>
                   <td className="px-4 py-3">
                     <Badge
                       label={STATUS_LABEL[t.status] ?? t.status}
                       className={STATUS_BADGE[t.status]}
                     />
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-4 py-3 text-ink-muted">
                     {t.tenant_users?.full_name ?? 'Sin asignar'}
                   </td>
                   <td className="px-4 py-3">
                     <SlaIndicator deadline={t.sla_deadline} now={now} />
                   </td>
-                  <td className="px-4 py-3 text-gray-500">{formatDate(t.submitted_at)}</td>
+                  <td className="px-4 py-3 text-ink-subtle">{formatDate(t.submitted_at)}</td>
                 </tr>
               ))}
             </tbody>

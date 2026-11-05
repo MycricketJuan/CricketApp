@@ -29,15 +29,15 @@ export default async function FirmarPage({
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 p-6">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900">{tramite.label}</h1>
-        {placa && <p className="mt-1 text-sm text-gray-500">Vehículo placa {placa}</p>}
+        <h1 className="text-xl font-semibold text-ink">{tramite.label}</h1>
+        {placa && <p className="mt-1 text-sm text-ink-subtle">Vehículo placa {placa}</p>}
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <p className="text-sm text-gray-700">
+      <div className="rounded-xl border border-border-soft bg-surface-100 p-4 shadow-sm">
+        <p className="text-sm text-ink-muted">
           Al firmar, aceptas el documento de levantamiento de la prenda sobre tu vehículo,
           generado a partir de los datos que confirmaste por WhatsApp. Esta es una firma
-          digital simulada dentro del proceso de Cricket.
+          digital simulada dentro del proceso de ZEREZ.
         </p>
       </div>
 

@@ -62,11 +62,11 @@ export function AgenteWizard() {
   }
 
   return (
-    <div className={`${archivo.className} fixed inset-0 z-50 overflow-hidden bg-[#0b0c0d] text-[#e8e8e8]`}>
+    <div className={`${archivo.className} fixed inset-0 z-50 overflow-hidden bg-surface-000 text-ink`}>
       <style>{`
         @keyframes agenteOrbPulse {
-          0%,100% { transform:scale(1); box-shadow:0 0 0 1px rgba(74,222,128,.35), 0 0 26px 2px rgba(74,222,128,.30); }
-          50% { transform:scale(1.035); box-shadow:0 0 0 1px rgba(74,222,128,.55), 0 0 46px 6px rgba(74,222,128,.42); }
+          0%,100% { transform:scale(1); box-shadow:0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent), 0 0 26px 2px color-mix(in srgb, var(--primary) 30%, transparent); }
+          50% { transform:scale(1.035); box-shadow:0 0 0 1px color-mix(in srgb, var(--primary) 55%, transparent), 0 0 46px 6px color-mix(in srgb, var(--primary) 42%, transparent); }
         }
       `}</style>
       <div className="flex h-full flex-col">
@@ -76,7 +76,7 @@ export function AgenteWizard() {
           style={{ opacity: entered ? 1 : 0, transform: entered ? 'translateY(0)' : 'translateY(14px)' }}
         >
           <Sidebar i={i} goTo={goTo} goWorkshop={goWorkshop} />
-          <div key={i} className="flex min-h-0 flex-1 flex-col bg-black">
+          <div key={i} className="flex min-h-0 flex-1 flex-col bg-surface-000">
             {i === 0 && <ScreenWelcome next={next} />}
             {i === 1 && (
               <ScreenIdentity
