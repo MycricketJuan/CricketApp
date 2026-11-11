@@ -1,359 +1,150 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  ACKS,
-  BASE_UNDERSTANDING,
-  COLOR_SWATCHES,
-  DEFAULT_COLOR,
-  DEFAULT_MENUS,
-  GAIN_PER_ANSWER,
-  GAIN_PER_SOURCE,
-  GOAL,
-  MAX_SOURCES_COUNTED,
-  OPEN_QUESTIONS,
-  REVIEW_POINTS,
-  extractUrls,
-  onColor,
-  parseHex,
-  type MenuDraft,
-} from './data'
-import { GhostButton, Orb, PrimaryButton, QuestionCard, UnderstandingMeter, type OrbState } from './ui'
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react'
+import { MODULES } from '@/lib/representation/catalog'
+import type { Coverage, RepCard, RepresentationState } from '@/lib/representation/types'
+import { Orb, QuestionCard, UnderstandingMeter, type OrbState } from './ui'
 
-type Step =
-  | 'welcome'
-  | 'name'
-  | 'company'
-  | 'color'
-  | 'logo'
-  | 'sources'
-  | 'analysis'
-  | 'open'
-  | 'review'
-  | 'menus'
-  | 'done'
+const COLOR_SWATCHES = ['#2563eb', '#10cba7', '#6f03fd', '#e11d48', '#f59e0b', '#0f1b4c'] as const
 
-interface Message {
-  from: 'zerez' | 'user'
-  text: string
-  color?: string
+// Pantalla de inicio — los cuatro caminos en INFINITIVO. Solo "Crear" está activo.
+const HOME_PATHS: { title: string; desc: string; active: boolean }[] = [
+  { title: 'Crear', desc: 'Crea la representación digital de tu empresa: su identidad, su conocimiento y sus objetivos.', active: true },
+  { title: 'Administrar', desc: 'Actualiza y evoluciona tu representación digital.', active: false },
+  { title: 'Analizar', desc: 'Conoce los resultados de tu representación: relaciones, ventas, PQRs y experiencia.', active: false },
+  { title: 'Conocer más', desc: 'Descubre qué es una representación digital y cómo transforma la relación con tus clientes.', active: false },
+]
+
+interface ChatMessage {
+  role: 'zerez' | 'user'
+  content: string
+  card?: RepCard | null
 }
-
-interface Profile {
-  user: string
-  company: string
-  color: string
-  logo: string | null
-}
-
-interface Source {
-  name: string
-  progress: number
-}
-
-const EMPTY_PROFILE: Profile = { user: '', company: '', color: '', logo: null }
-const ANALYSIS_PHASES = ['Leyendo tus fuentes', 'Entendiendo tu oferta y tu voz', 'Organizando lo que aprendí'] as const
-
-const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 export function OnboardingFlow() {
-  const [step, setStep] = useState<Step>('welcome')
-  const [thread, setThread] = useState<Message[]>([])
-  const [profile, setProfile] = useState<Profile>(EMPTY_PROFILE)
-  const [sources, setSources] = useState<Source[]>([])
+  const [phase, setPhase] = useState<'welcome' | 'chat'>('welcome')
+  const [hydrated, setHydrated] = useState(false)
+  const [state, setState] = useState<RepresentationState | null>(null)
+  const [thread, setThread] = useState<ChatMessage[]>([])
   const [orb, setOrb] = useState<OrbState>('idle')
   const [busy, setBusy] = useState(false)
-  const [understanding, setUnderstanding] = useState(0)
-  const [questionIndex, setQuestionIndex] = useState(0)
-  const [menus, setMenus] = useState<MenuDraft[]>(() => DEFAULT_MENUS.map((m) => ({ ...m })))
-  const [pendingColor, setPendingColor] = useState(DEFAULT_COLOR)
   const [draft, setDraft] = useState('')
 
-  const runId = useRef(0)
-  const ackN = useRef(0)
+  const queueRef = useRef<string[]>([])
+  const processingRef = useRef(false)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
 
-  const company = profile.company || 'tu empresa'
+  const company = state?.profile.company || 'tu empresa'
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'end' })
-  }, [thread, step, sources, menus])
+  }, [thread, state])
 
+  // Hidratar al cargar: recupera el hilo y el estado si ya existe una representación.
   useEffect(() => {
-    const id = runId
+    let alive = true
+    fetch('/api/representation')
+      .then((r) => r.json())
+      .then((data: { state: RepresentationState | null; thread: ChatMessage[] }) => {
+        if (!alive) return
+        setHydrated(true)
+        if (data.state) {
+          setState(data.state)
+          setThread((data.thread ?? []).map((m) => ({ role: m.role, content: m.content, card: m.card })))
+          if ((data.thread ?? []).length > 0) setPhase('chat')
+        }
+      })
+      .catch(() => alive && setHydrated(true))
     return () => {
-      id.current += 1
+      alive = false
     }
   }, [])
 
-  const ack = () => {
-    ackN.current += 1
-    return ACKS[ackN.current % ACKS.length]
-  }
-
-  /** ZEREZ "escribe": el orbe piensa un momento y luego aparece el mensaje. Se cancela si se reinicia el flujo. */
-  const say = useCallback(async (token: number, text: string) => {
-    setOrb('thinking')
-    await sleep(prefersReducedMotion() ? 0 : 550)
-    if (token !== runId.current) return false
-    setThread((t) => [...t, { from: 'zerez', text }])
-    setOrb('idle')
-    return true
+  const fireTurn = useCallback(async (inputs: string[]) => {
+    const res = await fetch('/api/representation/turn', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ inputs }),
+    })
+    if (!res.ok) {
+      setThread((t) => [...t, { role: 'zerez', content: 'Tuve un problema procesando eso. ¿Lo intentamos de nuevo?' }])
+      return
+    }
+    const data = (await res.json()) as {
+      state: RepresentationState
+      message: { role: 'zerez'; content: string; card: RepCard | null }
+    }
+    if (data.state) setState(data.state)
+    if (data.message?.content || data.message?.card) {
+      setThread((t) => [...t, { role: 'zerez', content: data.message.content, card: data.message.card }])
+    }
   }, [])
 
-  const user = (text: string, color?: string) => setThread((t) => [...t, { from: 'user', text, color }])
-
-  const run = useCallback((script: (token: number) => Promise<void>) => {
-    runId.current += 1
-    const token = runId.current
+  const processQueue = useCallback(async () => {
+    if (processingRef.current) return
+    processingRef.current = true
     setBusy(true)
-    void script(token).finally(() => {
-      if (token === runId.current) setBusy(false)
-    })
-  }, [])
+    setOrb('thinking')
+    try {
+      while (queueRef.current.length > 0) {
+        const batch = queueRef.current.splice(0, queueRef.current.length)
+        await fireTurn(batch)
+      }
+    } finally {
+      processingRef.current = false
+      setBusy(false)
+      setOrb('idle')
+    }
+  }, [fireTurn])
 
-  const restart = () => {
-    runId.current += 1
-    setStep('welcome')
-    setThread([])
-    setProfile(EMPTY_PROFILE)
-    setSources([])
-    setUnderstanding(0)
-    setQuestionIndex(0)
-    setMenus(DEFAULT_MENUS.map((m) => ({ ...m })))
-    setPendingColor(DEFAULT_COLOR)
+  // La barra NUNCA se bloquea: los mensajes se encolan y se procesan en orden.
+  const enqueue = useCallback(
+    (text: string) => {
+      const clean = text.trim()
+      if (!clean) return
+      setThread((t) => [...t, { role: 'user', content: clean }])
+      queueRef.current.push(clean)
+      void processQueue()
+    },
+    [processQueue],
+  )
+
+  const startCreate = useCallback(async () => {
+    setPhase('chat')
+    if (thread.length > 0 || processingRef.current) return
+    processingRef.current = true
+    setBusy(true)
+    setOrb('thinking')
+    try {
+      await fireTurn([]) // arranque: ZEREZ se presenta y pregunta el nombre
+    } finally {
+      processingRef.current = false
+      setBusy(false)
+      setOrb('idle')
+    }
+  }, [fireTurn, thread.length])
+
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    const text = draft
     setDraft('')
-    setBusy(false)
-    setOrb('idle')
+    enqueue(text)
   }
 
-  const startCreate = () =>
-    run(async (t) => {
-      setStep('name')
-      if (!(await say(t, '¡Hola! Soy ZEREZ. Vamos a crear la representación digital de tu empresa: aprenderé quién es, qué vende y cómo se relaciona con sus clientes.'))) return
-      if (!(await say(t, 'Empecemos por lo básico. ¿Cómo te llamas?'))) return
-    })
+  const pickColor = (hex: string) => enqueue(`Mi color principal es ${hex.toUpperCase()}.`)
 
-  const answerName = (text: string) =>
-    run(async (t) => {
-      user(text)
-      setProfile((p) => ({ ...p, user: text }))
-      if (!(await say(t, `Mucho gusto, ${text}. ¿Cómo se llama tu empresa?`))) return
-      setStep('company')
-    })
+  const lastCard = thread.length > 0 ? thread[thread.length - 1].card : null
+  const understanding = state?.understanding ?? 0
+  const goal = state?.goal ?? 80
 
-  const answerCompany = (text: string) =>
-    run(async (t) => {
-      user(text)
-      setProfile((p) => ({ ...p, company: text }))
-      setStep('color')
-      await say(t, `Ahora quiero conocer cómo se ve ${text}. Elige tu color principal o escribe su código hex.`)
-    })
-
-  const confirmColor = (hex: string) =>
-    run(async (t) => {
-      setProfile((p) => ({ ...p, color: hex }))
-      user(`Mi color principal es ${hex.toUpperCase()}.`, hex)
-      setStep('logo')
-      await say(t, `${ack()} ¿Tienes un logo? Súbelo y lo uso en tu representación.`)
-    })
-
-  const askForSources = async (t: number, logo: string | null) => {
-    if (!(await say(t, logo ? 'Se ve muy bien.' : 'Sin problema, lo puedes subir cuando quieras.'))) return
-    if (!(await say(t, `Ahora lo más importante: comparte todo lo que me ayude a entender ${company}. Con eso deduzco la mayor parte de lo que necesito y solo te pregunto lo que falte.`))) return
-    setStep('sources')
-  }
-
-  const setLogo = (src: string | null, msg: string) =>
-    run(async (t) => {
-      if (src) setProfile((p) => ({ ...p, logo: src }))
-      user(msg)
-      await askForSources(t, src)
-    })
-
-  const onLogoFile = (file: File | undefined) => {
-    if (!file || !file.type.startsWith('image/')) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (typeof reader.result === 'string') setLogo(reader.result, `Te comparto mi logo (${file.name}).`)
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const addSources = (urls: string[]) => {
-    const known = new Set(sources.map((s) => s.name))
-    const fresh = urls.filter((u) => !known.has(u)).map((name) => ({ name, progress: 0 }))
-    setSources((s) => [...s, ...fresh])
-    return fresh.length
-  }
-
-  const answerSources = (text: string) => {
-    const added = addSources(extractUrls(text))
-    user(text)
-    run(async (t) => {
-      await say(
-        t,
-        added
-          ? `Agregué ${added} ${added === 1 ? 'fuente' : 'fuentes'}. ¿Algo más? Cuando estés listo, empiezo a analizar.`
-          : 'No encontré una URL en tu mensaje. Pega la dirección completa, por ejemplo https://tuempresa.com.',
-      )
-    })
-  }
-
-  const startAnalysis = () =>
-    run(async (t) => {
-      user('Listo, analiza todo.')
-      if (!(await say(t, `Perfecto. Voy a leer todo lo que compartiste sobre ${company}.`))) return
-      setStep('analysis')
-      setOrb('thinking')
-      let current = sources.map((s) => ({ ...s, progress: 0 }))
-      let tick = 0
-      while (current.some((s) => s.progress < 100)) {
-        await sleep(prefersReducedMotion() ? 40 : 110)
-        if (t !== runId.current) return
-        tick += 1
-        current = current.map((s, i) =>
-          s.progress >= 100 || tick < i * 5
-            ? s
-            : { ...s, progress: Math.min(100, s.progress + 3 + Math.floor(Math.random() * 7)) },
-        )
-        setSources(current)
-      }
-      const base = BASE_UNDERSTANDING + GAIN_PER_SOURCE * Math.min(current.length, MAX_SOURCES_COUNTED)
-      setUnderstanding(base)
-      await sleep(400)
-      if (t !== runId.current) return
-      if (!(await say(t, `Listo. Leí ${current.length} ${current.length === 1 ? 'fuente' : 'fuentes'} y ya conozco a ${company} al ${base}%.`))) return
-      if (!(await say(t, `Para representarte bien necesito llegar al ${GOAL}%. Te haré unas preguntas abiertas: contéstalas como quieras.`))) return
-      setQuestionIndex(0)
-      setStep('open')
-    })
-
-  const answerOpen = (text: string) =>
-    run(async (t) => {
-      user(text)
-      const before = understanding
-      const after = Math.min(100, before + GAIN_PER_ANSWER)
-      setOrb('thinking')
-      setUnderstanding(after)
-      if (!(await say(t, `Gracias, eso me aclara mucho. Ya te conozco al ${after}% (+${after - before}).`))) return
-      if (after >= GOAL || questionIndex + 1 >= OPEN_QUESTIONS.length) {
-        if (!(await say(t, `Ya te conozco al ${after}%: lo suficiente para representarte bien.`))) return
-        if (!(await say(t, `Solo me falta que confirmes ${REVIEW_POINTS} puntos que deduje de tus fuentes. Lo demás lo puedes completar cuando quieras en Administra.`))) return
-        setStep('review')
-        return
-      }
-      setQuestionIndex((i) => i + 1)
-    })
-
-  const confirmReview = () =>
-    run(async (t) => {
-      user('Confirmo todo lo que dedujiste.')
-      const after = Math.min(100, understanding + 4)
-      setUnderstanding(after)
-      if (!(await say(t, `Listo, quedó confirmado. Ya te conozco al ${after}%.`))) return
-      if (!(await say(t, `Por último, deduje los caminos principales de tu representación: lo que tus clientes vienen a hacer con ${company}. Así aparecerán arriba, en lugar de un menú de sitio web.`))) return
-      setStep('menus')
-    })
-
-  const confirmMenus = () =>
-    run(async (t) => {
-      const on = menus.filter((m) => m.on)
-      user(`Confirmo los menús: ${on.map((m) => m.title).join(', ')}.`)
-      if (!(await say(t, `Perfecto. Con eso ya puedo generar la representación digital de ${company}.`))) return
-      setStep('done')
-    })
-
-  const onComposerSend = () => {
-    const text = draft.trim()
-    if (!text || busy) return
-    setDraft('')
-    switch (step) {
-      case 'welcome':
-        startCreate()
-        return
-      case 'name':
-        answerName(text)
-        return
-      case 'company':
-        answerCompany(text)
-        return
-      case 'color': {
-        const hex = parseHex(text)
-        if (hex) setPendingColor(hex)
-        confirmColor(hex ?? pendingColor)
-        return
-      }
-      case 'logo':
-        setLogo(null, text)
-        return
-      case 'sources':
-        answerSources(text)
-        return
-      case 'open':
-        answerOpen(text)
-        return
-      default:
-        return
-    }
-  }
-
-  const composerEnabled = !busy && ['welcome', 'name', 'company', 'color', 'logo', 'sources', 'open'].includes(step)
-
-  const placeholder = useMemo(() => {
-    switch (step) {
-      case 'name':
-        return 'Escribe tu nombre'
-      case 'company':
-        return 'Nombre de tu empresa'
-      case 'color':
-        return 'Elige un color o escribe un código hex'
-      case 'logo':
-        return 'Sube tu logo o escribe «sin logo»'
-      case 'sources':
-        return 'Pega la dirección de tu sitio o tus redes'
-      case 'open':
-        return 'Escribe tu respuesta'
-      default:
-        return 'Escribe lo que necesitas…'
-    }
-  }, [step])
-
-  const showMeter = understanding > 0
-  const accent = profile.color || 'var(--primary)'
-  const question = OPEN_QUESTIONS[questionIndex]
-
-  return (
-    <div
-      className="min-h-screen bg-surface-000 text-ink"
-      style={{
-        backgroundImage:
-          'radial-gradient(60% 50% at 15% 0%, var(--aura-cyan), transparent), radial-gradient(50% 40% at 90% 10%, var(--aura-violet), transparent), radial-gradient(40% 40% at 50% 100%, var(--aura-amber), transparent)',
-        backgroundAttachment: 'fixed',
-      }}
-    >
-      <header className="glass sticky top-0 z-topbar flex items-center justify-between px-12 py-3 zz-compact:px-4">
-        <span className="text-title font-bold tracking-tight">ZEREZ</span>
-        <div className="flex items-center gap-3">
-          {profile.company && (
-            <span className="text-caption text-ink-muted">
-              {profile.company}
-              {profile.user ? ` · ${profile.user}` : ''}
-            </span>
-          )}
-          {step !== 'welcome' && (
-            <button type="button" onClick={restart} className="rounded-full bg-wash px-4 py-1.5 text-caption font-semibold hover:bg-wash-strong">
-              Reiniciar
-            </button>
-          )}
-        </div>
-      </header>
-
-      {step === 'welcome' ? (
+  // ── Pantalla de inicio ──────────────────────────────────────
+  if (phase === 'welcome') {
+    return (
+      <div className="min-h-screen bg-surface-000 text-ink" style={auraStyle}>
+        <Header company={null} user={null} />
         <main className="mx-auto flex min-h-[calc(100vh-64px)] max-w-dock flex-col items-center justify-center gap-8 px-4 pb-24 text-center">
           <Orb state="idle" size={80} />
           <p className="max-w-conversation text-message text-ink-muted">
@@ -362,259 +153,172 @@ export function OnboardingFlow() {
           </p>
           <h1 className="text-slogan text-ink zz-compact:text-question">¿Qué te gustaría hacer hoy?</h1>
           <div className="grid w-full gap-3 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={startCreate}
-              className="rounded-lg bg-surface-100 p-5 text-left shadow-card transition-shadow duration-base hover:shadow-float"
-            >
-              <p className="text-title">Crea</p>
-              <p className="mt-1 text-body text-ink-muted">
-                Crea la representación digital de tu empresa: su identidad, su conocimiento y sus objetivos.
-              </p>
-            </button>
-            {[
-              ['Administra', 'Actualiza y evoluciona tu representación digital.'],
-              ['Analiza', 'Conoce los resultados de tu representación: relaciones, ventas, PQRs y experiencia.'],
-              ['Conoce más', 'Descubre qué es una representación digital y cómo transforma la relación con tus clientes.'],
-            ].map(([title, desc]) => (
-              <div key={title} className="rounded-lg bg-wash p-5 text-left opacity-70" aria-disabled>
-                <p className="text-title">
-                  {title} <span className="ml-1 text-label uppercase text-ink-subtle">Próximamente</span>
-                </p>
-                <p className="mt-1 text-body text-ink-muted">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </main>
-      ) : (
-        <div className="mx-auto flex max-w-page gap-8 px-12 pb-40 pt-8 zz-compact:px-4">
-          <aside className="sticky top-24 hidden h-fit w-rail shrink-0 space-y-6 md:block zz-panel:hidden">
-            <div className="space-y-4 rounded-lg bg-surface-100 p-5 shadow-card">
-              <div className="flex items-center gap-3">
-                {profile.logo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={profile.logo} alt={`Logo de ${profile.company}`} className="h-10 w-10 rounded-md object-contain" />
-                ) : (
-                  <div
-                    className="grid h-10 w-10 place-items-center rounded-md text-title"
-                    style={{ background: accent, color: profile.color ? onColor(profile.color) : 'var(--on-primary)' }}
-                  >
-                    {(profile.company || 'Z').charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <p className="truncate text-title">{profile.company || 'Tu empresa'}</p>
-                  <p className="text-caption text-ink-subtle">Representación digital</p>
-                </div>
-              </div>
-              {sources.length > 0 && (
-                <div className="space-y-1">
-                  <p className="text-label uppercase text-ink-subtle">Fuentes</p>
-                  <ul className="space-y-1 text-caption text-ink-muted">
-                    {sources.map((s) => (
-                      <li key={s.name} className="truncate">
-                        {s.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-            {showMeter && <UnderstandingMeter value={understanding} goal={GOAL} label={`Lo que sé de ${company}`} />}
-          </aside>
-
-          <main className="mx-auto w-full max-w-conversation space-y-4">
-            {showMeter && (
-              <div className="hidden zz-panel:block">
-                <UnderstandingMeter value={understanding} goal={GOAL} label={`Lo que sé de ${company}`} />
-              </div>
-            )}
-
-            <div className="flex justify-center py-2">
-              <Orb state={orb} size={56} />
-            </div>
-
-            {thread.map((m, i) =>
-              m.from === 'zerez' ? (
-                <p key={i} className="text-message text-ink">
-                  {m.text}
-                </p>
+            {HOME_PATHS.map((p) =>
+              p.active ? (
+                <button
+                  key={p.title}
+                  type="button"
+                  onClick={startCreate}
+                  disabled={!hydrated}
+                  className="rounded-lg bg-surface-100 p-5 text-left shadow-card transition-shadow duration-base hover:shadow-float disabled:opacity-60"
+                >
+                  <p className="text-title">{p.title}</p>
+                  <p className="mt-1 text-body text-ink-muted">{p.desc}</p>
+                </button>
               ) : (
-                <div key={i} className="flex justify-end">
-                  <p
-                    className="max-w-[85%] rounded-lg px-4 py-2.5 text-body"
-                    style={{
-                      background: m.color ?? profile.color ?? 'var(--primary)',
-                      color: m.color || profile.color ? onColor(m.color ?? profile.color) : 'var(--on-primary)',
-                    }}
-                  >
-                    {m.text}
+                <div key={p.title} className="rounded-lg bg-wash p-5 text-left opacity-70" aria-disabled>
+                  <p className="text-title">
+                    {p.title} <span className="ml-1 text-label uppercase text-ink-subtle">Próximamente</span>
                   </p>
+                  <p className="mt-1 text-body text-ink-muted">{p.desc}</p>
                 </div>
               ),
             )}
+          </div>
+        </main>
+      </div>
+    )
+  }
 
-            {!busy && step === 'color' && (
-              <QuestionCard title="Tu color principal" help="Se usa en tu representación y en lo que escribes aquí.">
-                <div className="flex flex-wrap items-center gap-3">
-                  {COLOR_SWATCHES.map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      aria-label={`Color ${c}`}
-                      aria-pressed={pendingColor === c}
-                      onClick={() => setPendingColor(c)}
-                      className="h-9 w-9 rounded-full ring-offset-2 ring-offset-surface-100 transition-shadow duration-fast aria-pressed:ring-2 aria-pressed:ring-primary"
-                      style={{ background: c }}
-                    />
-                  ))}
-                  <input
-                    type="color"
-                    aria-label="Otro color"
-                    value={pendingColor}
-                    onChange={(e) => setPendingColor(e.target.value)}
-                    className="h-9 w-9 cursor-pointer rounded-full bg-transparent"
+  // ── Conversación ────────────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-surface-000 text-ink" style={auraStyle}>
+      <Header company={state?.profile.company ?? null} user={state?.profile.user ?? null} />
+
+      <div className="mx-auto flex max-w-page gap-8 px-12 pb-40 pt-8 zz-compact:px-4">
+        <aside className="sticky top-24 hidden h-fit w-rail shrink-0 space-y-6 md:block zz-panel:hidden">
+          <div className="space-y-4 rounded-lg bg-surface-100 p-5 shadow-card">
+            <div className="flex items-center gap-3">
+              <div className="grid h-10 w-10 place-items-center rounded-md bg-primary-tint text-title text-primary">
+                {(state?.profile.company || 'Z').charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-title">{state?.profile.company || 'Tu empresa'}</p>
+                <p className="text-caption text-ink-subtle">Representación digital</p>
+              </div>
+            </div>
+            {understanding > 0 && (
+              <UnderstandingMeter value={Math.round(understanding)} goal={goal} label={`Lo que sé de ${company}`} />
+            )}
+          </div>
+
+          {state && <KnowledgeRail submoduleCoverage={state.submoduleCoverage} moduleCoverage={state.moduleCoverage} />}
+        </aside>
+
+        <main className="mx-auto w-full max-w-conversation space-y-4">
+          <div className="flex justify-center py-2">
+            <Orb state={orb} size={56} />
+          </div>
+
+          {thread.map((m, i) =>
+            m.role === 'zerez' ? (
+              <p key={i} className="text-message text-ink whitespace-pre-wrap">
+                {m.content}
+              </p>
+            ) : (
+              <div key={i} className="flex justify-end">
+                {/* Burbuja del usuario: relleno suave + tinta. Nunca el color de marca (ilegible). */}
+                <p className="max-w-[85%] rounded-lg bg-surface-200 px-4 py-2.5 text-body text-ink">{m.content}</p>
+              </div>
+            ),
+          )}
+
+          {!busy && lastCard?.type === 'color' && (
+            <QuestionCard title="Tu color principal" help="Es un atajo: también puedes escribir el color o su código hex abajo.">
+              <div className="flex flex-wrap items-center gap-3">
+                {COLOR_SWATCHES.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    aria-label={`Color ${c}`}
+                    onClick={() => pickColor(c)}
+                    className="h-9 w-9 rounded-full ring-offset-2 ring-offset-surface-100 transition-shadow duration-fast hover:ring-2 hover:ring-primary"
+                    style={{ background: c }}
                   />
-                </div>
-                <PrimaryButton onClick={() => confirmColor(pendingColor)}>Usar {pendingColor.toUpperCase()}</PrimaryButton>
-              </QuestionCard>
-            )}
+                ))}
+              </div>
+            </QuestionCard>
+          )}
 
-            {!busy && step === 'logo' && (
-              <QuestionCard title="Tu logo" help="PNG, JPG o SVG. Se queda en tu navegador; no se envía a ningún servidor.">
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => onLogoFile(e.target.files?.[0])}
-                />
-                <div className="flex flex-wrap gap-3">
-                  <PrimaryButton onClick={() => fileRef.current?.click()}>Subir logo</PrimaryButton>
-                  <GhostButton onClick={() => setLogo(null, 'Lo subo después.')}>Lo subo después</GhostButton>
-                </div>
-              </QuestionCard>
-            )}
+          <div ref={bottomRef} />
+        </main>
+      </div>
 
-            {!busy && step === 'sources' && (
-              <QuestionCard
-                title="Tus fuentes"
-                help="Pega la dirección de tu sitio web, tu Instagram, LinkedIn o cualquier página donde se vea cómo es tu empresa."
-              >
-                {sources.length > 0 && (
-                  <ul className="space-y-1 text-body text-ink-muted">
-                    {sources.map((s) => (
-                      <li key={s.name} className="truncate">
-                        · {s.name}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <PrimaryButton onClick={startAnalysis} disabled={sources.length === 0}>
-                  Analizar todo
-                </PrimaryButton>
-              </QuestionCard>
-            )}
-
-            {step === 'analysis' && (
-              <QuestionCard title="Analizando tus fuentes">
-                <ul className="space-y-3">
-                  {sources.map((s) => (
-                    <li key={s.name} className="space-y-1">
-                      <div className="flex justify-between text-caption text-ink-muted">
-                        <span className="truncate">{s.name}</span>
-                        <span className="text-numeral">{s.progress}%</span>
-                      </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-wash">
-                        <div className="h-full rounded-full bg-primary transition-[width] duration-progress" style={{ width: `${s.progress}%` }} />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-caption text-ink-subtle">
-                  {ANALYSIS_PHASES[Math.min(ANALYSIS_PHASES.length - 1, Math.floor((sources.reduce((a, s) => a + s.progress, 0) / Math.max(1, sources.length * 100)) * ANALYSIS_PHASES.length))]}
-                </p>
-              </QuestionCard>
-            )}
-
-            {!busy && step === 'open' && question && (
-              <QuestionCard title={question.q(company)} help={question.help} />
-            )}
-
-            {!busy && step === 'review' && (
-              <QuestionCard
-                title={`Confirma ${REVIEW_POINTS} puntos que deduje`}
-                help="Son los de menor confianza. Si prefieres, déjalos para Administra."
-              >
-                <div className="flex flex-wrap gap-3">
-                  <PrimaryButton onClick={confirmReview}>Confirmo todo</PrimaryButton>
-                  <GhostButton onClick={confirmReview}>Revisar después</GhostButton>
-                </div>
-              </QuestionCard>
-            )}
-
-            {!busy && step === 'menus' && (
-              <QuestionCard title="Los caminos de tu representación" help="Quita los que no apliquen. Más adelante podrás editarlos y reordenarlos.">
-                <ul className="space-y-2">
-                  {menus.map((m) => (
-                    <li key={m.id}>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-md bg-wash p-3">
-                        <input
-                          type="checkbox"
-                          checked={m.on}
-                          onChange={() => setMenus((all) => all.map((x) => (x.id === m.id ? { ...x, on: !x.on } : x)))}
-                          className="mt-1 h-4 w-4 accent-[var(--primary)]"
-                        />
-                        <span>
-                          <span className="block text-title">{m.title}</span>
-                          <span className="block text-caption text-ink-muted">{m.description}</span>
-                        </span>
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-                <PrimaryButton onClick={confirmMenus} disabled={!menus.some((m) => m.on)}>
-                  Confirmar menús
-                </PrimaryButton>
-              </QuestionCard>
-            )}
-
-            {!busy && step === 'done' && (
-              <QuestionCard title={`${company} ya tiene su primera versión`} help="El siguiente paso son las Pruebas: simular conversaciones y ajustar antes de publicar.">
-                <GhostButton onClick={restart}>Empezar de nuevo</GhostButton>
-              </QuestionCard>
-            )}
-
-            <div ref={bottomRef} />
-          </main>
-        </div>
-      )}
-
-      {(step !== 'done' || busy) && (
-        <form
-          className="glass fixed inset-x-0 bottom-6 z-dock mx-auto flex w-[calc(100%-32px)] max-w-dock items-center gap-2 rounded-full p-2 pl-5"
-          onSubmit={(e) => {
-            e.preventDefault()
-            onComposerSend()
-          }}
+      {/* Composer de vidrio, SIEMPRE habilitado. Mientras ZEREZ procesa, los mensajes se encolan. */}
+      <form
+        onSubmit={onSubmit}
+        className="fixed inset-x-0 bottom-6 z-dock mx-auto flex w-[calc(100%-32px)] max-w-dock items-center gap-2 rounded-full bg-surface-glass p-2 pl-5 shadow-float backdrop-blur-glass"
+      >
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder={busy ? 'ZEREZ está procesando… puedes seguir escribiendo' : 'Escribe tu respuesta'}
+          aria-label="Mensaje"
+          className="min-w-0 flex-1 bg-transparent text-body text-ink outline-none placeholder:text-ink-subtle"
+        />
+        <button
+          type="submit"
+          disabled={!draft.trim()}
+          className="rounded-full bg-primary px-5 py-2 text-body font-semibold text-on-primary disabled:opacity-40"
         >
-          <input
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            disabled={!composerEnabled}
-            placeholder={placeholder}
-            aria-label={placeholder}
-            className="min-w-0 flex-1 bg-transparent text-body text-ink outline-none placeholder:text-ink-subtle disabled:opacity-60"
-          />
-          <button
-            type="submit"
-            disabled={!composerEnabled || !draft.trim()}
-            className="rounded-full bg-primary px-5 py-2 text-body font-semibold text-on-primary disabled:opacity-40"
-          >
-            Enviar
-          </button>
-        </form>
+          Enviar
+        </button>
+      </form>
+    </div>
+  )
+}
+
+const auraStyle: CSSProperties = {
+  backgroundImage:
+    'radial-gradient(60% 50% at 15% 0%, var(--aura-cyan), transparent), radial-gradient(50% 40% at 90% 10%, var(--aura-violet), transparent), radial-gradient(40% 40% at 50% 100%, var(--aura-amber), transparent)',
+  backgroundAttachment: 'fixed',
+}
+
+function Header({ company, user }: { company: string | null; user: string | null }) {
+  return (
+    <header className="sticky top-0 z-topbar flex items-center justify-between bg-surface-glass px-12 py-3 shadow-card backdrop-blur-glass zz-compact:px-4">
+      <span className="text-title font-bold tracking-tight">ZEREZ</span>
+      {company && (
+        <span className="text-caption text-ink-muted">
+          {company}
+          {user ? ` · ${user}` : ''}
+        </span>
       )}
+    </header>
+  )
+}
+
+/** Rail del catálogo: módulos → submódulos con su % (calculado por el servidor). */
+function KnowledgeRail({
+  submoduleCoverage,
+  moduleCoverage,
+}: {
+  submoduleCoverage: Coverage[]
+  moduleCoverage: Coverage[]
+}) {
+  const subPct = new Map(submoduleCoverage.map((c) => [c.id, c.pct]))
+  const modPct = new Map(moduleCoverage.map((c) => [c.id, c.pct]))
+  return (
+    <div className="space-y-4 rounded-lg bg-surface-100 p-5 shadow-card">
+      <p className="text-label uppercase text-ink-subtle">Lo que sé</p>
+      <div className="space-y-4">
+        {MODULES.map((mod) => (
+          <div key={mod.id} className="space-y-1.5">
+            <div className="flex items-baseline justify-between">
+              <span className="text-title">{mod.titulo}</span>
+              <span className="text-numeral text-ink-muted">{Math.round(modPct.get(mod.id) ?? 0)}%</span>
+            </div>
+            <ul className="space-y-1">
+              {mod.submodulos.map((sub) => (
+                <li key={sub.id} className="flex items-center justify-between text-caption text-ink-muted">
+                  <span className="truncate">{sub.titulo}</span>
+                  <span className="text-numeral tabular-nums text-ink-subtle">{Math.round(subPct.get(sub.id) ?? 0)}%</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

@@ -1,0 +1,606 @@
+{
+  "version": "2026-11",
+  "meta_entendimiento": 80,
+  "modulos": [
+    {
+      "id": "representacion",
+      "titulo": "Representación",
+      "descripcion": "Qué sabe de la empresa que representa",
+      "submodulos": [
+        {
+          "id": "identidad",
+          "titulo": "Identidad",
+          "pregunta_guia": "Quién es la empresa",
+          "items": [
+            {
+              "id": "identidad.01",
+              "etiqueta": "Nombre y descripción de la empresa"
+            },
+            {
+              "id": "identidad.02",
+              "etiqueta": "Historia y origen"
+            },
+            {
+              "id": "identidad.03",
+              "etiqueta": "Actividad principal"
+            },
+            {
+              "id": "identidad.04",
+              "etiqueta": "Productos y servicios principales"
+            },
+            {
+              "id": "identidad.05",
+              "etiqueta": "Modelo de negocio"
+            },
+            {
+              "id": "identidad.06",
+              "etiqueta": "Cobertura y presencia"
+            },
+            {
+              "id": "identidad.07",
+              "etiqueta": "Tamaño y estructura relevante"
+            },
+            {
+              "id": "identidad.08",
+              "etiqueta": "Capacidades clave"
+            },
+            {
+              "id": "identidad.09",
+              "etiqueta": "Procesos relevantes para el cliente"
+            },
+            {
+              "id": "identidad.10",
+              "etiqueta": "Canales de relación"
+            }
+          ]
+        },
+        {
+          "id": "proposito",
+          "titulo": "Propósito",
+          "pregunta_guia": "Por qué existe y qué busca generar",
+          "items": [
+            {
+              "id": "proposito.01",
+              "etiqueta": "Razón de existir"
+            },
+            {
+              "id": "proposito.02",
+              "etiqueta": "Problema que busca resolver"
+            },
+            {
+              "id": "proposito.03",
+              "etiqueta": "Impacto buscado"
+            },
+            {
+              "id": "proposito.04",
+              "etiqueta": "Misión"
+            },
+            {
+              "id": "proposito.05",
+              "etiqueta": "Visión"
+            },
+            {
+              "id": "proposito.06",
+              "etiqueta": "Valores"
+            },
+            {
+              "id": "proposito.07",
+              "etiqueta": "Principios de actuación"
+            },
+            {
+              "id": "proposito.08",
+              "etiqueta": "Compromisos con el cliente"
+            },
+            {
+              "id": "proposito.09",
+              "etiqueta": "Cultura / filosofía"
+            },
+            {
+              "id": "proposito.10",
+              "etiqueta": "Prioridades estratégicas"
+            }
+          ]
+        },
+        {
+          "id": "posicionamiento",
+          "titulo": "Posicionamiento",
+          "pregunta_guia": "Cómo quiere ocupar un lugar en el mercado",
+          "items": [
+            {
+              "id": "posicionamiento.01",
+              "etiqueta": "Categoría / mercado"
+            },
+            {
+              "id": "posicionamiento.02",
+              "etiqueta": "Cliente objetivo"
+            },
+            {
+              "id": "posicionamiento.03",
+              "etiqueta": "Necesidades prioritarias del cliente"
+            },
+            {
+              "id": "posicionamiento.04",
+              "etiqueta": "Propuesta de valor"
+            },
+            {
+              "id": "posicionamiento.05",
+              "etiqueta": "Diferenciadores"
+            },
+            {
+              "id": "posicionamiento.06",
+              "etiqueta": "Beneficios principales"
+            },
+            {
+              "id": "posicionamiento.07",
+              "etiqueta": "Razones para elegirla"
+            },
+            {
+              "id": "posicionamiento.08",
+              "etiqueta": "Competidores y alternativas"
+            },
+            {
+              "id": "posicionamiento.09",
+              "etiqueta": "Diferencias frente a competidores"
+            },
+            {
+              "id": "posicionamiento.10",
+              "etiqueta": "Escalamiento hacia una persona"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "venta",
+      "titulo": "Venta",
+      "descripcion": "Qué vende y cómo conduce una oportunidad hasta el cierre",
+      "submodulos": [
+        {
+          "id": "oferta",
+          "titulo": "Oferta",
+          "pregunta_guia": "Qué puede vender tu representación",
+          "items": [
+            {
+              "id": "oferta.01",
+              "etiqueta": "Portafolio"
+            },
+            {
+              "id": "oferta.02",
+              "etiqueta": "Descripción de cada oferta"
+            },
+            {
+              "id": "oferta.03",
+              "etiqueta": "Características"
+            },
+            {
+              "id": "oferta.04",
+              "etiqueta": "Beneficios"
+            },
+            {
+              "id": "oferta.05",
+              "etiqueta": "Casos de uso"
+            },
+            {
+              "id": "oferta.06",
+              "etiqueta": "Precios y modelo comercial"
+            },
+            {
+              "id": "oferta.07",
+              "etiqueta": "Alcance"
+            },
+            {
+              "id": "oferta.08",
+              "etiqueta": "Requisitos y condiciones"
+            },
+            {
+              "id": "oferta.09",
+              "etiqueta": "Diferencias entre ofertas"
+            },
+            {
+              "id": "oferta.10",
+              "etiqueta": "Limitaciones"
+            },
+            {
+              "id": "oferta.11",
+              "etiqueta": "Evidencias"
+            },
+            {
+              "id": "oferta.12",
+              "etiqueta": "Disponibilidad / restricciones"
+            }
+          ]
+        },
+        {
+          "id": "cliente",
+          "titulo": "Cliente ideal",
+          "pregunta_guia": "A quién debe vender",
+          "items": [
+            {
+              "id": "cliente.01",
+              "etiqueta": "Segmentos objetivo"
+            },
+            {
+              "id": "cliente.02",
+              "etiqueta": "Perfil de empresa"
+            },
+            {
+              "id": "cliente.03",
+              "etiqueta": "Perfil del interlocutor"
+            },
+            {
+              "id": "cliente.04",
+              "etiqueta": "Necesidades típicas"
+            },
+            {
+              "id": "cliente.05",
+              "etiqueta": "Motivaciones"
+            },
+            {
+              "id": "cliente.06",
+              "etiqueta": "Criterios de decisión"
+            },
+            {
+              "id": "cliente.07",
+              "etiqueta": "Objeciones habituales"
+            },
+            {
+              "id": "cliente.08",
+              "etiqueta": "Dolores / frustraciones"
+            },
+            {
+              "id": "cliente.09",
+              "etiqueta": "Nivel de madurez"
+            },
+            {
+              "id": "cliente.10",
+              "etiqueta": "Señales de buen fit"
+            },
+            {
+              "id": "cliente.11",
+              "etiqueta": "Señales de mal fit"
+            },
+            {
+              "id": "cliente.12",
+              "etiqueta": "Journey de compra"
+            }
+          ]
+        },
+        {
+          "id": "necesidad",
+          "titulo": "Necesidad → Solución",
+          "pregunta_guia": "Qué recomendar y por qué",
+          "items": [
+            {
+              "id": "necesidad.01",
+              "etiqueta": "Necesidades principales"
+            },
+            {
+              "id": "necesidad.02",
+              "etiqueta": "Señales de necesidad"
+            },
+            {
+              "id": "necesidad.03",
+              "etiqueta": "Preguntas de descubrimiento"
+            },
+            {
+              "id": "necesidad.04",
+              "etiqueta": "Causa del problema"
+            },
+            {
+              "id": "necesidad.05",
+              "etiqueta": "Impacto"
+            },
+            {
+              "id": "necesidad.06",
+              "etiqueta": "Mapeo necesidad → oferta"
+            },
+            {
+              "id": "necesidad.07",
+              "etiqueta": "Justificación de la recomendación"
+            },
+            {
+              "id": "necesidad.08",
+              "etiqueta": "Beneficio esperado"
+            },
+            {
+              "id": "necesidad.09",
+              "etiqueta": "Alternativas"
+            },
+            {
+              "id": "necesidad.10",
+              "etiqueta": "Límites de solución"
+            },
+            {
+              "id": "necesidad.11",
+              "etiqueta": "Expectativas realistas"
+            },
+            {
+              "id": "necesidad.12",
+              "etiqueta": "Casos que requieren especialista"
+            }
+          ]
+        },
+        {
+          "id": "proceso",
+          "titulo": "Proceso de venta",
+          "pregunta_guia": "Cómo conducir la conversación",
+          "items": [
+            {
+              "id": "proceso.01",
+              "etiqueta": "Apertura"
+            },
+            {
+              "id": "proceso.02",
+              "etiqueta": "Descubrimiento"
+            },
+            {
+              "id": "proceso.03",
+              "etiqueta": "Preguntas"
+            },
+            {
+              "id": "proceso.04",
+              "etiqueta": "Perfilamiento"
+            },
+            {
+              "id": "proceso.05",
+              "etiqueta": "Recomendación"
+            },
+            {
+              "id": "proceso.06",
+              "etiqueta": "Argumentación de valor"
+            },
+            {
+              "id": "proceso.07",
+              "etiqueta": "Manejo de objeciones"
+            },
+            {
+              "id": "proceso.08",
+              "etiqueta": "Manejo de dudas"
+            },
+            {
+              "id": "proceso.09",
+              "etiqueta": "Señales de compra"
+            },
+            {
+              "id": "proceso.10",
+              "etiqueta": "Próximo paso"
+            },
+            {
+              "id": "proceso.11",
+              "etiqueta": "Cierre conversacional"
+            },
+            {
+              "id": "proceso.12",
+              "etiqueta": "Escalamiento comercial"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "feedback",
+      "titulo": "Feedback",
+      "descripcion": "Cómo escucha, interpreta y canaliza la voz del cliente",
+      "submodulos": [
+        {
+          "id": "escuchar",
+          "titulo": "Escuchar",
+          "pregunta_guia": "¿Qué está diciendo y sintiendo el cliente?",
+          "items": [
+            {
+              "id": "escuchar.01",
+              "etiqueta": "Feedback explícito"
+            },
+            {
+              "id": "escuchar.02",
+              "etiqueta": "Feedback implícito"
+            },
+            {
+              "id": "escuchar.03",
+              "etiqueta": "Señales de satisfacción"
+            },
+            {
+              "id": "escuchar.04",
+              "etiqueta": "Señales de insatisfacción"
+            },
+            {
+              "id": "escuchar.05",
+              "etiqueta": "Quejas"
+            },
+            {
+              "id": "escuchar.06",
+              "etiqueta": "Reclamos"
+            },
+            {
+              "id": "escuchar.07",
+              "etiqueta": "Peticiones"
+            },
+            {
+              "id": "escuchar.08",
+              "etiqueta": "Sugerencias"
+            },
+            {
+              "id": "escuchar.09",
+              "etiqueta": "Felicitaciones"
+            },
+            {
+              "id": "escuchar.10",
+              "etiqueta": "Fricción / esfuerzo"
+            },
+            {
+              "id": "escuchar.11",
+              "etiqueta": "Evidencias relevantes"
+            },
+            {
+              "id": "escuchar.12",
+              "etiqueta": "Señales de cierre"
+            },
+            {
+              "id": "escuchar.13",
+              "etiqueta": "Voz del cliente"
+            },
+            {
+              "id": "escuchar.14",
+              "etiqueta": "Señales para medir experiencia"
+            },
+            {
+              "id": "escuchar.15",
+              "etiqueta": "Fatiga de feedback"
+            }
+          ]
+        },
+        {
+          "id": "interpretar",
+          "titulo": "Interpretar",
+          "pregunta_guia": "¿Qué significa lo que expresa?",
+          "items": [
+            {
+              "id": "interpretar.01",
+              "etiqueta": "Tipo de feedback"
+            },
+            {
+              "id": "interpretar.02",
+              "etiqueta": "Tema / categoría"
+            },
+            {
+              "id": "interpretar.03",
+              "etiqueta": "Intención del cliente"
+            },
+            {
+              "id": "interpretar.04",
+              "etiqueta": "Sentimiento"
+            },
+            {
+              "id": "interpretar.05",
+              "etiqueta": "Intensidad del sentimiento"
+            },
+            {
+              "id": "interpretar.06",
+              "etiqueta": "Severidad"
+            },
+            {
+              "id": "interpretar.07",
+              "etiqueta": "Urgencia"
+            },
+            {
+              "id": "interpretar.08",
+              "etiqueta": "Causa / contexto"
+            },
+            {
+              "id": "interpretar.09",
+              "etiqueta": "Necesidad subyacente"
+            },
+            {
+              "id": "interpretar.10",
+              "etiqueta": "Resolubilidad"
+            },
+            {
+              "id": "interpretar.11",
+              "etiqueta": "Riesgo"
+            },
+            {
+              "id": "interpretar.12",
+              "etiqueta": "Resultado esperado"
+            },
+            {
+              "id": "interpretar.13",
+              "etiqueta": "Insight potencial"
+            },
+            {
+              "id": "interpretar.14",
+              "etiqueta": "Métrica apropiada"
+            },
+            {
+              "id": "interpretar.15",
+              "etiqueta": "Fin de sesión / episodio"
+            }
+          ]
+        },
+        {
+          "id": "actuar",
+          "titulo": "Actuar",
+          "pregunta_guia": "¿Qué hacer con ese feedback?",
+          "items": [
+            {
+              "id": "actuar.01",
+              "etiqueta": "Tipo de respuesta"
+            },
+            {
+              "id": "actuar.02",
+              "etiqueta": "Empatía y reconocimiento"
+            },
+            {
+              "id": "actuar.03",
+              "etiqueta": "Información adicional"
+            },
+            {
+              "id": "actuar.04",
+              "etiqueta": "Resolución directa"
+            },
+            {
+              "id": "actuar.05",
+              "etiqueta": "Límites de actuación"
+            },
+            {
+              "id": "actuar.06",
+              "etiqueta": "Registro"
+            },
+            {
+              "id": "actuar.07",
+              "etiqueta": "Escalamiento"
+            },
+            {
+              "id": "actuar.08",
+              "etiqueta": "Destino del escalamiento"
+            },
+            {
+              "id": "actuar.09",
+              "etiqueta": "Compromiso comunicable"
+            },
+            {
+              "id": "actuar.10",
+              "etiqueta": "Promesas prohibidas"
+            },
+            {
+              "id": "actuar.11",
+              "etiqueta": "Seguimiento"
+            },
+            {
+              "id": "actuar.12",
+              "etiqueta": "Cierre"
+            },
+            {
+              "id": "actuar.13",
+              "etiqueta": "Canalización del insight"
+            },
+            {
+              "id": "actuar.14",
+              "etiqueta": "Solicitud de feedback"
+            },
+            {
+              "id": "actuar.15",
+              "etiqueta": "Política de medición"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pruebas": {
+    "pasos": [
+      "Generar",
+      "Simular",
+      "Intervenir",
+      "Ajustar",
+      "Aprobar"
+    ]
+  },
+  "activacion": {
+    "pasos": [
+      "Aprobar",
+      "Contratar",
+      "Pagar",
+      "Publicar"
+    ]
+  }
+}
